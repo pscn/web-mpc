@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -51,26 +52,33 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 		}()
 		for event := range rc {
 			h.logger.Printf("Event: %d\n", event.Type)
+			var data []byte
+			var err error
 			switch event.Type {
-			case mpc.EventError:
-				h.logger.Println("error:", event.Data)
+			case mpc.EventTypeError:
 				h.logger.Println("error:", event.Error())
 				break
-			case mpc.EventString:
+			case mpc.EventTypeString:
 				h.logger.Println("string:", event.String())
-				c.WriteMessage(websocket.TextMessage, []byte(event.String()))
+			case mpc.EventTypeStatus:
+				h.logger.Println("status:", event.Status())
+			case mpc.EventTypeCurrentSong:
+				h.logger.Println("current song:", event.CurrentSong())
+			}
+			data, err = json.Marshal(event)
+			if err != nil {
+				h.logger.Println("marshal:", err)
+				break
+			}
+			if data != nil {
+				h.logger.Println("writing:", string(data))
+				c.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					h.logger.Println("write:", err)
 					break
 				}
 			}
 		}
-		// open watcher for mpc
-		//			c.WriteMessage(websocket.TextMessage, msg.Data)
-		//			if err != nil {
-		//				h.logger.Println("write:", err)
-		//				break
-		//			}
 	}()
 
 	for { // read commands from the webpage
@@ -80,5 +88,25 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		h.logger.Printf("recv: %v", string(data))
+		var cmd mpc.Command
+		err = json.Unmarshal(data, &cmd)
+		h.logger.Printf("Command: %v", cmd.Command)
+		switch cmd.Command {
+		case "play":
+			err = client.Play()
+		case "resume":
+			err = client.Resume()
+		case "pause":
+			err = client.Pause()
+		case "stop":
+			err = client.Stop()
+		case "next":
+			err = client.Next()
+		case "previous":
+			err = client.Previous()
+		}
+		if err != nil {
+			h.logger.Printf("Command error: %v", err)
+		}
 	}
 }

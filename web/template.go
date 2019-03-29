@@ -2,7 +2,7 @@ package web
 
 import "html/template"
 
-// Template
+// Template the one and only Template
 var Template = template.Must(template.New("").Parse(`
 <!DOCTYPE html>
 <html lang="en">
@@ -23,49 +23,77 @@ var Template = template.Must(template.New("").Parse(`
 
 <script>  
 window.addEventListener("load", function(evt) {
-
-	var output = document.getElementById("output");
-	var input = document.getElementById("input");
 	var ws;
 
+	var pause = function() {
+		document.getElementById("play").style.display = "none";
+		document.getElementById("pause").style.display = "none";
+		document.getElementById("resume").style.display = "";
+		document.getElementById("stop").style.display = "";
+		document.getElementById("next").style.display = "";
+		document.getElementById("previous").style.display = "";
+	};
+
+	var play = function() {
+		document.getElementById("play").style.display = "none";
+		document.getElementById("pause").style.display = "";
+		document.getElementById("resume").style.display = "none";
+		document.getElementById("stop").style.display = "";
+		document.getElementById("next").style.display = "";
+		document.getElementById("previous").style.display = "";
+	};
+
+	var stop = function() {
+		document.getElementById("play").style.display = "";
+		document.getElementById("pause").style.display = "none";
+		document.getElementById("resume").style.display = "none";
+		document.getElementById("stop").style.display = "none";
+		document.getElementById("next").style.display = "none";
+		document.getElementById("previous").style.display = "none";
+	};
+	var currentSongTitle = document.getElementById("cs-title");
+	var currentSongArtist = document.getElementById("cs-artist");
+	var currentSongAlbum = document.getElementById("cs-album");
+
 	$(document).ready(function(){
-		// your code
-		ws = new WebSocket("{{.}}");
-		ws.onopen = function(evt) { print("OPEN");		}
-		ws.onclose = function(evt) { print("CLOSE"); ws = null;		}
+		ws = new WebSocket("{{.ws}}");
+		ws.onopen = function(evt) { console.log("OPEN");}
+		ws.onclose = function(evt) { console.log("CLOSE"); ws = null;	}
 		ws.onmessage = function(evt) {
-			print("RESPONSE: " + evt.data);
+			console.log("RESPONSE: " + evt.data);
 			obj = JSON.parse(evt.data);
-			document.getElementById("artist_name").innerHTML = obj.artist;
+			if (obj.type == {{.string}}) {
+			} else if (obj.type == {{.status}}) {
+				if (obj.data.state == "pause") { pause(); }
+				else if (obj.data.state == "play") { play(); }
+				else if (obj.data.state == "stop") { stop(); }
+			} else if (obj.type == {{.currentSong}}) {
+				currentSongTitle.innerHTML = obj.data.title;
+				currentSongArtist.innerHTML = obj.data.artist;
+				currentSongAlbum.innerHTML = obj.data.album;
+			}
 		}
 		ws.onerror = function(evt) {
-				print("ERROR: " + evt.data);
+				console.log("ERROR: " + evt.data);
 		}
 	});
 
-	var print = function(message) {
-		var d = document.createElement("div");
-		d.innerHTML = message;
-		output.appendChild(d);
-	};
-
-    document.getElementById("send").onclick = function(evt) {
-        if (!ws) {
-            return false;
-        }
-		myJson={"cmd":input.value, "xtra":"haha"}
-		print("SEND: " + myJson);
+	var command = function(cmd) {
+        if (!ws) { return false; }
+		myJson={"command":cmd}
+		console.log("SEND: " + myJson);
         ws.send(JSON.stringify(myJson));
         return false;
-    };
+	}
 
-    document.getElementById("close").onclick = function(evt) {
-        if (!ws) {
-            return false;
-        }
-        ws.close();
-        return false;
-    };
+	// FIXME: loop over array with play, pause etc...
+	var controls = ["play", "resume", "pause", "stop", "next", "previous"]
+	controls.forEach(activator);
+	function activator(value) {
+			document.getElementById(value).onclick = function(evt) {
+			return command(value);
+		};
+	}
 
 });
 </script>
@@ -89,25 +117,31 @@ window.addEventListener("load", function(evt) {
 		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 		crossorigin="anonymous"></script>
 
-<div class="container">
+<div class="container-fluid">
+  <div class="row">
+	<div class="col-sm">
+		<p>
+		<button id="play" class="btn btn-primary">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+		<button id="resume" class="btn btn-warning">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+		<button id="pause" class="btn btn-warning">&nbsp;<i class="fas fa-pause"></i>&nbsp;</button>
+		<button id="previous" class="btn btn-secondary">&nbsp;<i class="fas fa-backward"></i>&nbsp;</button>
+		<button id="next" class="btn btn-secondary">&nbsp;<i class="fas fa-forward"></i>&nbsp;</button>
+		<button id="stop" class="btn btn-danger">&nbsp;<i class="fas fa-stop"></i>&nbsp;</button>
+		</p>
+	</div>
+  </div>
+
   <div class="row">
 	<div class="col-sm">
 	  <div class="card">
 		<div class="card-body">
-			<h5 class="card-title" id="artist_name">&nbsp;</h5>
+			<h5 class="card-title" id="cs-title">&nbsp;</h5>
+			<p class="card-text">
+				<span id="cs-artist"></span>&nbsp;&ndash;&nbsp;
+				<span id="cs-album"></span>
+			</p>
 		</div>
 	  </div>
-	</div>
-  </div>
-  <div class="row">
-	<div class="col-sm">
-		<p>
-		<button id="backward" class="btn btn-secondary"><i class="fas fa-backward"></i></button>
-		<button id="play" class="btn btn-primary"><i class="fas fa-play"></i></button>
-		<button id="pause" class="btn btn-warning"><i class="fas fa-pause"></i></button>
-		<button id="forward" class="btn btn-secondary"><i class="fas fa-forward"></i></button>
-		<button id="stop" class="btn btn-danger"><i class="fas fa-stop"></i></button>
-		</p>
 	</div>
   </div>
   <div class="row">
@@ -115,21 +149,6 @@ window.addEventListener("load", function(evt) {
 		<div class="progress">
   			<div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
 		</div>
-	</div>
-  </div>
-  <div class="row">
-	<div class="col-sm">
-	<form>
-		<button id="open">Open</button>
-		<button id="close">Close</button>
-		<p><input id="input" type="text" value="Hello world!">
-		<button id="send">Send</button>
-	</form>
-	</div>
-  </div>
-  <div class="row">
-	<div class="col-sm">
-	  <div id="output"></div>
 	</div>
   </div>
 </div>

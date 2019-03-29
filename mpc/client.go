@@ -74,6 +74,44 @@ func (client *Client) Status() *mpd.Attrs {
 	return &status
 }
 
+// Play start playing
+func (client *Client) Play() error {
+	return client.mpc.Play(-1)
+}
+
+// Pause playing
+func (client *Client) Pause() error {
+	return client.mpc.Pause(true)
+}
+
+// Resume playing
+func (client *Client) Resume() error {
+	return client.mpc.Pause(false)
+}
+
+// Stop stops playing
+func (client *Client) Stop() error {
+	return client.mpc.Stop()
+}
+
+// Next song in playlist
+func (client *Client) Next() error {
+	return client.mpc.Next()
+}
+
+// Previous song in playlist
+func (client *Client) Previous() error {
+	return client.mpc.Previous()
+}
+
+// CurrentSong returns the currently active song
+func (client *Client) CurrentSong() *mpd.Attrs {
+	attrs, err := client.mpc.CurrentSong()
+	if err != nil {
+		client.logger.Println("currentsong:", err)
+	}
+	return &attrs
+}
 func (client *Client) watcher() (*mpd.Watcher, error) {
 	mpw, err := mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
 	return mpw, err
@@ -85,25 +123,28 @@ func (client *Client) EventLoop(rc chan *Event) {
 	mpw, err := mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
 	if err != nil { // FIXME: error recovery
 		client.logger.Println("error", err)
-		rc <- ErrorEvent(errors.Wrapf(err, "failed to start watcher for MPD events"))
+		rc <- NewErrorEvent(errors.Wrapf(err, "failed to start watcher for MPD events"))
 	}
 	defer mpw.Close()
-	rc <- StringEvent("listening for MPD events")
+	rc <- NewStringEvent("listening for MPD events")
 
 	go func() { // event loop
-		status := *client.Status()
-		rc <- StringEvent(fmt.Sprintf("MPD status: %s", status))
+		rc <- NewStatusEvent(client.Status())
+		rc <- NewCurrentSongEvent(client.CurrentSong())
 		for subsystem := range mpw.Event {
-			rc <- StringEvent(fmt.Sprintf("MPD subsystem: %s", subsystem))
+			rc <- NewStringEvent(fmt.Sprintf("MPD subsystem: %s", subsystem))
 			switch subsystem {
 			case "update":
 				status := *client.Status()
 				client.logger.Printf("Status: %v\n", status)
 				if _, ok := status["updating_db"]; !ok { // if present, it's still in progress
-					rc <- StringEvent("database updating")
+					rc <- NewStringEvent("database updating")
 				}
 			case "player":
-
+				status := *client.Status()
+				rc <- NewStatusEvent(client.Status())
+				rc <- NewCurrentSongEvent(client.CurrentSong())
+				client.logger.Printf("Status: %v\n", status)
 			}
 		}
 	}()
@@ -112,8 +153,8 @@ func (client *Client) EventLoop(rc chan *Event) {
 	for err := range mpw.Error {
 		// Seen so far:
 		// mpd shutdown → write: broken pipe
-		rc <- ErrorEvent(errors.Wrapf(err, "MPDClient error loop"))
+		rc <- NewErrorEvent(errors.Wrapf(err, "MPDClient error loop"))
 	}
-	rc <- StringEvent("client shutdown")
+	rc <- NewStringEvent("client shutdown")
 	return
 }
