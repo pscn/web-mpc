@@ -70,7 +70,7 @@ type EventDataStatus struct {
 func NewStatusEvent(attrs *mpd.Attrs) *Event {
 	return NewEvent(EventTypeStatus, &EventDataStatus{
 		Duration: helpers.ToFloat64((*attrs)["duration"]),
-		Elapsed:  helpers.ToFloat64((*attrs)["duration"]),
+		Elapsed:  helpers.ToFloat64((*attrs)["elapsed"]),
 		Consume:  helpers.ToBool((*attrs)["consume"]),
 		Random:   helpers.ToBool((*attrs)["random"]),
 		Single:   helpers.ToBool((*attrs)["single"]),
