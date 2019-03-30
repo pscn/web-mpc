@@ -51,9 +51,29 @@ window.addEventListener("load", function(evt) {
 		document.getElementById("next").style.display = "none";
 		document.getElementById("previous").style.display = "none";
 	};
-	var currentSongTitle = document.getElementById("cs-title");
-	var currentSongArtist = document.getElementById("cs-artist");
-	var currentSongAlbum = document.getElementById("cs-album");
+
+	var currentSongTitle = document.getElementById("csTitle");
+	var currentSongArtist = document.getElementById("csArtist");
+	var currentSongAlbum = document.getElementById("csAlbum");
+
+	var progressBar = document.getElementById("progressBar");
+	var progressLabel = document.getElementById("progressLabel");
+	var duration = 1.0;
+	var elapsed = 0.0;
+	var state = "pause";
+	var readableSeconds = function(value) {
+		var min = parseInt(value/60);
+		var sec = parseInt(value % 60);
+		if (sec < 10) { sec = "0" + sec; }
+		return min + ":" + sec;
+	};
+	var updateProgressBar = function() {
+		console.log("progress: " + duration + " / " + elapsed);
+		progressBar.style.width = (elapsed/duration*100) + "%";
+		progressLabel.innerHTML = readableSeconds(elapsed) + "/" + readableSeconds(duration);
+		if ((state=="play") && (elapsed<duration)) { elapsed += 1.0; }
+		setTimeout(updateProgressBar, 1000);
+	};
 
 	$(document).ready(function(){
 		ws = new WebSocket("{{.ws}}");
@@ -64,9 +84,22 @@ window.addEventListener("load", function(evt) {
 			obj = JSON.parse(evt.data);
 			if (obj.type == {{.string}}) {
 			} else if (obj.type == {{.status}}) {
-				if (obj.data.state == "pause") { pause(); }
-				else if (obj.data.state == "play") { play(); }
-				else if (obj.data.state == "stop") { stop(); }
+				if (obj.data.state == "pause") {
+					pause();
+					state = "pause";
+					duration = obj.data.duration;
+					elapsed = obj.data.elapsed;
+				} else if (obj.data.state == "play") {
+					play();
+					state = "play";
+					duration = obj.data.duration;
+					elapsed = obj.data.elapsed;
+				} else if (obj.data.state == "stop") {
+					stop();
+					state = "stop";
+					duration = 1.0;
+					elapsed = 0.0;
+				}
 			} else if (obj.type == {{.currentSong}}) {
 				currentSongTitle.innerHTML = obj.data.title;
 				currentSongArtist.innerHTML = obj.data.artist;
@@ -76,6 +109,7 @@ window.addEventListener("load", function(evt) {
 		ws.onerror = function(evt) {
 				console.log("ERROR: " + evt.data);
 		}
+		updateProgressBar();
 	});
 
 	var command = function(cmd) {
@@ -135,20 +169,20 @@ window.addEventListener("load", function(evt) {
 	<div class="col-sm">
 	  <div class="card">
 		<div class="card-body">
-			<h5 class="card-title" id="cs-title">&nbsp;</h5>
+			<h5 class="card-title">
+				<span id="csTitle">&nbsp;</span>
+				<div id="progressLabel">&nbsp;</div>
+			</h5>
 			<p class="card-text">
-				<span id="cs-artist"></span>&nbsp;&ndash;&nbsp;
-				<span id="cs-album"></span>
+				<span id="csArtist"></span>&nbsp;&ndash;&nbsp;
+				<span id="csAlbum"></span>
 			</p>
+			<div class="progress">
+				<div id="progressBar" class="progress-bar" role="progressbar" 
+					style="width: 0%; transition: width 1s ease-in-out"></div>
+			</div>
 		</div>
 	  </div>
-	</div>
-  </div>
-  <div class="row">
-	<div class="col-sm">
-		<div class="progress">
-  			<div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
-		</div>
 	</div>
   </div>
 </div>
