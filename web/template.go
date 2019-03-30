@@ -20,41 +20,56 @@ var Template = template.Must(template.New("").Parse(`
 		href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
 		crossorigin="anonymous">
-
-<script>  
+<style>
+/* https://stackoverflow.com/questions/19254146/position-fixed-not-working-in-mobile-browser */
+.fixed {
+  -webkit-backface-visibility: hidden;
+}
+</style>
+<script> 
 window.addEventListener("load", function(evt) {
 	var ws;
 
+	var btnPlay = document.getElementById("play");
+	var btnPause = document.getElementById("pause");
+	var btnResume = document.getElementById("resume");
+	var btnStop = document.getElementById("stop");
+	var btnNext = document.getElementById("next");
+	var btnPrevious = document.getElementById("previous");
 	var pause = function() {
-		document.getElementById("play").style.display = "none";
-		document.getElementById("pause").style.display = "none";
-		document.getElementById("resume").style.display = "";
-		document.getElementById("stop").style.display = "";
-		document.getElementById("next").style.display = "";
-		document.getElementById("previous").style.display = "";
+		btnPlay.style.display = "none";
+		btnPause.style.display = "none";
+		btnResume.style.display = "";
+	  btnStop.style.display = "";		btnStop.disabled = "";
+	  btnNext.style.display = "";		btnNext.disabled = "";
+		btnPrevious.style.display = ""; btnPrevious.disabled = "";
 	};
 
 	var play = function() {
-		document.getElementById("play").style.display = "none";
-		document.getElementById("pause").style.display = "";
-		document.getElementById("resume").style.display = "none";
-		document.getElementById("stop").style.display = "";
-		document.getElementById("next").style.display = "";
-		document.getElementById("previous").style.display = "";
+		btnPlay.style.display = "none";
+		btnPause.style.display = "";
+		btnResume.style.display = "none";
+	  btnStop.style.display = "";		btnStop.disabled = "";
+	  btnNext.style.display = "";		btnNext.disabled = "";
+		btnPrevious.style.display = ""; btnPrevious.disabled = "";
 	};
 
 	var stop = function() {
-		document.getElementById("play").style.display = "";
-		document.getElementById("pause").style.display = "none";
-		document.getElementById("resume").style.display = "none";
-		document.getElementById("stop").style.display = "none";
-		document.getElementById("next").style.display = "none";
-		document.getElementById("previous").style.display = "none";
+		btnPlay.style.display = "";
+		btnPause.style.display = "none";
+		btnResume.style.display = "none";
+	  btnStop.style.display = "";		btnStop.disabled = "disabled";
+	  btnNext.style.display = "";		btnNext.disabled = "disabled";
+		btnPrevious.style.display = ""; btnPrevious.disabled = "disabled";
 	};
 
 	var currentSongTitle = document.getElementById("csTitle");
 	var currentSongArtist = document.getElementById("csArtist");
+	var currentSongAlbumArtist = document.getElementById("csAlbumArtist");
 	var currentSongAlbum = document.getElementById("csAlbum");
+	var currentSongReleased = document.getElementById("csReleased");
+
+	var currentPlaylist = document.getElementById("cpContainer");
 
 	var progressBar = document.getElementById("progressBar");
 	var progressLabel = document.getElementById("progressLabel");
@@ -68,7 +83,7 @@ window.addEventListener("load", function(evt) {
 		return min + ":" + sec;
 	};
 	var updateProgressBar = function() {
-		console.log("progress: " + duration + " / " + elapsed);
+		// console.log("progress: " + duration + " / " + elapsed);
 		progressBar.style.width = (elapsed/duration*100) + "%";
 		progressLabel.innerHTML = readableSeconds(elapsed) + "/" + readableSeconds(duration);
 		if ((state=="play") && (elapsed<duration)) { elapsed += 1.0; }
@@ -101,13 +116,63 @@ window.addEventListener("load", function(evt) {
 					elapsed = 0.0;
 				}
 			} else if (obj.type == {{.currentSong}}) {
-				currentSongTitle.innerHTML = obj.data.title;
 				currentSongArtist.innerHTML = obj.data.artist;
+				currentSongTitle.innerHTML = obj.data.title;
+				if (obj.data.album_artist != "") {
+					currentSongAlbumArtist.innerHTML = obj.data.album_artist;
+				} else {
+					currentSongAlbumArtist.innerHTML = obj.data.artist;
+				}
 				currentSongAlbum.innerHTML = obj.data.album;
+				if (obj.data.released != "") {
+					currentSongReleased.innerHTML = "&nbsp;(" + obj.data.released + ")";
+				} else {
+					currentSongReleased.innerHTML = "";
+				}
+			} else if (obj.type == {{.currentPlaylist}}) {
+				console.log("currentPlaylist")
+				var list = "";
+				for (var i=0; i<obj.data.Playlist.length; i++) {
+					list += '<div class="row">'; // row 1
+					list += '<div class="col-xl">'; // col-xl
+					list += '<div class="row">'; // row 2
+					list += '<div class="col-1 m-1">';
+					list += '<button id="plRemove' + i + '" class="btn btn-secondary btn-sm">' + 
+							'<i class="fas fa-minus-square"></i>' +
+							'</button>';
+					list += '</div>';
+					list += '<div class="col-auto m-1">';
+					list += obj.data.Playlist[i].artist;
+					list += '&nbsp;&ndash;&nbsp;';
+					list += obj.data.Playlist[i].title;
+					list += '&nbsp;' + readableSeconds(obj.data.Playlist[i].length);
+					list += '<br />';
+					list += obj.data.Playlist[i].album_artist;
+					list += '&nbsp;&ndash;&nbsp;';
+					list += obj.data.Playlist[i].album;
+					list += '</div>';
+					list += '</div>'; // row 2
+					list += '</div>'; // col-xl
+					list += '</div>'; // row 1
+				}
+				currentPlaylist.innerHTML = list;
+				for (var i=0; i<obj.data.Playlist.length; i++) {
+					{
+						const j=i;
+						document.getElementById("plRemove" + j).onclick = function(evt) {
+							return command("remove" + j);
+						};
+					}
+				}
 			}
 		}
 		ws.onerror = function(evt) {
 				console.log("ERROR: " + evt.data);
+		}
+		window.onfocus = function(event) {
+			// request a fresh status as some browsers (e. g. Chrome) suspend out
+			// progress bar setTimeout functions
+			command("status");
 		}
 		updateProgressBar();
 	});
@@ -120,7 +185,7 @@ window.addEventListener("load", function(evt) {
         return false;
 	}
 
-	// FIXME: loop over array with play, pause etc...
+	// add onclick function for all controls
 	var controls = ["play", "resume", "pause", "stop", "next", "previous"]
 	controls.forEach(activator);
 	function activator(value) {
@@ -152,39 +217,50 @@ window.addEventListener("load", function(evt) {
 		crossorigin="anonymous"></script>
 
 <div class="container-fluid">
-  <div class="row">
-	<div class="col-sm">
-		<p>
-		<button id="play" class="btn btn-primary">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
-		<button id="resume" class="btn btn-warning">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
-		<button id="pause" class="btn btn-warning">&nbsp;<i class="fas fa-pause"></i>&nbsp;</button>
-		<button id="previous" class="btn btn-secondary">&nbsp;<i class="fas fa-backward"></i>&nbsp;</button>
-		<button id="next" class="btn btn-secondary">&nbsp;<i class="fas fa-forward"></i>&nbsp;</button>
-		<button id="stop" class="btn btn-danger">&nbsp;<i class="fas fa-stop"></i>&nbsp;</button>
-		</p>
-	</div>
-  </div>
-
-  <div class="row">
-	<div class="col-sm">
-	  <div class="card">
-		<div class="card-body">
-			<h5 class="card-title">
-				<span id="csTitle">&nbsp;</span>
-				<div id="progressLabel">&nbsp;</div>
-			</h5>
-			<p class="card-text">
-				<span id="csArtist"></span>&nbsp;&ndash;&nbsp;
-				<span id="csAlbum"></span>
-			</p>
-			<div class="progress">
-				<div id="progressBar" class="progress-bar" role="progressbar" 
-					style="width: 0%; transition: width 1s ease-in-out"></div>
+  <div class="row sticky-top bg-light fixed">
+		<div class="col-md order-2">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-auto p-1">
+						<h6>
+						<span id="csArtist"></span>&nbsp;&ndash;&nbsp;
+						<span id="csTitle">&nbsp;</span>
+						</h6>
+					</div>
+					<div class="col p-1 text-center">
+						<h6 id="progressLabel" class="text-muted">&nbsp;</h6>
+					</div>
+					<div class="col-auto p-1">
+						<h6>
+							<span id="csAlbumArtist"></span>&nbsp;&ndash;&nbsp;
+							<span id="csAlbum"></span>
+							<span id="csReleased"></span>
+						</h6>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col p-1">
+						<div class="progress">
+							<div id="progressBar" class="progress-bar" role="progressbar" 
+								style="width: 0%; transition: width 1s ease-in-out"></div>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-	  </div>
-	</div>
-  </div>
+		</div><!-- col -->
+
+		<div class="col-sm-auto order-1 text-center">
+			<p>
+			<button id="play" class="btn btn-primary">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+			<button id="resume" class="btn btn-warning">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+			<button id="pause" class="btn btn-warning">&nbsp;<i class="fas fa-pause"></i>&nbsp;</button>
+			<button id="previous" class="btn btn-secondary">&nbsp;<i class="fas fa-backward"></i>&nbsp;</button>
+			<button id="next" class="btn btn-secondary">&nbsp;<i class="fas fa-forward"></i>&nbsp;</button>
+			<button id="stop" class="btn btn-danger">&nbsp;<i class="fas fa-stop"></i>&nbsp;</button>
+			</p>
+		</div><!-- col -->
+	</div><!-- row -->
+	<div id="cpContainer"></div>
 </div>
 </body>
 </html>

@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/pscn/web-mpc/helpers"
 
 	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/mpc"
@@ -43,9 +46,10 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 
+	rc := make(chan *mpc.Event, 1)
+	defer close(rc)
+
 	go func() { // read events from mpc
-		rc := make(chan *mpc.Event, 1)
-		defer close(rc)
 		go func() {
 			client.EventLoop(rc)
 			return
@@ -64,6 +68,8 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 				h.logger.Println("status:", event.Status())
 			case mpc.EventTypeCurrentSong:
 				h.logger.Println("current song:", event.CurrentSong())
+			case mpc.EventTypeCurrentPlaylist:
+				h.logger.Println("current playlist:", event.CurrentPlaylist())
 			}
 			data, err = json.Marshal(event)
 			if err != nil {
@@ -104,6 +110,13 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 			err = client.Next()
 		case "previous":
 			err = client.Previous()
+		case "status":
+			rc <- mpc.NewStatusEvent(client.Status())
+		}
+		if strings.HasPrefix(cmd.Command, "remove") {
+			nr := helpers.ToInt64(cmd.Command[6:])
+			h.logger.Printf("%s => %s == %d", cmd.Command, cmd.Command[6:], nr)
+			err = client.RemovePlaylistEntry(nr)
 		}
 		if err != nil {
 			h.logger.Printf("Command error: %v", err)

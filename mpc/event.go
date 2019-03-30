@@ -17,6 +17,8 @@ const (
 	EventTypeStatus EventType = 2
 	// EventTypeCurrentSong the Event contains the currently active song
 	EventTypeCurrentSong EventType = 3
+	// EventTypeCurrentPlaylist the Event contains the currently active song
+	EventTypeCurrentPlaylist EventType = 4
 )
 
 // Event from the clients EventLoop
@@ -113,7 +115,7 @@ func NewCurrentSongEvent(attrs *mpd.Attrs) *Event {
 		Length:      helpers.ToInt64((*attrs)["Time"]),
 		File:        (*attrs)["file"],
 		Genre:       (*attrs)["Genre"],
-		Released:    (*attrs)["Released"],
+		Released:    (*attrs)["Date"],
 	})
 }
 
@@ -121,6 +123,41 @@ func NewCurrentSongEvent(attrs *mpd.Attrs) *Event {
 func (event *Event) CurrentSong() *EventDataCurrentSong {
 	if event.Type == EventTypeCurrentSong { // FIXME: how to inform the develeoper?
 		return event.Data.(*EventDataCurrentSong)
+	}
+	return nil
+}
+
+// EventDataCurrentPlaylist converted from *mpd.attrs
+type EventDataCurrentPlaylist struct {
+	Playlist []EventDataCurrentSong
+}
+
+// NewCurrentPlaylistEvent creates a new Event including the current song data mapped from mpd.Attrs
+func NewCurrentPlaylistEvent(attrArr *[]mpd.Attrs) *Event {
+	event := &EventDataCurrentPlaylist{}
+	event.Playlist = make([]EventDataCurrentSong, len(*attrArr))
+	for i, attrs := range *attrArr {
+		if attrs["AlbumArtist"] == "" {
+			attrs["AlbumArtist"] = attrs["Artist"]
+		}
+		event.Playlist[i] = EventDataCurrentSong{
+			Artist:      attrs["Artist"],
+			Album:       attrs["Album"],
+			AlbumArtist: attrs["AlbumArtist"],
+			Title:       attrs["Title"],
+			Length:      helpers.ToInt64(attrs["Time"]),
+			File:        attrs["file"],
+			Genre:       attrs["Genre"],
+			Released:    attrs["Date"],
+		}
+	}
+	return NewEvent(EventTypeCurrentPlaylist, event)
+}
+
+// CurrentPlaylist payload of an event
+func (event *Event) CurrentPlaylist() *EventDataCurrentPlaylist {
+	if event.Type == EventTypeCurrentPlaylist { // FIXME: how to inform the develeoper?
+		return event.Data.(*EventDataCurrentPlaylist)
 	}
 	return nil
 }
