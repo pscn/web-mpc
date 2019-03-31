@@ -32,6 +32,8 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 	logger := log.New(os.Stdout, "web-mpc ", log.LstdFlags|log.Lshortfile)
+	// disable origin check to test from static html, css & js (FIXME: remove this)
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	h := web.New(&upgrader, logger)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", home)
