@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+      shrink-to-fit=no">
+    <!-- Font Awesome for play, pause etc. buttons-->
+    <link rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous">
+    <link rel="stylesheet" href="layout.css">
+    <!-- A nicer condensed font-->
+    <!-- FIXME: maybe use a none condensed font when not on mobile? -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed"
+      rel="stylesheet">
+
+  </head>
+  <body>
+    <script src="layout.js"></script>
+    <!-- control buttons & current song info -->
+    <div class="row full">
+      <div class="col">
+        <button id="play" class="round wide"><i class="fas fa-play"></i></button>
+        <button id="resume" class="round wide"><i class="fas fa-play"></i></button>
+        <button id="pause" class="round wide" style="display: none"><i
+            class="fas fa-pause"></i></button>
+        <button id="previous" class="round narrow"><i class="fas
+            fa-backward"></i></button>
+        <button id="next" class="round narrow"><i class="fas fa-forward"></i></button>
+        <button id="stop" class="round wide"><i class="fas fa-stop"></i></button>
+        <button id="search" class="round narrow"><i class="fas fa-search"></i></button>
+      </div>
+      <div class="col">
+        <div class="current">
+          <span id="csTitle" class="title">Title</span>
+          <span id="csArtist" class="artist">Artist</span>
+          <span id="csAlbum">Album</span>
+          <span id="csAlbumArtist">[AlbumArtist]</span>
+          <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
+        </div>
+      </div>
+    </div>
+    <!-- playlist entry -->
+    <div id="playlistEntry" class="row full" style="display: none">
+      <div class="col">
+        <button id="plPlay" class="round wide"><i class="fas fa-play"></i></button>
+        <button id="plRemove" class="round narrow"><i class="fas
+            fa-minus-circle"></i></button>
+      </div>
+      <div class="col">
+        <div class="playlist">
+          <span id="plTitle" class="title">Title</span>
+          <span id="plArtist" class="artist">Artist</span>
+          <span id="plAlbum">Album</span>
+          <span id="plAlbumArtist">[AlbumArtist]&nbsp;</span>
+          <span id="plDuration">2:31</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- current playlist-->
+    <div id="playlist">
+    </div>
+  </body>
+</html>
