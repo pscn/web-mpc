@@ -29,6 +29,7 @@ func New(upgrader *websocket.Upgrader, logger *log.Logger) *Handler {
 // Channel to websocket
 func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 	h.logger.Printf("handling: %s", r.Host)
+	defer h.logger.Printf("stop handling: %s", r.Host)
 
 	// open websocket
 	c, err := h.upgrader.Upgrade(w, r, nil)

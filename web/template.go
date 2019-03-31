@@ -133,27 +133,23 @@ window.addEventListener("load", function(evt) {
 				console.log("currentPlaylist")
 				var list = "";
 				for (var i=0; i<obj.data.Playlist.length; i++) {
-					list += '<div class="row">'; // row 1
-					list += '<div class="col-xl">'; // col-xl
-					list += '<div class="row">'; // row 2
-					list += '<div class="col-1 m-1">';
-					list += '<button id="plRemove' + i + '" class="btn btn-secondary btn-sm">' + 
-							'<i class="fas fa-minus-square"></i>' +
-							'</button>';
+//					list += '<div class="row">'; // row 1
+//					list += '<div class="col-xl p-1">'; // col-xl
+					list += '<div class="d-flex p-1 bd-highlight flex-nowrap">'; // row 2
+					list += '<div class="d-flex align-middle">';
+					list += '<button id="plPlay' + i + '" class="btn btn-outline-primary btn-sm"><i class="fas fa-play"></i></button>';
+					list += '&nbsp;';
+					list += '<button id="plRemove' + i + '" class="btn btn-outline-danger btn-sm"><i class="fas fa-minus"></i></button>';
 					list += '</div>';
-					list += '<div class="col-auto m-1">';
+					list += '<div class="d-flex p-1 align-middle">'; // row 2
 					list += obj.data.Playlist[i].artist;
 					list += '&nbsp;&ndash;&nbsp;';
 					list += obj.data.Playlist[i].title;
-					list += '&nbsp;' + readableSeconds(obj.data.Playlist[i].length);
-					list += '<br />';
-					list += obj.data.Playlist[i].album_artist;
 					list += '&nbsp;&ndash;&nbsp;';
 					list += obj.data.Playlist[i].album;
-					list += '</div>';
-					list += '</div>'; // row 2
-					list += '</div>'; // col-xl
-					list += '</div>'; // row 1
+					list += '</div></div>';
+	//				list += '</div>'; // col-xl
+//					list += '</div>'; // row 1
 				}
 				currentPlaylist.innerHTML = list;
 				for (var i=0; i<obj.data.Playlist.length; i++) {
@@ -249,15 +245,13 @@ window.addEventListener("load", function(evt) {
 			</div>
 		</div><!-- col -->
 
-		<div class="col-sm-auto order-1 text-center">
-			<p>
-			<button id="play" class="btn btn-primary">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
-			<button id="resume" class="btn btn-warning">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
-			<button id="pause" class="btn btn-warning">&nbsp;<i class="fas fa-pause"></i>&nbsp;</button>
-			<button id="previous" class="btn btn-secondary">&nbsp;<i class="fas fa-backward"></i>&nbsp;</button>
-			<button id="next" class="btn btn-secondary">&nbsp;<i class="fas fa-forward"></i>&nbsp;</button>
-			<button id="stop" class="btn btn-danger">&nbsp;<i class="fas fa-stop"></i>&nbsp;</button>
-			</p>
+		<div class="col-sm-auto order-1 text-center p-1">
+			<button id="play" class="btn btn-outline-primary">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+			<button id="resume" class="btn btn-outline-warning">&nbsp;<i class="fas fa-play"></i>&nbsp;</button>
+			<button id="pause" class="btn btn-outline-warning">&nbsp;<i class="fas fa-pause"></i>&nbsp;</button>
+			<button id="previous" class="btn btn-outline-secondary">&nbsp;<i class="fas fa-backward"></i>&nbsp;</button>
+			<button id="next" class="btn btn-outline-secondary">&nbsp;<i class="fas fa-forward"></i>&nbsp;</button>
+			<button id="stop" class="btn btn-outline-danger">&nbsp;<i class="fas fa-stop"></i>&nbsp;</button>
 		</div><!-- col -->
 	</div><!-- row -->
 	<div id="cpContainer"></div>
