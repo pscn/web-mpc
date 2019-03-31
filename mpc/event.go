@@ -96,7 +96,7 @@ type EventDataCurrentSong struct {
 	Album       string `json:"album"`
 	AlbumArtist string `json:"album_artist"`
 	Title       string `json:"title"`
-	Length      int64  `json:"length"`
+	Duration    int64  `json:"duration"`
 	File        string `json:"file"`
 	Genre       string `json:"genre"`
 	Released    string `json:"released"`
@@ -112,7 +112,7 @@ func NewCurrentSongEvent(attrs *mpd.Attrs) *Event {
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
 		Title:       (*attrs)["Title"],
-		Length:      helpers.ToInt64((*attrs)["Time"]),
+		Duration:    helpers.ToInt64((*attrs)["Time"]),
 		File:        (*attrs)["file"],
 		Genre:       (*attrs)["Genre"],
 		Released:    (*attrs)["Date"],
@@ -145,7 +145,7 @@ func NewCurrentPlaylistEvent(attrArr *[]mpd.Attrs) *Event {
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
 			Title:       attrs["Title"],
-			Length:      helpers.ToInt64(attrs["Time"]),
+			Duration:    helpers.ToInt64(attrs["Time"]),
 			File:        attrs["file"],
 			Genre:       attrs["Genre"],
 			Released:    attrs["Date"],
