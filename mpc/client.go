@@ -53,10 +53,10 @@ func (client *Client) Close() error {
 func (client *Client) Ping() (err error) {
 	if err = client.mpc.Ping(); err != nil {
 		if err = client.reConnect(); err != nil {
-			panic(err) // FIXME: no panic
+			client.logger.Panic(err) // FIXME: no panic
 		}
 		if err = client.mpc.Ping(); err != nil {
-			panic(err) // FIXME: no panic
+			client.logger.Panic(err) // FIXME: no panic
 		}
 	}
 	return
@@ -68,7 +68,7 @@ func (client *Client) Status() *mpd.Attrs {
 	client.Ping()
 	status, err := client.mpc.Status()
 	if err != nil {
-		panic(err) // FIXME: no panic
+		client.logger.Panic(err) // FIXME: no panic
 	}
 	return &status
 }
@@ -134,14 +134,14 @@ func (client *Client) CurrentPlaylist() *[]mpd.Attrs {
 }
 
 // Search for str (as tokens)
-func (client *Client) Search() *[]mpd.Attrs {
-	client.Ping()
-	attrs, err := client.mpc.PlaylistInfo(-1, -1)
-	if err != nil {
-		client.logger.Println("currentsong:", err)
-	}
-	return &attrs
-}
+// func (client *Client) Search() *[]mpd.Attrs {
+// 	client.Ping()
+// 	attrs, err := client.mpc.Find(-1, -1)
+// 	if err != nil {
+// 		client.logger.Println("currentsong:", err)
+// 	}
+// 	return &attrs
+// }
 
 // RemovePlaylistEntry nr
 func (client *Client) RemovePlaylistEntry(nr int64) error {
