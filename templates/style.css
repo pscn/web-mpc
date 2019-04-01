@@ -46,6 +46,10 @@ button {
   background: lightgray;
 }
 
+.playlist button:disabled {
+  color: gray;
+}
+
 button.wide {
   margin-right: -4px;
   padding-top: 8px;

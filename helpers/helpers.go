@@ -24,7 +24,7 @@ func ToInt64(str string) int64 {
 
 // ToInt the string
 func ToInt(str string) int {
-	return int(ToInt64(string))
+	return int(ToInt64(str))
 }
 
 // ToBool the string

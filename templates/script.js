@@ -34,6 +34,7 @@ window.addEventListener("load", function (evt) {
     btnPrevious.style.display = ""; btnPrevious.disabled = "disabled";
   };
 
+  var cs = document.getElementById("cs");
   var csTitle = document.getElementById("csTitle");
   var csArtist = document.getElementById("csArtist");
   var csAlbumArtist = document.getElementById("csAlbumArtist");
@@ -87,6 +88,7 @@ window.addEventListener("load", function (evt) {
         elapsed = 0.0;
       }
     } else if (obj.type == 3) {
+      cs.title = obj.data.file;
       csArtist.innerHTML = obj.data.artist;
       csTitle.innerHTML = obj.data.title;
       if (obj.data.artist != obj.data.album_artist) {
@@ -117,6 +119,13 @@ window.addEventListener("load", function (evt) {
         node.querySelector("#plArtist").innerHTML = obj.data.Playlist[i].artist;
         {
           const j = i;
+          const file = obj.data.Playlist[i].file;
+          if (file == cs.title) {
+            node.querySelector("#plPlay").disabled = "disabled";
+          }
+          node.querySelector("#plPlay").onclick = function (evt) {
+            return command("play" + j);
+          };
           node.querySelector("#plRemove").onclick = function (evt) {
             return command("remove" + j);
           };

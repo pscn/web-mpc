@@ -151,7 +151,6 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 			}
 			err = client.Play(nr)
 		}
-
 		if strings.HasPrefix(cmd.Command, "remove") {
 			nr := helpers.ToInt64(cmd.Command[6:])
 			if h.verbosity > 5 {

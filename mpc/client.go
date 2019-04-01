@@ -200,7 +200,7 @@ func (client *Client) EventLoop(rc chan *Message) {
 		rc <- NewCurrentSong(client.CurrentSong())
 		rc <- NewCurrentPlaylist(client.CurrentPlaylist())
 		for subsystem := range client.mpw.Event {
-			rc <- NewStringEvent(fmt.Sprintf("MPD subsystem: %s", subsystem))
+			client.logger.Printf("MPD subsystem: %s", subsystem)
 			switch subsystem {
 			case "update":
 				status := *client.Status()
@@ -208,13 +208,12 @@ func (client *Client) EventLoop(rc chan *Message) {
 				if _, ok := status["updating_db"]; !ok { // if present, it's still in progress
 					rc <- NewStringEvent("database updating")
 				}
-			case "player":
+			case "player", "playlist":
 				status := *client.Status()
 				rc <- NewStatus(client.Status())
 				rc <- NewCurrentSong(client.CurrentSong())
-				client.logger.Printf("Status: %v\n", status)
-			case "playlist":
 				rc <- NewCurrentPlaylist(client.CurrentPlaylist())
+				client.logger.Printf("Status: %v\n", status)
 			}
 		}
 		client.logger.Printf("mpw loop exited")

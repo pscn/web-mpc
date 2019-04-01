@@ -164,7 +164,7 @@ func (msg *Message) CurrentPlaylist() *PlaylistData {
 	return nil
 }
 
-// EventDataCurrentPlaylist converted from *mpd.attrs
+// SearchResultData converted from *mpd.attrs
 type SearchResultData struct {
 	Playlist []SongData
 }
