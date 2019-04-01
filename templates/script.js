@@ -187,19 +187,27 @@ window.addEventListener("load", function (evt) {
       return command(value);
     };
   }
-  document.getElementById("search").onclick = function (evt) {
+  var showList = function (evt) {
+    document.getElementById("playlist").style.display = "";
+    document.getElementById("searchBox").style.display = "none";
+    document.getElementById("searchResult").style.display = "none";
+    document.getElementById("search").disabled = "";
+    document.getElementById("list").disabled = "disabled";
+  }
+  var showSearch = function (evt) {
     document.getElementById("playlist").style.display = "none";
     document.getElementById("searchBox").style.display = "";
     document.getElementById("searchText").focus();
     document.getElementById("searchResult").innerHTML = "";
     document.getElementById("searchResult").style.display = "";
+    document.getElementById("search").disabled = "disabled";
+    document.getElementById("list").disabled = "";
   }
+  document.getElementById("search").onclick = showSearch;
 
-  document.getElementById("closeSearch").onclick = function (evt) {
-    document.getElementById("playlist").style.display = "";
-    document.getElementById("searchBox").style.display = "none";
-    document.getElementById("searchResult").style.display = "none";
-  }
+  document.getElementById("list").onclick = showList;
+  document.getElementById("closeSearch").onclick = showList;
+
   document.getElementById("submitSearch").onclick = function (evt) {
     return command("search" + document.getElementById("searchText").value);
   }
