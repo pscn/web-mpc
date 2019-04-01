@@ -116,7 +116,8 @@ window.addEventListener("load", function (evt) {
           node.querySelector("#plAlbumArtist").style.display = "none";
         }
         node.querySelector("#plArtist").innerHTML = obj.data.Playlist[i].artist;
-        node.querySelector("#plArtist").innerHTML = obj.data.Playlist[i].artist;
+        node.querySelector("#plDuration").innerHTML =
+          readableSeconds(obj.data.Playlist[i].duration);
         {
           const j = i;
           const file = obj.data.Playlist[i].file;

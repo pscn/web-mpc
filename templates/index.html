@@ -28,7 +28,8 @@
     <div class="row full player">
       <div class="col">
         <button id="search" class="round narrow"><i class="fas fa-search"></i></button>
-        <button id="list" class="round narrow" disabled="disabled"><i class="fas fa-list"></i></button>
+        <button id="list" class="round narrow" disabled="disabled"><i class="fas
+            fa-list"></i></button>
         <button id="play" class="round wide"><i class="fas fa-play"></i></button>
         <button id="resume" class="round wide"><i class="fas fa-play"></i></button>
         <button id="pause" class="round wide" style="display: none"><i
@@ -38,18 +39,14 @@
         <button id="next" class="round narrow"><i class="fas fa-forward"></i></button>
         <button id="stop" class="round wide"><i class="fas fa-stop"></i></button>
       </div>
-      <div class="col">
-        <div class="currentSong">
+      <div class="col elapsed">
           <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
-        </div>
       </div>
-      <div class="col">
-        <div id="cs" class="currentSong">
-          <span id="csTitle" class="title">Title</span>
-          <span id="csArtist" class="artist">Artist</span>
-          <span id="csAlbum">Album</span>
-          <span id="csAlbumArtist">[AlbumArtist]</span>
-        </div>
+      <div id="cs" class="currentSong">
+        <div id="csTitle" class="col title">Title</div>
+        <div id="csArtist" class="col artist">Artist</div>
+        <div id="csAlbum" class="col album">Album</div>
+        <div id="csAlbumArtist" class="col albumArtist">[AlbumArtist]</div>
       </div>
     </div>
 
@@ -60,14 +57,12 @@
         <button id="plRemove" class="round narrow"><i class="fas
             fa-minus-circle"></i></button>
       </div>
-      <div class="col">
-        <div class="playlistSong">
-          <span id="plTitle" class="title">Title</span>
-          <span id="plArtist" class="artist">Artist</span>
-          <span id="plAlbum">Album</span>
-          <span id="plAlbumArtist">[AlbumArtist]&nbsp;</span>
-          <span id="plDuration">2:31</span>
-        </div>
+      <div class="playlistSong">
+        <div id="plTitle" class="col title">Title</div>
+        <div id="plArtist" class="col artist">Artist</div>
+        <div id="plAlbum" class="col album">Album</div>
+        <div id="plAlbumArtist" class="col albumArtist">[AlbumArtist]&nbsp;</div>
+        <div id="plDuration" class="col">2:31</div>
       </div>
     </div>
 
@@ -77,9 +72,10 @@
 
     <!-- search box-->
     <div id="searchBox" style="display: none">
-        <input id="searchText" type="text" name="search">
-        <button id="submitSearch" class="round narrow"><i class="fas fa-search"></i></button>
-        <button id="closeSearch" class="round narrow"><i class="fas fa-window-close"></i></button>
+      <input id="searchText" type="text" name="search">
+      <button id="submitSearch" class="round narrow"><i class="fas fa-search"></i></button>
+      <button id="closeSearch" class="round narrow"><i class="fas
+          fa-window-close"></i></button>
     </div>
 
     <!-- search entry template -->
@@ -102,7 +98,5 @@
     <!-- current playlist-->
     <div id="searchResult">
     </div>
-  </body>
-</html>
   </body>
 </html>

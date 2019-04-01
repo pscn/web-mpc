@@ -3,8 +3,8 @@
 body {
   background: white;
   font-family: 'Roboto', sans-serif;
-  font-size: 20px;
-  margin: 2px;
+  font-size: 16px;
+  margin: 4px;
   padding: 0px;
 }
 
@@ -52,18 +52,18 @@ button {
 
 button.wide {
   margin-right: -4px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 4px;
+  padding-bottom: 2px;
   padding-left: 12px;
   padding-right: 11px;
 }
 
 button.narrow {
   margin-right: -4px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 4px;
+  padding-bottom: 2px;
   padding-left: 8px;
-  padding-right: 8px;
+  padding-right: 7px;
 }
 
 button.round {
@@ -99,6 +99,10 @@ button.round {
   float: left;
 }
 
+.col {
+  padding-right: 1em;
+}
+
 .full {
   width: 100%;
 }
@@ -107,11 +111,16 @@ button.round {
   font-style: italic;
 }
 
+div.elapsed {
+  padding-left: 0px;
+  padding-top: 2px;
+}
+
 div.currentSong, div.playlistSong {
   /* align with the buttons above FIXME: on mobile only? */
   padding-left: 12px;
   /* align with the button on the left side (on desktop) */
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 @media (min-width: 768px) {
