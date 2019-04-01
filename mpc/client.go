@@ -160,19 +160,25 @@ func (client *Client) RemovePlaylistEntry(nr int64) error {
 	//PlaylistDelete("", int(nr))
 }
 
+// Search for search string tokenized by space and searched in any
 func (client *Client) Search(search string) *[]mpd.Attrs {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
-		searchTokens = append(searchTokens, "any")
-		searchTokens = append(searchTokens, token)
+		if token != "" {
+			searchTokens = append(searchTokens, "any")
+			searchTokens = append(searchTokens, token)
+		}
 	}
 	client.logger.Printf("tokens: %v", searchTokens)
-	attrs, err := client.mpc.Search(searchTokens...)
-	if err != nil {
-		client.logger.Printf("search error: %v", err)
-		return nil
+	if len(searchTokens) > 0 {
+		attrs, err := client.mpc.Search(searchTokens...)
+		if err != nil {
+			client.logger.Printf("search error: %v", err)
+			return nil
+		}
+		return &attrs
 	}
-	return &attrs
+	return nil
 }
 
 // EventLoop with a return channel for messages

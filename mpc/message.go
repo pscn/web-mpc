@@ -172,6 +172,9 @@ type DataSearchResult struct {
 // NewSearchResult from mpd.Attrs
 func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
 	event := &DataSearchResult{}
+	if attrArr == nil {
+		return NewMessage(SearchResult, event)
+	}
 	event.Playlist = make([]Song, len(*attrArr))
 	for i, attrs := range *attrArr {
 		if attrs["AlbumArtist"] == "" {
