@@ -84,9 +84,9 @@ func (client *Client) Status() *mpd.Attrs {
 }
 
 // Play start playing
-func (client *Client) Play() error {
+func (client *Client) Play(nr int) error {
 	client.Ping()
-	return client.mpc.Play(-1)
+	return client.mpc.Play(nr)
 }
 
 // Pause playing
@@ -179,6 +179,11 @@ func (client *Client) Search(search string) *[]mpd.Attrs {
 		return &attrs
 	}
 	return nil
+}
+
+// Add file to playlist
+func (client *Client) Add(file string) error {
+	return client.mpc.Add(file)
 }
 
 // EventLoop with a return channel for messages

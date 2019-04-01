@@ -123,7 +123,7 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 		}
 		switch cmd.Command {
 		case "play":
-			err = client.Play()
+			err = client.Play(-1)
 		case "resume":
 			err = client.Resume()
 		case "pause":
@@ -137,6 +137,21 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 		case "status":
 			rc <- mpc.NewStatus(client.Status())
 		}
+		if strings.HasPrefix(cmd.Command, "add") {
+			file := cmd.Command[3:]
+			if h.verbosity > 5 {
+				logger.Printf("%s => %s == %s", cmd.Command, cmd.Command[3:], file)
+			}
+			err = client.Add(file)
+		}
+		if strings.HasPrefix(cmd.Command, "play") {
+			nr := helpers.ToInt(cmd.Command[4:])
+			if h.verbosity > 5 {
+				logger.Printf("%s => %s == %d", cmd.Command, cmd.Command[4:], nr)
+			}
+			err = client.Play(nr)
+		}
+
 		if strings.HasPrefix(cmd.Command, "remove") {
 			nr := helpers.ToInt64(cmd.Command[6:])
 			if h.verbosity > 5 {
