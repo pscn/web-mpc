@@ -60,7 +60,8 @@ window.addEventListener("load", function (evt) {
     setTimeout(updateProgress, 1000);
   };
 
-  ws = new WebSocket("ws://192.168.0.111:8080/echo");
+  ws_addr = document.getElementById("ws").value;
+  ws = new WebSocket(ws_addr);
   ws.onopen = function (evt) { console.log("OPEN"); }
   ws.onclose = function (evt) { console.log("CLOSE"); ws = null; }
   ws.onmessage = function (evt) {
@@ -121,27 +122,6 @@ window.addEventListener("load", function (evt) {
         }
         console.log(node.innerHTML);
         currentPlaylist.append(node);
-
-        //					list += '<div class="row">'; // row 1
-        //					list += '<div class="col-xl p-1">'; // col-xl
-        /*
-        node.setAttribute
-        list += '<div class="d-flex p-1 bd-highlight flex-nowrap">'; // row 2
-        list += '<div class="d-flex align-middle">';
-        list += '<button id="plPlay' + i + '" class="btn btn-outline-primary btn-sm"><i class="fas fa-play"></i></button>';
-        list += '&nbsp;';
-        list += '<button id="plRemove' + i + '" class="btn btn-outline-danger btn-sm"><i class="fas fa-minus"></i></button>';
-        list += '</div>';
-        list += '<div class="d-flex p-1 align-middle">'; // row 2
-        list += obj.data.Playlist[i].artist;
-        list += '&nbsp;&ndash;&nbsp;';
-        list += obj.data.Playlist[i].title;
-        list += '&nbsp;&ndash;&nbsp;';
-        list += obj.data.Playlist[i].album;
-        list += '</div></div>';
-        //				list += '</div>'; // col-xl
-        //					list += '</div>'; // row 1
-        */
       }
     }
   }
@@ -149,7 +129,7 @@ window.addEventListener("load", function (evt) {
     console.log("ERROR: " + evt.data);
   }
   window.onfocus = function (event) {
-    // request a fresh status as some browsers (e. g. Chrome) suspend out
+    // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress bar setTimeout functions
     command("status");
   }

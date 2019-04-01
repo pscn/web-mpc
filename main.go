@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 )
 
 var addr = flag.String("addr", "192.168.0.111:8080", "http service address")
+var devel = flag.Bool("devel", false, "serves html, jss & css from the src templates directory")
 
 var upgrader = websocket.Upgrader{} // FIXME: what is this, what does it do?
 
@@ -39,34 +41,61 @@ func main() {
 		"currentPlaylist": mpc.EventTypeCurrentPlaylist,
 	}
 	for i := range tmplName {
-		logger.Printf("reading: %s", tmplName[i])
+		logger.Printf("preparing handler for: %s", tmplName[i])
 		{
-			var tmplNr = i
+			// FIXME: this is hackish, maybe use gorillas muxer or ...
+			var tmplNr = i // copy to new scope so we can use it safelly in the callback functions
 			logger.Printf("adding handler: %s", tmplName[tmplNr])
-			if tmplName[i] == "index.html" {
-				tmplStr, err := box.FindString(tmplName[i])
-				if err != nil {
-					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
+			if tmplName[tmplNr] == "index.html" {
+				if *devel {
+					mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+						logger.Printf("serving / to %s", r.Host)
+						p["ws"] = "ws://" + r.Host + "/echo"
+						w.Header().Set("Content-type", tmplType[tmplNr])
+						dat, err := ioutil.ReadFile(fmt.Sprintf("templates/%s", tmplName[tmplNr]))
+						if err != nil {
+							logger.Fatal(err)
+						}
+						tmpl := template.Must(template.New("").Parse(string(dat)))
+						tmpl.Execute(w, p)
+					})
+				} else {
+					tmplStr, err := box.FindString(tmplName[i])
+					if err != nil {
+						logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
+					}
+					tmpl := template.Must(template.New("").Parse(tmplStr))
+					mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+						logger.Printf("serving / to %s", r.Host)
+						p["ws"] = "ws://" + r.Host + "/echo"
+						w.Header().Set("Content-type", tmplType[tmplNr])
+						tmpl.Execute(w, p)
+					})
 				}
-				tmpl := template.Must(template.New("").Parse(tmplStr))
-				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-					logger.Printf("serving / to %s", r.Host)
-					p["ws"] = "ws://" + r.Host + "/echo"
-					w.Header().Set("Content-type", tmplType[tmplNr])
-					tmpl.Execute(w, p)
-				})
 			} else {
-				tmplByte, err := box.Find(tmplName[i])
-				if err != nil {
-					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
+				if *devel {
+					mux.HandleFunc(fmt.Sprintf("/%s", tmplName[tmplNr]), func(w http.ResponseWriter, r *http.Request) {
+						logger.Printf("serving /%s to %s", tmplName[tmplNr], r.Host)
+						p["ws"] = "ws://" + r.Host + "/echo"
+						w.Header().Set("Content-type", tmplType[tmplNr])
+						dat, err := ioutil.ReadFile(fmt.Sprintf("templates/%s", tmplName[tmplNr]))
+						if err != nil {
+							logger.Fatal(err)
+						}
+						w.Write(dat)
+					})
+				} else {
+					tmplByte, err := box.Find(tmplName[i])
+					if err != nil {
+						logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
+					}
+					mux.HandleFunc(fmt.Sprintf("/%s", tmplName[tmplNr]), func(w http.ResponseWriter, r *http.Request) {
+						logger.Printf("serving /%s to %s", tmplName[tmplNr], r.Host)
+						p["ws"] = "ws://" + r.Host + "/echo"
+						w.Header().Set("Content-type", tmplType[tmplNr])
+						w.Write(tmplByte)
+					})
 				}
-				mux.HandleFunc(fmt.Sprintf("/%s", tmplName[tmplNr]), func(w http.ResponseWriter, r *http.Request) {
-					logger.Printf("serving /%s to %s", tmplName[tmplNr], r.Host)
-					p["ws"] = "ws://" + r.Host + "/echo"
-					w.Header().Set("Content-type", tmplType[tmplNr])
-					w.Write(tmplByte)
-				})
-
 			}
 		}
 	}
