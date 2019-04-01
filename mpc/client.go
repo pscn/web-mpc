@@ -3,6 +3,7 @@ package mpc
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/fhs/gompd/mpd"
 	"github.com/pkg/errors"
@@ -159,19 +160,34 @@ func (client *Client) RemovePlaylistEntry(nr int64) error {
 	//PlaylistDelete("", int(nr))
 }
 
+func (client *Client) Search(search string) *[]mpd.Attrs {
+	var searchTokens []string
+	for _, token := range strings.Split(search, " ") {
+		searchTokens = append(searchTokens, "any")
+		searchTokens = append(searchTokens, token)
+	}
+	client.logger.Printf("tokens: %v", searchTokens)
+	attrs, err := client.mpc.Search(searchTokens...)
+	if err != nil {
+		client.logger.Printf("search error: %v", err)
+		return nil
+	}
+	return &attrs
+}
+
 // EventLoop with a return channel for messages
-func (client *Client) EventLoop(rc chan *Event) {
+func (client *Client) EventLoop(rc chan *Message) {
 	defer client.logger.Println("stop eventloop")
-	defer close(rc)
+
 	go func() { // event loop
 		defer func() { // if you want to recover from any panic below, use this
 			if r := recover(); r != nil {
 				client.logger.Println("recovered", r)
 			}
 		}()
-		rc <- NewStatusEvent(client.Status())
-		rc <- NewCurrentSongEvent(client.CurrentSong())
-		rc <- NewCurrentPlaylistEvent(client.CurrentPlaylist())
+		rc <- NewStatus(client.Status())
+		rc <- NewCurrentSong(client.CurrentSong())
+		rc <- NewCurrentPlaylist(client.CurrentPlaylist())
 		for subsystem := range client.mpw.Event {
 			rc <- NewStringEvent(fmt.Sprintf("MPD subsystem: %s", subsystem))
 			switch subsystem {
@@ -183,11 +199,11 @@ func (client *Client) EventLoop(rc chan *Event) {
 				}
 			case "player":
 				status := *client.Status()
-				rc <- NewStatusEvent(client.Status())
-				rc <- NewCurrentSongEvent(client.CurrentSong())
+				rc <- NewStatus(client.Status())
+				rc <- NewCurrentSong(client.CurrentSong())
 				client.logger.Printf("Status: %v\n", status)
 			case "playlist":
-				rc <- NewCurrentPlaylistEvent(client.CurrentPlaylist())
+				rc <- NewCurrentPlaylist(client.CurrentPlaylist())
 			}
 		}
 		client.logger.Printf("mpw loop exited")
