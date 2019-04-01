@@ -35,11 +35,11 @@ func main() {
 	mux := http.NewServeMux()
 	// read templates and add listener
 	p := map[string]interface{}{
-		"error":           mpc.EventTypeError,
-		"string":          mpc.EventTypeString,
-		"status":          mpc.EventTypeStatus,
-		"currentSong":     mpc.EventTypeCurrentSong,
-		"currentPlaylist": mpc.EventTypeCurrentPlaylist,
+		"error":           mpc.Error,
+		"string":          mpc.Info,
+		"status":          mpc.Status,
+		"currentSong":     mpc.CurrentSong,
+		"currentPlaylist": mpc.Playlist,
 	}
 	for i := range tmplName {
 		if verbosity > 5 {
