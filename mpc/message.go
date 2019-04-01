@@ -92,8 +92,8 @@ func (msg *Message) Status() *StatusData {
 	return nil
 }
 
-// Song converted from *mpd.attrs
-type Song struct {
+// SongData converted from *mpd.attrs
+type SongData struct {
 	Artist      string `json:"artist"`
 	Album       string `json:"album"`
 	AlbumArtist string `json:"album_artist"`
@@ -109,7 +109,7 @@ func NewCurrentSong(attrs *mpd.Attrs) *Message {
 	if (*attrs)["AlbumArtist"] == "" {
 		(*attrs)["AlbumArtist"] = (*attrs)["Artist"]
 	}
-	return NewMessage(CurrentSong, &Song{
+	return NewMessage(CurrentSong, &SongData{
 		Artist:      (*attrs)["Artist"],
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
@@ -122,27 +122,27 @@ func NewCurrentSong(attrs *mpd.Attrs) *Message {
 }
 
 // CurrentSong payload of an event
-func (msg *Message) CurrentSong() *Song {
+func (msg *Message) CurrentSong() *SongData {
 	if msg.Type == CurrentSong { // FIXME: how to inform the develeoper?
-		return msg.Data.(*Song)
+		return msg.Data.(*SongData)
 	}
 	return nil
 }
 
 // PlaylistData converted from *mpd.attrs
 type PlaylistData struct {
-	Playlist []Song
+	Playlist []SongData
 }
 
 // NewCurrentPlaylist creates a new Event including the current song data mapped from mpd.Attrs
 func NewCurrentPlaylist(attrArr *[]mpd.Attrs) *Message {
 	event := &PlaylistData{}
-	event.Playlist = make([]Song, len(*attrArr))
+	event.Playlist = make([]SongData, len(*attrArr))
 	for i, attrs := range *attrArr {
 		if attrs["AlbumArtist"] == "" {
 			attrs["AlbumArtist"] = attrs["Artist"]
 		}
-		event.Playlist[i] = Song{
+		event.Playlist[i] = SongData{
 			Artist:      attrs["Artist"],
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
@@ -165,22 +165,22 @@ func (msg *Message) CurrentPlaylist() *PlaylistData {
 }
 
 // EventDataCurrentPlaylist converted from *mpd.attrs
-type DataSearchResult struct {
-	Playlist []Song
+type SearchResultData struct {
+	Playlist []SongData
 }
 
 // NewSearchResult from mpd.Attrs
 func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
-	event := &DataSearchResult{}
+	event := &SearchResultData{}
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
 	}
-	event.Playlist = make([]Song, len(*attrArr))
+	event.Playlist = make([]SongData, len(*attrArr))
 	for i, attrs := range *attrArr {
 		if attrs["AlbumArtist"] == "" {
 			attrs["AlbumArtist"] = attrs["Artist"]
 		}
-		event.Playlist[i] = Song{
+		event.Playlist[i] = SongData{
 			Artist:      attrs["Artist"],
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
@@ -195,9 +195,9 @@ func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
 }
 
 // SearchResult payload of an event
-func (msg *Message) SearchResult() *DataSearchResult {
+func (msg *Message) SearchResult() *SearchResultData {
 	if msg.Type == SearchResult { // FIXME: how to inform the develeoper?
-		return msg.Data.(*DataSearchResult)
+		return msg.Data.(*SearchResultData)
 	}
 	return nil
 }

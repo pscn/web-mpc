@@ -143,9 +143,9 @@ window.addEventListener("load", function (evt) {
         node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
         node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
         {
-          const j = i;
-          node.querySelector("#srRemove").onclick = function (evt) {
-            return command("remove" + j);
+          const file = obj.data.Playlist[i].file;
+          node.querySelector("#srAdd").onclick = function (evt) {
+            return command("add" + file);
           };
         }
         searchResult.append(node);
@@ -182,11 +182,14 @@ window.addEventListener("load", function (evt) {
     document.getElementById("playlist").style.display = "none";
     document.getElementById("searchBox").style.display = "";
     document.getElementById("searchText").focus();
+    document.getElementById("searchResult").innerHTML = "";
+    document.getElementById("searchResult").style.display = "";
   }
 
   document.getElementById("closeSearch").onclick = function (evt) {
     document.getElementById("playlist").style.display = "";
     document.getElementById("searchBox").style.display = "none";
+    document.getElementById("searchResult").style.display = "none";
   }
   document.getElementById("submitSearch").onclick = function (evt) {
     return command("search" + document.getElementById("searchText").value);
