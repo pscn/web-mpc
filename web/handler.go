@@ -144,7 +144,7 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 			}
 			err = client.Add(file)
 		}
-		if strings.HasPrefix(cmd.Command, "play") {
+		if strings.HasPrefix(cmd.Command, "play") && len(cmd.Command) > 4 {
 			nr := helpers.ToInt(cmd.Command[4:])
 			if h.verbosity > 5 {
 				logger.Printf("%s => %s == %d", cmd.Command, cmd.Command[4:], nr)

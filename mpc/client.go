@@ -210,10 +210,12 @@ func (client *Client) EventLoop(rc chan *Message) {
 				}
 			case "player", "playlist":
 				status := *client.Status()
+				currentSong := *client.CurrentSong()
 				rc <- NewStatus(client.Status())
 				rc <- NewCurrentSong(client.CurrentSong())
 				rc <- NewCurrentPlaylist(client.CurrentPlaylist())
 				client.logger.Printf("Status: %v\n", status)
+				client.logger.Printf("CurrentSong: %v\n", currentSong)
 			}
 		}
 		client.logger.Printf("mpw loop exited")
