@@ -26,7 +26,7 @@
 
     <!-- control buttons & current song info -->
     <div class="row full player">
-      <div class="col">
+      <div class="colS">
         <button id="search" class="round narrow"><i class="fas fa-search"></i></button>
         <button id="list" class="round narrow" disabled="disabled"><i class="fas
             fa-list"></i></button>
@@ -37,8 +37,10 @@
         <button id="previous" class="round narrow"><i class="fas
             fa-backward"></i></button>
         <button id="next" class="round narrow"><i class="fas fa-forward"></i></button>
-        <button id="stop" class="round wide"><i class="fas fa-stop"></i></button>
+        <button id="stop" class="round narrow"><i class="fas fa-stop"></i></button>
       </div>
+    </div>
+    <div class="row full player">
       <div class="col elapsed">
           <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
       </div>
@@ -52,7 +54,7 @@
 
     <!-- playlist entry template -->
     <div id="playlistEntry" class="row full playlist" style="display: none">
-      <div class="col">
+      <div class="colS">
         <button id="plPlay" class="round wide"><i class="fas fa-play"></i></button>
         <button id="plRemove" class="round narrow"><i class="fas
             fa-minus-circle"></i></button>

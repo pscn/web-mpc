@@ -99,6 +99,14 @@ button.round {
   float: left;
 }
 
+.row .colS {
+  float: left;
+}
+
+.colS {
+  padding-right: 2px;
+}
+
 .col {
   padding-right: 1em;
 }
@@ -112,7 +120,7 @@ button.round {
 }
 
 div.elapsed {
-  padding-left: 0px;
+  padding-left: 8px;
   padding-top: 2px;
 }
 
