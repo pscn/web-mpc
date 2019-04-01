@@ -73,5 +73,37 @@
     <!-- current playlist-->
     <div id="playlist">
     </div>
+
+    <!-- search box-->
+    <div id="searchBox" style="display: none">
+        <input id="searchText" type="text" name="search">
+        <button id="submitSearch" class="round narrow"><i class="fas fa-search"></i></button>
+        <button id="closeSearch" class="round narrow"><i class="fas fa-window-close"></i></button>
+    </div>
+
+    <!-- search entry template -->
+    <div id="searchEntry" class="row full playlist" style="display: none">
+      <div class="col">
+        <button id="srPlay" class="round wide"><i class="fas fa-sray"></i></button>
+        <button id="srRemove" class="round narrow"><i class="fas
+            fa-minus-circle"></i></button>
+      </div>
+      <div class="col">
+        <div class="SearchResultSong">
+          <span id="srTitle" class="title">Title</span>
+          <span id="srArtist" class="artist">Artist</span>
+          <span id="srAlbum">Album</span>
+          <span id="srAlbumArtist">[AlbumArtist]&nbsp;</span>
+          <span id="srDuration">2:31</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- current playlist-->
+    <div id="searchResult">
+    </div>
+  </body>
+</html>
   </body>
 </html>

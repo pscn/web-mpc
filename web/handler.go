@@ -55,34 +55,36 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 
-	rc := make(chan *mpc.Event, 1)
-	// defer close(rc) client should close it
+	rc := make(chan *mpc.Message, 1)
+	defer close(rc)
 
 	go client.EventLoop(rc)
 
 	go func() { // read events from mpc
 
 		for event := range rc {
-			//			logger.Printf("Event: %d\n", event.Type)
+			if h.verbosity > 5 {
+				logger.Printf("Event: %d\n", event.Type)
+			}
 			var data []byte
 			var err error
 			switch event.Type {
-			case mpc.EventTypeError:
+			case mpc.Error:
 				logger.Println("error:", event.Error())
 				break
-			case mpc.EventTypeString:
+			case mpc.Info:
 				if h.verbosity > 5 {
 					logger.Println("string:", event.String())
 				}
-			case mpc.EventTypeStatus:
+			case mpc.Status:
 				if h.verbosity > 5 {
 					logger.Println("status:", event.Status())
 				}
-			case mpc.EventTypeCurrentSong:
+			case mpc.CurrentSong:
 				if h.verbosity > 5 {
 					logger.Println("current song:", event.CurrentSong())
 				}
-			case mpc.EventTypeCurrentPlaylist:
+			case mpc.Playlist:
 				if h.verbosity > 5 {
 					logger.Println("current playlist:", event.CurrentPlaylist())
 				}
@@ -133,7 +135,7 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 		case "previous":
 			err = client.Previous()
 		case "status":
-			rc <- mpc.NewStatusEvent(client.Status())
+			rc <- mpc.NewStatus(client.Status())
 		}
 		if strings.HasPrefix(cmd.Command, "remove") {
 			nr := helpers.ToInt64(cmd.Command[6:])
@@ -142,6 +144,12 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 			}
 			err = client.RemovePlaylistEntry(nr)
 		}
+		if strings.HasPrefix(cmd.Command, "search") {
+			search := cmd.Command[6:]
+			logger.Printf("%s => %s == %s", cmd.Command, cmd.Command[6:], search)
+			rc <- mpc.NewSearchResult(client.Search(search))
+		}
+
 		if err != nil {
 			logger.Printf("Command error: %v", err)
 		}

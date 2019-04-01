@@ -42,6 +42,7 @@ window.addEventListener("load", function (evt) {
   var csDuration = document.getElementById("csDuration");
 
   var currentPlaylist = document.getElementById("playlist");
+  var searchResult = document.getElementById("searchResult");
 
   var duration = 1.0;
   var elapsed = 0.0;
@@ -120,8 +121,34 @@ window.addEventListener("load", function (evt) {
             return command("remove" + j);
           };
         }
-        console.log(node.innerHTML);
         currentPlaylist.append(node);
+      }
+    } else if (obj.type == 5) {
+      console.log("searchResult")
+      searchResult.innerHTML = "";
+      var list = "";
+      for (var i = 0; i < obj.data.Playlist.length; i++) {
+        var playlistEntry = document.getElementById("searchEntry")
+        var node = playlistEntry.cloneNode(true);
+        node.id = "srRow" + i;
+        node.style.display = "";
+        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
+        node.querySelector("#srTitle").innerHTML = obj.data.Playlist[i].title;
+        node.querySelector("#srAlbum").innerHTML = obj.data.Playlist[i].album;
+        if (obj.data.Playlist[i].artist != obj.data.Playlist[i].album_artist) {
+          node.querySelector("#srAlbumArtist").innerHTML = "[" + obj.data.Playlist[i].album_artist + "]&nbsp;";
+        } else {
+          node.querySelector("#srAlbumArtist").style.display = "none";
+        }
+        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
+        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
+        {
+          const j = i;
+          node.querySelector("#srRemove").onclick = function (evt) {
+            return command("remove" + j);
+          };
+        }
+        searchResult.append(node);
       }
     }
   }
@@ -150,6 +177,22 @@ window.addEventListener("load", function (evt) {
     document.getElementById(value).onclick = function (evt) {
       return command(value);
     };
+  }
+  document.getElementById("search").onclick = function (evt) {
+    document.getElementById("playlist").style.display = "none";
+    document.getElementById("searchBox").style.display = "";
+    document.getElementById("searchText").focus();
+  }
+
+  document.getElementById("closeSearch").onclick = function (evt) {
+    document.getElementById("playlist").style.display = "";
+    document.getElementById("searchBox").style.display = "none";
+  }
+  document.getElementById("submitSearch").onclick = function (evt) {
+    return command("search" + document.getElementById("searchText").value);
+  }
+  document.getElementById("searchText").onchange = function (evt) {
+    return command("search" + document.getElementById("searchText").value);
   }
 
 });
