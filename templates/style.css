@@ -1,8 +1,8 @@
 /* inspired from: http://bafs.github.io/mu/ */
 
 body {
-  background: cornflowerblue;
-  font-family: 'Roboto Condensed', sans-serif;
+  background: white;
+  font-family: 'Roboto', sans-serif;
   font-size: 20px;
   margin: 8px;
   padding: 0px;
@@ -18,30 +18,64 @@ button {
   transition-duration: 0.6s;
 }
 
-button:hover {
-  background: turquoise;
+.player button {
+  color: white;
 }
 
-button:focus {
-  background: paleturquoise;
+.playlist button {
+  color: black;
+}
+
+.player button:hover {
+  background: gray;
+}
+
+.player button:focus {
+  background: gray;
+}
+
+.player button:disabled {
+  color: gray;
+}
+
+.playlist button:hover {
+  background: lightgray;
+}
+
+.playlist button:focus {
+  background: lightgray;
 }
 
 button.wide {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-button.narrow {
+  margin-right: -4px;
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 12px;
-  padding-right: 12px;
+  padding-right: 11px;
+}
+
+button.narrow {
+  margin-right: -4px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 button.round {
   border-radius: 8px;
+}
+
+.player, .playlist {
+  border: 1px solid black;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  background: black;
+  color: white;
+}
+
+.playlist {
+  background: gray;
 }
 
 .row {
@@ -64,13 +98,12 @@ button.round {
 .full {
   width: 100%;
 }
-.title {
-  color: black;
-}
+
 .artist {
-  color: darkslategray;
+  font-style: italic;
 }
-div.current, div.playlist {
+
+div.currentSong, div.playlistSong {
   /* align with the buttons above FIXME: on mobile only? */
   padding-left: 12px;
   /* align with the button on the left side (on desktop) */

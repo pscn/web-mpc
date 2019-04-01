@@ -82,7 +82,7 @@ window.addEventListener("load", function (evt) {
       } else if (obj.data.state == "stop") {
         stop();
         state = "stop";
-        duration = 666.0;
+        duration = 0.0;
         elapsed = 0.0;
       }
     } else if (obj.type == 3) {

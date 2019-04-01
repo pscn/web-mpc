@@ -17,10 +17,15 @@
     <title>Web MPC</title>
   </head>
   <body>
-    <form style="display:none"><input id="ws" type="text" value="{{.ws}}"></form>
+    <!-- pass parameters from main.go to hidden input fields -->
+    <form style="display:none">
+      <input id="ws" type="text" value="{{.ws}}">
+    </form>
+
     <script src="script.js"></script>
+
     <!-- control buttons & current song info -->
-    <div class="row full">
+    <div class="row full player">
       <div class="col">
         <button id="play" class="round wide"><i class="fas fa-play"></i></button>
         <button id="resume" class="round wide"><i class="fas fa-play"></i></button>
@@ -33,25 +38,29 @@
         <button id="search" class="round narrow"><i class="fas fa-search"></i></button>
       </div>
       <div class="col">
-        <div class="current">
+        <div class="currentSong">
+          <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
+        </div>
+      </div>
+      <div class="col">
+        <div class="currentSong">
           <span id="csTitle" class="title">Title</span>
           <span id="csArtist" class="artist">Artist</span>
           <span id="csAlbum">Album</span>
           <span id="csAlbumArtist">[AlbumArtist]</span>
-          <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
         </div>
       </div>
     </div>
-    <hr>
-    <!-- playlist entry -->
-    <div id="playlistEntry" class="row full" style="display: none">
+
+    <!-- playlist entry template -->
+    <div id="playlistEntry" class="row full playlist" style="display: none">
       <div class="col">
         <button id="plPlay" class="round wide"><i class="fas fa-play"></i></button>
         <button id="plRemove" class="round narrow"><i class="fas
             fa-minus-circle"></i></button>
       </div>
       <div class="col">
-        <div class="playlist">
+        <div class="playlistSong">
           <span id="plTitle" class="title">Title</span>
           <span id="plArtist" class="artist">Artist</span>
           <span id="plAlbum">Album</span>

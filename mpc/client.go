@@ -15,6 +15,7 @@ type Client struct {
 	password string
 	logger   *log.Logger
 	mpc      *mpd.Client
+	mpw      *mpd.Watcher
 }
 
 // New with host, port, password and in & out channels
@@ -38,14 +39,22 @@ func (client *Client) reConnect() (err error) {
 	}
 	if err == nil {
 		client.logger.Printf("connected to %s:%d", client.host, client.port)
+		client.mpw, err = mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
+		if err == nil {
+			client.logger.Printf("listening to %s:%d", client.host, client.port)
+		}
 	}
 	return
 }
 
 // Close the MPDClient
-func (client *Client) Close() error {
+func (client *Client) Close() (err error) {
 	client.logger.Println("closing connection")
-	return client.mpc.Close() // close client
+	err = client.mpc.Close() // close client
+	if err != nil {
+		client.logger.Printf("failed to close client: %v", err)
+	}
+	return client.mpw.Close()
 }
 
 // Ping and try to re-connect if ping fails
@@ -150,27 +159,20 @@ func (client *Client) RemovePlaylistEntry(nr int64) error {
 	//PlaylistDelete("", int(nr))
 }
 
-func (client *Client) watcher() (*mpd.Watcher, error) {
-	mpw, err := mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
-	return mpw, err
-}
-
 // EventLoop with a return channel for messages
 func (client *Client) EventLoop(rc chan *Event) {
+	defer client.logger.Println("stop eventloop")
 	defer close(rc)
-	mpw, err := mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
-	if err != nil { // FIXME: error recovery
-		client.logger.Println("error", err)
-		rc <- NewErrorEvent(errors.Wrapf(err, "failed to start watcher for MPD events"))
-	}
-	defer mpw.Close()
-	rc <- NewStringEvent("listening for MPD events")
-
 	go func() { // event loop
+		defer func() { // if you want to recover from any panic below, use this
+			if r := recover(); r != nil {
+				client.logger.Println("recovered", r)
+			}
+		}()
 		rc <- NewStatusEvent(client.Status())
 		rc <- NewCurrentSongEvent(client.CurrentSong())
 		rc <- NewCurrentPlaylistEvent(client.CurrentPlaylist())
-		for subsystem := range mpw.Event {
+		for subsystem := range client.mpw.Event {
 			rc <- NewStringEvent(fmt.Sprintf("MPD subsystem: %s", subsystem))
 			switch subsystem {
 			case "update":
@@ -188,14 +190,14 @@ func (client *Client) EventLoop(rc chan *Event) {
 				rc <- NewCurrentPlaylistEvent(client.CurrentPlaylist())
 			}
 		}
+		client.logger.Printf("mpw loop exited")
 	}()
 
 	// error loop
-	for err := range mpw.Error {
+	for err := range client.mpw.Error {
 		// Seen so far:
 		// mpd shutdown → write: broken pipe
 		rc <- NewErrorEvent(errors.Wrapf(err, "MPDClient error loop"))
 	}
-	rc <- NewStringEvent("client shutdown")
 	return
 }
