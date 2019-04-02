@@ -2,18 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1,
-      shrink-to-fit=no">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Font Awesome for play, pause etc. buttons-->
     <link rel="stylesheet"
       href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
       integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
       crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <!-- A nicer condensed font-->
-    <!-- FIXME: maybe use a none condensed font when not on mobile? -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed"
-      rel="stylesheet">
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto+Condensed">
     <title>Web MPC</title>
   </head>
   <body>
@@ -22,83 +20,80 @@
       <input id="ws" type="text" value="{{.ws}}">
     </form>
 
+    <!-- load our javascript -->
     <script src="script.js"></script>
 
-    <!-- control buttons & current song info -->
-    <div class="row full player">
-      <div class="colS">
-        <button id="search" class="round narrow"><i class="fas fa-search"></i></button>
-        <button id="list" class="round narrow" disabled="disabled"><i class="fas
+    <div class="main"><!-- main grid -->
+      <div class="switchView"><!-- switch between playlist and search view -->
+        <button id="search"><i class="fas fa-search"></i></button>
+        <button id="list" disabled="disabled"><i class="fas
             fa-list"></i></button>
-        <button id="play" class="round wide"><i class="fas fa-play"></i></button>
-        <button id="resume" class="round wide"><i class="fas fa-play"></i></button>
-        <button id="pause" class="round wide" style="display: none"><i
+      </div>
+      <div class="playerControl"><!-- play, pause etc. -->
+        <button id="play">
+          <i class="fas fa-play"></i>
+        </button>
+        <button id="resume"><i class="fas fa-play"></i></button>
+        <button id="pause" style="display: none"><i
             class="fas fa-pause"></i></button>
-        <button id="previous" class="round narrow"><i class="fas
+        <button id="previous"><i class="fas
             fa-backward"></i></button>
-        <button id="next" class="round narrow"><i class="fas fa-forward"></i></button>
-        <button id="stop" class="round narrow"><i class="fas fa-stop"></i></button>
+        <button id="next"><i class="fas fa-forward"></i></button>
+        <button id="stop"><i class="fas fa-stop"></i></button>
       </div>
-    </div>
-    <div class="row full player">
-      <div class="col elapsed">
-          <span id="csElapsed">0:21</span>/<span id="csDuration">2:31</span>
+      <div class="playerElapsed"><!-- time elapsed for current song -->
+        <span id="csElapsed">0:21</span> <span id="csDuration">2:31</span>
       </div>
-      <div id="cs" class="currentSong">
-        <div id="csTitle" class="col title">Title</div>
-        <div id="csArtist" class="col artist">Artist</div>
-        <div id="csAlbum" class="col album">Album</div>
-        <div id="csAlbumArtist" class="col albumArtist">[AlbumArtist]</div>
+      <div class="playerCurrentSong"><!-- currently active song -->
+        <div id="cs" class="currentSong">
+          <div id="csTitle" class="title">Title</div>
+          <div id="csArtist" class="artist">Artist</div>
+          <div id="csAlbum" class="album">Album</div>
+          <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
+        </div>
+      </div>
+      <div id="playlist" class="playlist"><!-- currently active playlist -->
+      </div>
+      <div id="searchBox" class="searchBox"><!-- search input field -->
+        <input id="searchText" type="text" name="search">
+        <button id="submitSearch"><i class="fas fa-search"></i></button>
+        <button id="closeSearch"><i class="fas
+            fa-window-close"></i></button>
+      </div>
+      <div id="searchResult" class="searchResult"><!-- search result -->
       </div>
     </div>
 
     <!-- playlist entry template -->
     <div id="playlistEntry" class="row full playlist" style="display: none">
       <div class="colS">
-        <button id="plPlay" class="round wide"><i class="fas fa-play"></i></button>
-        <button id="plRemove" class="round narrow"><i class="fas
+        <button id="plPlay"><i class="fas fa-play"></i></button>
+        <button id="plRemove"><i class="fas
             fa-minus-circle"></i></button>
       </div>
       <div class="playlistSong">
-        <div id="plTitle" class="col title">Title</div>
-        <div id="plArtist" class="col artist">Artist</div>
-        <div id="plAlbum" class="col album">Album</div>
-        <div id="plAlbumArtist" class="col albumArtist">[AlbumArtist]&nbsp;</div>
-        <div id="plDuration" class="col">2:31</div>
+        <div id="plTitle" class="playlistTitle">Title</div>
+        <div id="plArtist" class="playlistArtist">Artist</div>
+        <div id="plAlbum" class="playlistAlbum">Album</div>
+        <div id="plAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</div>
+        <div id="plDuration" class="playlistDuration">2:31</div>
       </div>
-    </div>
-
-    <!-- current playlist-->
-    <div id="playlist">
-    </div>
-
-    <!-- search box-->
-    <div id="searchBox" style="display: none">
-      <input id="searchText" type="text" name="search">
-      <button id="submitSearch" class="round narrow"><i class="fas fa-search"></i></button>
-      <button id="closeSearch" class="round narrow"><i class="fas
-          fa-window-close"></i></button>
     </div>
 
     <!-- search entry template -->
     <div id="searchEntry" class="row full playlist" style="display: none">
       <div class="col">
-        <button id="srAdd" class="round wide"><i class="fas fa-plus"></i></button>
+        <button id="srAdd"><i class="fas fa-plus"></i></button>
       </div>
       <div class="col">
         <div class="playlistSong">
-          <span id="srTitle" class="title">Title</span>
-          <span id="srArtist" class="artist">Artist</span>
-          <span id="srAlbum">Album</span>
-          <span id="srAlbumArtist">[AlbumArtist]&nbsp;</span>
-          <span id="srDuration">2:31</span>
+          <span id="srTitle" class="searchResultTitle">Title</span>
+          <span id="srArtist" class="searchResultArtist">Artist</span>
+          <span id="srAlbum" class="searchResultAlbum">Album</span>
+          <span id="srAlbumArtist" class="searchResultAlbumArtist">[AlbumArtist]</span>
+          <span id="srDuration" class="searchResultDuration">2:31</span>
         </div>
       </div>
-    </div>
-
-
-    <!-- current playlist-->
-    <div id="searchResult">
     </div>
   </body>
 </html>
