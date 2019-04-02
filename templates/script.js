@@ -101,26 +101,25 @@ window.addEventListener("load", function (evt) {
     } else if (obj.type == 4) {
       console.log("currentPlaylist")
       currentPlaylist.innerHTML = "";
-      var list = "";
-      for (var i = 0; i < obj.data.Playlist.length; i++) {
-        var playlistEntry = document.getElementById("playlistEntry")
+      var playlistEntry = document.getElementById("playlistEntry")
+      obj.data.Playlist.map(function (entry, i) {
         var node = playlistEntry.cloneNode(true);
         node.id = "plRow" + i;
         node.style.display = "";
-        node.querySelector("#plArtist").innerHTML = obj.data.Playlist[i].artist;
-        node.querySelector("#plTitle").innerHTML = obj.data.Playlist[i].title;
-        node.querySelector("#plAlbum").innerHTML = obj.data.Playlist[i].album;
-        if (obj.data.Playlist[i].artist != obj.data.Playlist[i].album_artist) {
-          node.querySelector("#plAlbumArtist").innerHTML = "[" + obj.data.Playlist[i].album_artist + "]&nbsp;";
+        node.querySelector("#plArtist").innerHTML = entry.artist;
+        node.querySelector("#plTitle").innerHTML = entry.title;
+        node.querySelector("#plAlbum").innerHTML = entry.album;
+        if (entry.artist != entry.album_artist) {
+          node.querySelector("#plAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
         } else {
           node.querySelector("#plAlbumArtist").style.display = "none";
         }
-        node.querySelector("#plArtist").innerHTML = obj.data.Playlist[i].artist;
+        node.querySelector("#plArtist").innerHTML = entry.artist;
         node.querySelector("#plDuration").innerHTML =
-          readableSeconds(obj.data.Playlist[i].duration);
+          readableSeconds(entry.duration);
         {
           const j = i;
-          const file = obj.data.Playlist[i].file;
+          const file = entry.file;
           if (file == cs.title) {
             node.querySelector("#plPlay").disabled = "disabled";
           }
@@ -132,34 +131,32 @@ window.addEventListener("load", function (evt) {
           };
         }
         currentPlaylist.append(node);
-      }
+      })
     } else if (obj.type == 5) {
-      console.log("searchResult")
       searchResult.innerHTML = "";
-      var list = "";
-      for (var i = 0; i < obj.data.Playlist.length; i++) {
-        var playlistEntry = document.getElementById("searchEntry")
+      var playlistEntry = document.getElementById("searchEntry")
+      obj.data.Playlist.map(function (entry, i) {
         var node = playlistEntry.cloneNode(true);
         node.id = "srRow" + i;
         node.style.display = "";
-        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
-        node.querySelector("#srTitle").innerHTML = obj.data.Playlist[i].title;
-        node.querySelector("#srAlbum").innerHTML = obj.data.Playlist[i].album;
-        if (obj.data.Playlist[i].artist != obj.data.Playlist[i].album_artist) {
-          node.querySelector("#srAlbumArtist").innerHTML = "[" + obj.data.Playlist[i].album_artist + "]&nbsp;";
+        node.querySelector("#srArtist").innerHTML = entry.artist;
+        node.querySelector("#srTitle").innerHTML = entry.title;
+        node.querySelector("#srAlbum").innerHTML = entry.album;
+        if (entry.artist != entry.album_artist) {
+          node.querySelector("#srAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
         } else {
           node.querySelector("#srAlbumArtist").style.display = "none";
         }
-        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
-        node.querySelector("#srArtist").innerHTML = obj.data.Playlist[i].artist;
+        node.querySelector("#srArtist").innerHTML = entry.artist;
+        node.querySelector("#srDuration").innerHTML = readableSeconds(entry.duration);
         {
-          const file = obj.data.Playlist[i].file;
+          const file = entry.file;
           node.querySelector("#srAdd").onclick = function (evt) {
             return command("add" + file);
           };
         }
         searchResult.append(node);
-      }
+      })
     }
   }
   ws.onerror = function (evt) {
@@ -199,6 +196,7 @@ window.addEventListener("load", function (evt) {
     document.getElementById("playlist").style.display = "none";
     document.getElementById("searchBox").style.display = "";
     document.getElementById("searchText").focus();
+    document.getElementById("searchText").select();
     document.getElementById("searchResult").innerHTML = "";
     document.getElementById("searchResult").style.display = "";
     document.getElementById("search").disabled = "disabled";
@@ -215,5 +213,7 @@ window.addEventListener("load", function (evt) {
   document.getElementById("searchText").onchange = function (evt) {
     return command("search" + document.getElementById("searchText").value);
   }
+
+  showList();
 
 });

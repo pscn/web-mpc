@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <!-- yes we fullscreen! -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Font Awesome for play, pause etc. buttons-->
@@ -59,11 +61,12 @@
       </div>
 
       <div id="searchBox" class="searchBox"><!-- search input field -->
-        <input id="searchText" type="text" name="search">
+        <input id="searchText" type="text" name="search" class="textInput">
         <button id="submitSearch"><i class="fas fa-search"></i></button>
         <button id="closeSearch"><i class="fas
             fa-window-close"></i></button>
       </div>
+
       <div id="searchResult" class="searchResult"><!-- search result -->
       </div>
     </div>
@@ -71,9 +74,13 @@
     <!-- playlist entry template will be placed into id="playlist" -->
     <div id="playlistEntry" class="playlistRow" style="display: none">
       <div class="playlistControl">
-        <button id="plPlay"><i class="fas fa-play"></i></button>
-        <button id="plRemove"><i class="fas
-            fa-minus-circle"></i></button>
+        <div class="playlistControlPrimary">
+          <button id="plPlay"><i class="fas fa-play"></i></button>
+        </div>
+        <div class="playlistControlSecondary">
+          <button id="plRemove"><i class="fas
+              fa-minus-circle"></i></button>
+        </div>
       </div>
       <div class="playlistSong">
         <div id="plTitle" class="playlistTitle">Title</div>
@@ -85,17 +92,17 @@
     </div>
 
     <!-- search entry template -->
-    <div id="searchEntry" class="row full playlist" style="display: none">
+    <div id="searchEntry" class="searchResultRow" style="display: none">
       <div class="col">
         <button id="srAdd"><i class="fas fa-plus"></i></button>
       </div>
       <div class="col">
         <div class="playlistSong">
-          <span id="srTitle" class="searchResultTitle">Title</span>
-          <span id="srArtist" class="searchResultArtist">Artist</span>
-          <span id="srAlbum" class="searchResultAlbum">Album</span>
-          <span id="srAlbumArtist" class="searchResultAlbumArtist">[AlbumArtist]</span>
-          <span id="srDuration" class="searchResultDuration">2:31</span>
+          <span id="srTitle" class="playlistTitle">Title</span>
+          <span id="srArtist" class="playlistArtist">Artist</span>
+          <span id="srAlbum" class="playlistAlbum">Album</span>
+          <span id="srAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</span>
+          <span id="srDuration" class="playlistDuration">2:31</span>
         </div>
       </div>
     </div>
