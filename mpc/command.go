@@ -6,13 +6,20 @@ package mpc
 type CommandType uint
 
 const (
-	Play   CommandType = 0
-	Add    CommandType = 1
-	Search CommandType = 2
+	Play          CommandType = 0
+	Resume        CommandType = 1
+	Pause         CommandType = 2
+	Stop          CommandType = 3
+	Next          CommandType = 4
+	Previous      CommandType = 5
+	Add           CommandType = 6
+	Remove        CommandType = 7
+	Search        CommandType = 8
+	StatusRequest CommandType = 9
 )
 
 // Command from the web
 type Command struct {
-	Command string `json:"command"`
-	Data    string `json:"data"`
+	Command CommandType `json:"command"`
+	Data    string      `json:"data"`
 }

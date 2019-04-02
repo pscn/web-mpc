@@ -2,17 +2,28 @@ window.addEventListener("load", function (evt) {
   var ws;
 
   // hard coded command types: synchronize with command.go
-  var cmdPlay = 0;
-  var cmdAdd = 1;
-  var cmdSearch = 2;
+  var cmd = {
+    "play": 0,
+    "resume": 1,
+    "pause": 2,
+    "stop": 3,
+    "next": 4,
+    "previous": 5,
+    "add": 6,
+    "remove": 7,
+    "search": 8,
+    "statusrRequest": 9,
+  };
 
   // hard coded event types: synchronize with message.go
-  var evError = 0;
-  var evInfo = 1;
-  var evStatus = 2;
-  var evCurrentSong = 3;
-  var evPlaylist = 4;
-  var evSearchResult = 5;
+  var ev = {
+    "error": 0,
+    "info": 1,
+    "status": 2,
+    "currentSong": 3,
+    "playlist": 4,
+    "searchResult":5,
+  };
 
   // pre-load some document.getElementById calls to have the code a little
   // shorter down the road
@@ -60,10 +71,10 @@ window.addEventListener("load", function (evt) {
     console.log("RESPONSE: " + evt.data);
     obj = JSON.parse(evt.data);
     switch (obj.type) {
-      case evError, evInfo:
+      case ev["error"], ev["info"]:
         console.log(obj.data);
         break;
-      case evStatus:
+      case ev["status"]:
         if (obj.data.state == "pause") {
           pause();
           state = "pause";
@@ -81,7 +92,7 @@ window.addEventListener("load", function (evt) {
           elapsed = 0.0;
         }
         break;
-      case evCurrentSong:
+      case ev["currentSong"]:
         el["cs"].title = obj.data.file;
         el["csArtist"].innerHTML = obj.data.artist;
         el["csTitle"].innerHTML = obj.data.title;
@@ -93,7 +104,7 @@ window.addEventListener("load", function (evt) {
         }
         el["csAlbum"].innerHTML = obj.data.album;
         break;
-      case evPlaylist:
+      case ev["playlist"]:
         console.log("playlist")
         el["playlist"].innerHTML = "";
         obj.data.Playlist.map(function (entry, i) {
@@ -118,16 +129,16 @@ window.addEventListener("load", function (evt) {
               node.querySelector("#plPlay").disabled = "disabled";
             }
             node.querySelector("#plPlay").onclick = function (evt) {
-              return command("play" + j);
+              return command("play", j);
             };
             node.querySelector("#plRemove").onclick = function (evt) {
-              return command("remove" + j);
+              return command("remove", j);
             };
           }
           el["playlist"].append(node);
         })
         break;
-      case evSearchResult:
+      case ev["searchResult"]:
         el["searchResult"].innerHTML = "";
         obj.data.Playlist.map(function (entry, i) {
           var node = el["searchEntry"].cloneNode(true);
@@ -146,7 +157,7 @@ window.addEventListener("load", function (evt) {
           {
             const file = entry.file;
             node.querySelector("#srAdd").onclick = function (evt) {
-              return command("add" + file);
+              return command("add", file);
             };
           }
           el["searchResult"].append(node);
@@ -160,13 +171,13 @@ window.addEventListener("load", function (evt) {
   window.onfocus = function (event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress bar setTimeout functions
-    command("status");
+    command("statusRequest", "");
   }
   updateProgress();
 
-  var command = function (cmd) {
+  var command = function (cmdType, data) {
     if (!ws) { return false; }
-    myJson = { "command": cmd }
+    myJson = { "command": cmd[cmdType], "data": data };
     console.log("SEND: " + myJson);
     ws.send(JSON.stringify(myJson));
     return false;
@@ -203,7 +214,7 @@ window.addEventListener("load", function (evt) {
   var buttonIDs = ["play", "resume", "pause", "stop", "next", "previous"];
   buttonIDs.map(function (value) {
     document.getElementById(value).onclick = function (evt) {
-      return command(value);
+      return command(value, "");
     };
   });
 
@@ -230,10 +241,10 @@ window.addEventListener("load", function (evt) {
   el["closeSearch"].onclick = showList;
 
   el["submitSearch"].onclick = function (evt) {
-    return command("search" + el["searchText"].value);
+    return command("search", el["searchText"].value);
   }
   el["searchText"].onchange = function (evt) {
-    return command("search" + el["searchText"].value);
+    return command("search", el["searchText"].value);
   }
 
   showList();

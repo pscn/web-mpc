@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/pscn/web-mpc/helpers"
 
@@ -118,50 +117,35 @@ func (h *Handler) Channel(w http.ResponseWriter, r *http.Request) {
 		}
 		var cmd mpc.Command
 		err = json.Unmarshal(data, &cmd)
-		if h.verbosity > 5 {
-			logger.Printf("Command: %v", cmd.Command)
-		}
+		logger.Printf("Command: %v", cmd)
 		switch cmd.Command {
-		case "play":
-			err = client.Play(-1)
-		case "resume":
-			err = client.Resume()
-		case "pause":
-			err = client.Pause()
-		case "stop":
-			err = client.Stop()
-		case "next":
-			err = client.Next()
-		case "previous":
-			err = client.Previous()
-		case "status":
-			rc <- mpc.NewStatus(client.Status())
-		}
-		if strings.HasPrefix(cmd.Command, "add") {
-			file := cmd.Command[3:]
-			if h.verbosity > 5 {
-				logger.Printf("%s => %s == %s", cmd.Command, cmd.Command[3:], file)
-			}
-			err = client.Add(file)
-		}
-		if strings.HasPrefix(cmd.Command, "play") && len(cmd.Command) > 4 {
-			nr := helpers.ToInt(cmd.Command[4:])
-			if h.verbosity > 5 {
-				logger.Printf("%s => %s == %d", cmd.Command, cmd.Command[4:], nr)
+		case mpc.Play:
+			var nr int
+			if cmd.Data != "" {
+				nr = helpers.ToInt(cmd.Data)
+			} else {
+				nr = -1
 			}
 			err = client.Play(nr)
-		}
-		if strings.HasPrefix(cmd.Command, "remove") {
-			nr := helpers.ToInt64(cmd.Command[6:])
-			if h.verbosity > 5 {
-				logger.Printf("%s => %s == %d", cmd.Command, cmd.Command[6:], nr)
-			}
+		case mpc.Resume:
+			err = client.Resume()
+		case mpc.Pause:
+			err = client.Pause()
+		case mpc.Stop:
+			err = client.Stop()
+		case mpc.Next:
+			err = client.Next()
+		case mpc.Previous:
+			err = client.Previous()
+		case mpc.StatusRequest:
+			rc <- mpc.NewStatus(client.Status())
+		case mpc.Add:
+			err = client.Add(cmd.Data)
+		case mpc.Remove:
+			nr := helpers.ToInt64(cmd.Data)
 			err = client.RemovePlaylistEntry(nr)
-		}
-		if strings.HasPrefix(cmd.Command, "search") {
-			search := cmd.Command[6:]
-			logger.Printf("%s => %s == %s", cmd.Command, cmd.Command[6:], search)
-			rc <- mpc.NewSearchResult(client.Search(search))
+		case mpc.Search:
+			rc <- mpc.NewSearchResult(client.Search(cmd.Data))
 		}
 
 		if err != nil {
