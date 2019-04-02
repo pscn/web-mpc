@@ -1,50 +1,35 @@
 window.addEventListener("load", function (evt) {
   var ws;
 
-  var btnPlay = document.getElementById("play");
-  var btnPause = document.getElementById("pause");
-  var btnResume = document.getElementById("resume");
-  var btnStop = document.getElementById("stop");
-  var btnNext = document.getElementById("next");
-  var btnPrevious = document.getElementById("previous");
-  var pause = function () {
-    btnPlay.style.display = "none";
-    btnPause.style.display = "none";
-    btnResume.style.display = "";
-    btnStop.style.display = ""; btnStop.disabled = "";
-    btnNext.style.display = ""; btnNext.disabled = "";
-    btnPrevious.style.display = ""; btnPrevious.disabled = "";
-  };
+  // hard coded command types: synchronize with command.go
+  var cmdPlay = 0;
+  var cmdAdd = 1;
+  var cmdSearch = 2;
 
-  var play = function () {
-    btnPlay.style.display = "none";
-    btnPause.style.display = "";
-    btnResume.style.display = "none";
-    btnStop.style.display = ""; btnStop.disabled = "";
-    btnNext.style.display = ""; btnNext.disabled = "";
-    btnPrevious.style.display = ""; btnPrevious.disabled = "";
-  };
+  // hard coded event types: synchronize with message.go
+  var evError = 0;
+  var evInfo = 1;
+  var evStatus = 2;
+  var evCurrentSong = 3;
+  var evPlaylist = 4;
+  var evSearchResult = 5;
 
-  var stop = function () {
-    btnPlay.style.display = "";
-    btnPause.style.display = "none";
-    btnResume.style.display = "none";
-    btnStop.style.display = ""; btnStop.disabled = "disabled";
-    btnNext.style.display = ""; btnNext.disabled = "disabled";
-    btnPrevious.style.display = ""; btnPrevious.disabled = "disabled";
-  };
+  // pre-load some document.getElementById calls to have the code a little
+  // shorter down the road
+  var elementIDs = [
+    "playlist", "searchBox", "searchText", "searchResult",
+    "search", "submitSearch", "closeSearch", "searchText", "list",
+    "ws",
+    "playlistEntry", "playlist",
+    "cs", "csTitle", "csArtist", "csAlbumArtist", "csAlbum",
+    "csElapsed", "csDuration",
+    "play", "resume", "pause", "stop", "next", "previous"];
+  var el = {}
+  elementIDs.map(function (value) {
+    el[value] = document.getElementById(value);
+  });
 
-  var cs = document.getElementById("cs");
-  var csTitle = document.getElementById("csTitle");
-  var csArtist = document.getElementById("csArtist");
-  var csAlbumArtist = document.getElementById("csAlbumArtist");
-  var csAlbum = document.getElementById("csAlbum");
-  var csElapsed = document.getElementById("csElapsed");
-  var csDuration = document.getElementById("csDuration");
-
-  var currentPlaylist = document.getElementById("playlist");
-  var searchResult = document.getElementById("searchResult");
-
+  // a few "globals" to track the process and current state of the player
   var duration = 1.0;
   var elapsed = 0.0;
   var state = "pause";
@@ -55,108 +40,118 @@ window.addEventListener("load", function (evt) {
     return min + ":" + sec;
   };
   var updateProgress = function () {
-    // console.log("progress: " + duration + " / " + elapsed);
-    csElapsed.innerHTML = readableSeconds(elapsed);
-    csDuration.innerHTML = readableSeconds(duration);
-    if ((state == "play") && (elapsed < duration)) { elapsed += 1.0; }
+    el["csElapsed"].innerHTML = readableSeconds(elapsed);
+    el["csDuration"].innerHTML = readableSeconds(duration);
+    if ((state == "play") && (elapsed < duration)) {
+      elapsed += 1.0;
+    }
     setTimeout(updateProgress, 1000);
   };
 
-  ws_addr = document.getElementById("ws").value;
+  ws_addr = el["ws"].value;
   ws = new WebSocket(ws_addr);
-  ws.onopen = function (evt) { console.log("OPEN"); }
-  ws.onclose = function (evt) { console.log("CLOSE"); ws = null; }
+  ws.onopen = function (evt) {
+    console.log("OPEN");
+  }
+  ws.onclose = function (evt) {
+    console.log("CLOSE"); ws = null;
+  }
   ws.onmessage = function (evt) {
     console.log("RESPONSE: " + evt.data);
     obj = JSON.parse(evt.data);
-    if (obj.type == 1) {
-    } else if (obj.type == 2) {
-      if (obj.data.state == "pause") {
-        pause();
-        state = "pause";
-        duration = obj.data.duration;
-        elapsed = obj.data.elapsed;
-      } else if (obj.data.state == "play") {
-        play();
-        state = "play";
-        duration = obj.data.duration;
-        elapsed = obj.data.elapsed;
-      } else if (obj.data.state == "stop") {
-        stop();
-        state = "stop";
-        duration = 0.0;
-        elapsed = 0.0;
-      }
-    } else if (obj.type == 3) {
-      cs.title = obj.data.file;
-      csArtist.innerHTML = obj.data.artist;
-      csTitle.innerHTML = obj.data.title;
-      if (obj.data.artist != obj.data.album_artist) {
-        csAlbumArtist.style.display = "";
-        csAlbumArtist.innerHTML = "[" + obj.data.album_artist + "]&nbsp;";
-      } else {
-        csAlbumArtist.style.display = "none";
-      }
-      csAlbum.innerHTML = obj.data.album;
-    } else if (obj.type == 4) {
-      console.log("currentPlaylist")
-      currentPlaylist.innerHTML = "";
-      var playlistEntry = document.getElementById("playlistEntry")
-      obj.data.Playlist.map(function (entry, i) {
-        var node = playlistEntry.cloneNode(true);
-        node.id = "plRow" + i;
-        node.style.display = "";
-        node.querySelector("#plArtist").innerHTML = entry.artist;
-        node.querySelector("#plTitle").innerHTML = entry.title;
-        node.querySelector("#plAlbum").innerHTML = entry.album;
-        if (entry.artist != entry.album_artist) {
-          node.querySelector("#plAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
-        } else {
-          node.querySelector("#plAlbumArtist").style.display = "none";
+    switch (obj.type) {
+      case evError, evInfo:
+        console.log(obj.data);
+        break;
+      case evStatus:
+        if (obj.data.state == "pause") {
+          pause();
+          state = "pause";
+          duration = obj.data.duration;
+          elapsed = obj.data.elapsed;
+        } else if (obj.data.state == "play") {
+          play();
+          state = "play";
+          duration = obj.data.duration;
+          elapsed = obj.data.elapsed;
+        } else if (obj.data.state == "stop") {
+          stop();
+          state = "stop";
+          duration = 0.0;
+          elapsed = 0.0;
         }
-        node.querySelector("#plArtist").innerHTML = entry.artist;
-        node.querySelector("#plDuration").innerHTML =
-          readableSeconds(entry.duration);
-        {
-          const j = i;
-          const file = entry.file;
-          if (file == cs.title) {
-            node.querySelector("#plPlay").disabled = "disabled";
+        break;
+      case evCurrentSong:
+        el["cs"].title = obj.data.file;
+        el["csArtist"].innerHTML = obj.data.artist;
+        el["csTitle"].innerHTML = obj.data.title;
+        if (obj.data.artist != obj.data.album_artist) {
+          el["csAlbumArtist"].style.display = "";
+          el["csAlbumArtist"].innerHTML = "[" + obj.data.album_artist + "]&nbsp;";
+        } else {
+          el["csAlbumArtist"].style.display = "none";
+        }
+        el["csAlbum"].innerHTML = obj.data.album;
+        break;
+      case evPlaylist:
+        console.log("playlist")
+        el["playlist"].innerHTML = "";
+        obj.data.Playlist.map(function (entry, i) {
+          var node = el["playlistEntry"].cloneNode(true);
+          node.id = "plRow" + i;
+          node.style.display = "";
+          node.querySelector("#plArtist").innerHTML = entry.artist;
+          node.querySelector("#plTitle").innerHTML = entry.title;
+          node.querySelector("#plAlbum").innerHTML = entry.album;
+          if (entry.artist != entry.album_artist) {
+            node.querySelector("#plAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
+          } else {
+            node.querySelector("#plAlbumArtist").style.display = "none";
           }
-          node.querySelector("#plPlay").onclick = function (evt) {
-            return command("play" + j);
-          };
-          node.querySelector("#plRemove").onclick = function (evt) {
-            return command("remove" + j);
-          };
-        }
-        currentPlaylist.append(node);
-      })
-    } else if (obj.type == 5) {
-      searchResult.innerHTML = "";
-      var playlistEntry = document.getElementById("searchEntry")
-      obj.data.Playlist.map(function (entry, i) {
-        var node = playlistEntry.cloneNode(true);
-        node.id = "srRow" + i;
-        node.style.display = "";
-        node.querySelector("#srArtist").innerHTML = entry.artist;
-        node.querySelector("#srTitle").innerHTML = entry.title;
-        node.querySelector("#srAlbum").innerHTML = entry.album;
-        if (entry.artist != entry.album_artist) {
-          node.querySelector("#srAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
-        } else {
-          node.querySelector("#srAlbumArtist").style.display = "none";
-        }
-        node.querySelector("#srArtist").innerHTML = entry.artist;
-        node.querySelector("#srDuration").innerHTML = readableSeconds(entry.duration);
-        {
-          const file = entry.file;
-          node.querySelector("#srAdd").onclick = function (evt) {
-            return command("add" + file);
-          };
-        }
-        searchResult.append(node);
-      })
+          node.querySelector("#plArtist").innerHTML = entry.artist;
+          node.querySelector("#plDuration").innerHTML =
+            readableSeconds(entry.duration);
+          {
+            const j = i;
+            const file = entry.file;
+            if (file == cs.title) {
+              node.querySelector("#plPlay").disabled = "disabled";
+            }
+            node.querySelector("#plPlay").onclick = function (evt) {
+              return command("play" + j);
+            };
+            node.querySelector("#plRemove").onclick = function (evt) {
+              return command("remove" + j);
+            };
+          }
+          el["playlist"].append(node);
+        })
+        break;
+      case evSearchResult:
+        el["searchResult"].innerHTML = "";
+        obj.data.Playlist.map(function (entry, i) {
+          var node = el["searchEntry"].cloneNode(true);
+          node.id = "srRow" + i;
+          node.style.display = "";
+          node.querySelector("#srArtist").innerHTML = entry.artist;
+          node.querySelector("#srTitle").innerHTML = entry.title;
+          node.querySelector("#srAlbum").innerHTML = entry.album;
+          if (entry.artist != entry.album_artist) {
+            node.querySelector("#srAlbumArtist").innerHTML = "[" + entry.album_artist + "]&nbsp;";
+          } else {
+            node.querySelector("#srAlbumArtist").style.display = "none";
+          }
+          node.querySelector("#srArtist").innerHTML = entry.artist;
+          node.querySelector("#srDuration").innerHTML = readableSeconds(entry.duration);
+          {
+            const file = entry.file;
+            node.querySelector("#srAdd").onclick = function (evt) {
+              return command("add" + file);
+            };
+          }
+          el["searchResult"].append(node);
+        })
+        break;
     }
   }
   ws.onerror = function (evt) {
@@ -178,40 +173,67 @@ window.addEventListener("load", function (evt) {
   }
 
   // add onclick function for all controls
-  var controls = ["play", "resume", "pause", "stop", "next", "previous"]
-  controls.forEach(activator);
-  function activator(value) {
+  var pause = function () {
+    el["play"].style.display = "none";
+    el["pause"].style.display = "none";
+    el["resume"].style.display = "";
+    el["stop"].style.display = ""; el["stop"].disabled = "";
+    el["next"].style.display = ""; el["next"].disabled = "";
+    el["previous"].style.display = ""; el["previous"].disabled = "";
+  };
+
+  var play = function () {
+    el["play"].style.display = "none";
+    el["pause"].style.display = "";
+    el["resume"].style.display = "none";
+    el["stop"].style.display = ""; el["stop"].disabled = "";
+    el["next"].style.display = ""; el["next"].disabled = "";
+    el["previous"].style.display = ""; el["previous"].disabled = "";
+  };
+
+  var stop = function () {
+    el["play"].style.display = "";
+    el["pause"].style.display = "none";
+    el["resume"].style.display = "none";
+    el["stop"].style.display = ""; el["stop"].disabled = "disabled";
+    el["next"].style.display = ""; el["next"].disabled = "disabled";
+    el["previous"].style.display = ""; el["previous"].disabled = "disabled";
+  };
+
+  var buttonIDs = ["play", "resume", "pause", "stop", "next", "previous"];
+  buttonIDs.map(function (value) {
     document.getElementById(value).onclick = function (evt) {
       return command(value);
     };
-  }
+  });
+
   var showList = function (evt) {
-    document.getElementById("playlist").style.display = "";
-    document.getElementById("searchBox").style.display = "none";
-    document.getElementById("searchResult").style.display = "none";
-    document.getElementById("search").disabled = "";
-    document.getElementById("list").disabled = "disabled";
+    el["playlist"].style.display = "";
+    el["searchBox"].style.display = "none";
+    el["searchResult"].style.display = "none";
+    el["search"].disabled = "";
+    el["list"].disabled = "disabled";
   }
   var showSearch = function (evt) {
-    document.getElementById("playlist").style.display = "none";
-    document.getElementById("searchBox").style.display = "";
-    document.getElementById("searchText").focus();
-    document.getElementById("searchText").select();
-    document.getElementById("searchResult").innerHTML = "";
-    document.getElementById("searchResult").style.display = "";
-    document.getElementById("search").disabled = "disabled";
-    document.getElementById("list").disabled = "";
+    el["playlist"].style.display = "none";
+    el["searchBox"].style.display = "";
+    el["searchText"].focus();
+    el["searchText"].select();
+    el["searchResult"].innerHTML = "";
+    el["searchResult"].style.display = "";
+    el["search"].disabled = "disabled";
+    el["list"].disabled = "";
   }
-  document.getElementById("search").onclick = showSearch;
+  el["search"].onclick = showSearch;
 
-  document.getElementById("list").onclick = showList;
-  document.getElementById("closeSearch").onclick = showList;
+  el["list"].onclick = showList;
+  el["closeSearch"].onclick = showList;
 
-  document.getElementById("submitSearch").onclick = function (evt) {
-    return command("search" + document.getElementById("searchText").value);
+  el["submitSearch"].onclick = function (evt) {
+    return command("search" + el["searchText"].value);
   }
-  document.getElementById("searchText").onchange = function (evt) {
-    return command("search" + document.getElementById("searchText").value);
+  el["searchText"].onchange = function (evt) {
+    return command("search" + el["searchText"].value);
   }
 
   showList();

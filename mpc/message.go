@@ -5,32 +5,32 @@ import (
 	"github.com/pscn/web-mpc/helpers"
 )
 
-// Type to identify the type of event
-type Type uint
+// MessageType to identify the type of message
+type MessageType uint
 
 const (
 	// Error the Event contains an error as payload
-	Error Type = 0
+	Error MessageType = 0
 	// Info the Event contains a string as payload
-	Info Type = 1
+	Info MessageType = 1
 	// Status the Event contains a status as payload
-	Status Type = 2
+	Status MessageType = 2
 	// CurrentSong the Event contains the currently active song
-	CurrentSong Type = 3
+	CurrentSong MessageType = 3
 	// Playlist the Event contains the currently active song
-	Playlist Type = 4
+	Playlist MessageType = 4
 	// SearchResult the result of a search
-	SearchResult Type = 5
+	SearchResult MessageType = 5
 )
 
 // Message from the clients EventLoop
 type Message struct {
-	Type Type        `json:"type"`
+	Type MessageType `json:"type"`
 	Data interface{} `json:"data"`
 }
 
 // NewMessage creates a new event with type and data
-func NewMessage(msgType Type, data interface{}) *Message {
+func NewMessage(msgType MessageType, data interface{}) *Message {
 	return &Message{msgType, data}
 }
 
