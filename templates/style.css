@@ -57,7 +57,8 @@ body {
   grid-template-columns: 1fr;
   grid-template-areas:
     "playerControlPrimary"
-    "playerControlSecondary";
+    "playerControlSecondary"    
+    "playerControlTertiary";
   border: 2px solid black;
   border-radius: 4px;
   margin: 2px;
@@ -73,7 +74,7 @@ body {
     display: grid;
     grid-template-columns: auto auto;
     grid-template-areas:
-      "playerControlPrimary playerControlSecondary";
+      "playerControlPrimary playerControlSecondary playerControlTertiary";
   }
 
 }
@@ -84,6 +85,9 @@ body {
 
 .playerControlSecondary {
   grid-area: playerControlSecondary;
+}
+.playerControlTertiary {
+  grid-area: playerControlTertiary;
 }
 
 .playerElapsedDuration {
