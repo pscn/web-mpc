@@ -31,7 +31,7 @@ window.addEventListener("load", function (evt) {
     "playlist", "searchBox", "searchText", "searchResult",
     "search", "submitSearch", "closeSearch", "searchText", "list",
     "ws",
-    "playlistEntry", "playlist",
+    "playlistEntry", "playlist", "searchEntry",
     "cs", "csTitle", "csArtist", "csAlbumArtist", "csAlbum",
     "csElapsed", "csDuration",
     "play", "resume", "pause", "stop", "next", "previous"];
