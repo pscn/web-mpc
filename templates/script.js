@@ -178,7 +178,7 @@ window.addEventListener("load", function (evt) {
   var command = function (cmdType, data) {
     if (!ws) { return false; }
     myJson = { "command": cmd[cmdType], "data": data };
-    console.log("SEND: " + myJson);
+    console.log("SEND: " + JSON.stringify(myJson));
     ws.send(JSON.stringify(myJson));
     return false;
   }
