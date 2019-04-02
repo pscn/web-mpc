@@ -129,10 +129,10 @@ window.addEventListener("load", function (evt) {
               node.querySelector("#plPlay").disabled = "disabled";
             }
             node.querySelector("#plPlay").onclick = function (evt) {
-              return command("play", j);
+              return command("play", j.toString());
             };
             node.querySelector("#plRemove").onclick = function (evt) {
-              return command("remove", j);
+              return command("remove", j.toString());
             };
           }
           el["playlist"].append(node);
