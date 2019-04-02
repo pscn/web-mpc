@@ -29,31 +29,35 @@
         <button id="list" disabled="disabled"><i class="fas
             fa-list"></i></button>
       </div>
+
       <div class="playerControl"><!-- play, pause etc. -->
-        <button id="play">
-          <i class="fas fa-play"></i>
-        </button>
-        <button id="resume"><i class="fas fa-play"></i></button>
-        <button id="pause" style="display: none"><i
-            class="fas fa-pause"></i></button>
-        <button id="previous"><i class="fas
-            fa-backward"></i></button>
-        <button id="next"><i class="fas fa-forward"></i></button>
-        <button id="stop"><i class="fas fa-stop"></i></button>
-      </div>
-      <div class="playerElapsed"><!-- time elapsed for current song -->
-        <span id="csElapsed">0:21</span> <span id="csDuration">2:31</span>
-      </div>
-      <div class="playerCurrentSong"><!-- currently active song -->
-        <div id="cs" class="currentSong">
-          <div id="csTitle" class="title">Title</div>
-          <div id="csArtist" class="artist">Artist</div>
-          <div id="csAlbum" class="album">Album</div>
-          <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
+        <div class="playerControlPrimary">
+          <button id="play"><i class="fas fa-play"></i></button>
+          <button id="resume"><i class="fas fa-play"></i></button>
+          <button id="pause" style="display: none"><i class="fas fa-pause"></i></button>
+          <button id="stop"><i class="fas fa-stop"></i></button>
+        </div>
+        <div class="playerControlSecondary">
+          <button id="previous"><i class="fas fa-backward"></i></button>
+          <button id="next"><i class="fas fa-forward"></i></button>
         </div>
       </div>
+
+      <div class="playerElapsedDuration">
+        <div id="csElapsed" class="playerElapsed">0:21</div>
+        <div id="csDuration" class="playerDuration">2:12</div>
+      </div>
+
+      <div id="cs" class="playerCurrentSong"><!-- currently active song -->
+        <div id="csTitle" class="title">Title</div>
+        <div id="csArtist" class="artist">Artist</div>
+        <div id="csAlbum" class="album">Album</div>
+        <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
+      </div>
+
       <div id="playlist" class="playlist"><!-- currently active playlist -->
       </div>
+
       <div id="searchBox" class="searchBox"><!-- search input field -->
         <input id="searchText" type="text" name="search">
         <button id="submitSearch"><i class="fas fa-search"></i></button>
@@ -64,9 +68,9 @@
       </div>
     </div>
 
-    <!-- playlist entry template -->
-    <div id="playlistEntry" class="row full playlist" style="display: none">
-      <div class="colS">
+    <!-- playlist entry template will be placed into id="playlist" -->
+    <div id="playlistEntry" class="playlistRow" style="display: none">
+      <div class="playlistControl">
         <button id="plPlay"><i class="fas fa-play"></i></button>
         <button id="plRemove"><i class="fas
             fa-minus-circle"></i></button>

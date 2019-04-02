@@ -1,5 +1,5 @@
 body {
-  background: white;
+  background: #efefef;
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   margin: 4px;
@@ -10,8 +10,8 @@ body {
   display: grid;
   grid-template-columns: 4px auto 1fr auto 4px;
   grid-template-areas:
-    ". switchView playerCurrentSong playerElapsed ."
-    ". playerControl playerCurrentSong playerElapsed ."
+    ". switchView playerCurrentSong playerElapsedDuration ."
+    ". playerControl playerCurrentSong playerElapsedDuration ."
     ". searchBox searchBox searchBox ."
     ". playlist playlist playlist ."
     ". searchResult searchResult searchResult .";
@@ -19,28 +19,83 @@ body {
 
 .switchView {
   grid-area: switchView;
-  border: solid 1px black;
+  border: 2px solid black;
   border-radius: 4px;
-  background: #efefef;
-  text-align: left;
-  vertical-align: middle;
+  margin: 2px;
+  padding: 2px;
 }
 
 .playerCurrentSong {
   grid-area: playerCurrentSong;
-  background: blue;
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
 }
 
 .playerControl {
   grid-area: playerControl;
-  background: green;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "playerControlPrimary"
+    "playerControlSecondary";
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+}
+
+@media (min-width: 768px) {
+
+  /* desktop */
+  .playerControl {
+    grid-area: playerControl;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "playerControlPrimary playerControlSecondary";
+  }
+
+}
+
+.playerControlPrimary {
+  grid-area: playerControlPrimary;
+}
+
+.playerControlSecondary {
+  grid-area: playerControlSecondary;
+}
+
+.playerElapsedDuration {
+  grid-area: playerElapsedDuration;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "playerElapsed"
+    "playerDuration";
+  height: 2em;
 }
 
 .playerElapsed {
   grid-area: playerElapsed;
-  background: yellow;
   text-align: right;
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
 }
+
+.playerDuration {
+  grid-area: playerDuration;
+  text-align: right;
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+}
+
+
 
 .playlist {
   grid-area: playlist;
@@ -48,10 +103,68 @@ body {
 
 .searchBox {
   grid-area: searchBox;
+  /* initially hidden*/
+  display: none;
 }
 
 .searchResult {
   grid-area: searchResult;
+  /* initially hidden*/
+  display: none;
+}
+
+.playlistRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "playlistControl playlistSong";
+}
+
+.playlistControl {
+  grid-area: playlistControl;
+}
+
+.playlistSong {
+  grid-area: playlistSong;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "playlistTitle playlistDuration"
+    "playlistArtist ."
+    "playlistAlbum ."
+    "playlistAlbumArtist .";
+}
+
+@media (min-width: 768px) {
+
+  /* desktop */
+  .playlistSong {
+    grid-area: playlistSong;
+    display: grid;
+    grid-template-columns: 3fr 2fr 3fr 1fr auto;
+    grid-template-areas:
+      "playlistTitle playlistArtist playlistAlbum playlistAlbumArtist playlistDuration";
+  }
+}
+
+.playlistTitle {
+  grid-area: playlistTitle;
+}
+
+.playlistArtist {
+  grid-area: playlistArtist;
+}
+
+.playlistAlbum {
+  grid-area: playlistAlbum;
+}
+
+.playlistAlbumArtist {
+  grid-area: playlistAlbumArtist;
+}
+
+.playlistDuration {
+  grid-area: playlistDuration;
 }
 
 button {
@@ -62,11 +175,12 @@ button {
   -webkit-transition-duration: 0.6s;
   /* Safari */
   transition-duration: 0.6s;
-  padding-top: 4px;
-  padding-bottom: 2px;
-  padding-left: 12px;
-  padding-right: 11px;
-  border-radius: 8px;
+  margin: 4px;
+  font-size: 20px;
+}
+
+button:hover {
+  background: #afafaf;
 }
 
 .player button {
@@ -101,41 +215,11 @@ button {
   color: gray;
 }
 
-.player,
-.playlist {
-  border: 1px solid black;
-  border-radius: 8px;
-  margin-bottom: 2px;
-  background: black;
-  color: white;
-}
-
-.playlist {
+div.playlistRow:nth-child(even) {
   background: gray;
 }
 
-.artist {
-  font-style: italic;
-}
-
-div.elapsed {
-  padding-left: 8px;
-  padding-top: 2px;
-}
-
-div.currentSong,
-div.playlistSong {
-  /* align with the buttons above FIXME: on mobile only? */
-  padding-left: 12px;
-  /* align with the button on the left side (on desktop) */
-  padding-top: 2px;
-}
-
-div.playlist:nth-child(even) {
-  background: gray;
-}
-
-div.playlist:nth-child(odd) {
+div.playlistRow:nth-child(odd) {
   background: lightgray;
 }
 
