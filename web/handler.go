@@ -32,19 +32,6 @@ func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
 	}
 }
 
-// getTemplateParameters returns common "constants" shared between go
-// and javascript
-func getTemplateParameters() *map[string]interface{} {
-	p := map[string]interface{}{
-		"error":           mpc.Error,
-		"string":          mpc.Info,
-		"status":          mpc.Status,
-		"currentSong":     mpc.CurrentSong,
-		"currentPlaylist": mpc.Playlist,
-	}
-	return &p
-}
-
 // StaticPacked serves content with contenType
 func (h *Handler) StaticPacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
 	tmplStr, err := (*box).FindString(fileName)
@@ -79,9 +66,9 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 		return nil
 	}
 	tmpl := template.Must(template.New("").Parse(tmplStr))
-	p := *getTemplateParameters()
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		p["ws"] = "ws://" + r.Host + "/echo"
+		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
 		w.Header().Set("Content-type", contentType)
 		tmpl.Execute(w, p)
 	}
@@ -89,9 +76,8 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 
 // StaticTemplateFile serves content with contenType
 func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.HandlerFunc {
-	p := *getTemplateParameters()
 	return func(w http.ResponseWriter, r *http.Request) {
-		p["ws"] = "ws://" + r.Host + "/echo"
+		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
 		w.Header().Set("Content-type", contentType)
 		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
 		if err != nil {
