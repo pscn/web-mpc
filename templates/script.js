@@ -3,7 +3,7 @@ window.addEventListener("load", function (evt) {
 
   var command = function (cmd, data) {
     if (!ws) { return false; }
-    myJson = { "command": cmd, "data": data };
+    myJson = { "command": cmd, "data ": data };
     console.log("SEND: " + JSON.stringify(myJson));
     ws.send(JSON.stringify(myJson));
     return false;
