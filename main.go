@@ -15,7 +15,9 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-var addr = flag.String("addr", "192.168.0.111:8080", "http service address")
+var addr = flag.String("addr", "127.0.0.1:8080", "http service address")
+var mpdHost = flag.String("mpd", "127.0.0.1:6000", "MPD service address")
+var pass = flag.String("password", "", "MPD password")
 var devel = flag.Bool("devel", false, "serves html, jss & css from the src templates directory")
 
 var upgrader = websocket.Upgrader{} // FIXME: what is this, what does it do?
@@ -113,7 +115,7 @@ func main() {
 			}
 		}
 	}
-	mux.HandleFunc("/echo", h.Channel)
+	mux.HandleFunc("/echo", h.Channel(*mpdHost, *pass))
 
 	log.Fatal(http.ListenAndServe(*addr, mux))
 }

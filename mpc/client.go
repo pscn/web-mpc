@@ -1,7 +1,6 @@
 package mpc
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -11,8 +10,7 @@ import (
 
 // Client with host, port & password & mpc reference
 type Client struct {
-	host     string
-	port     int
+	addr     string // host:port
 	password string
 	logger   *log.Logger
 	mpc      *mpd.Client
@@ -20,10 +18,9 @@ type Client struct {
 }
 
 // New with host, port, password and in & out channels
-func New(host string, port int, password string, logger *log.Logger) (*Client, error) {
+func New(addr string, password string, logger *log.Logger) (*Client, error) {
 	mpc := &Client{
-		host:     host,
-		port:     port,
+		addr:     addr,
 		password: password,
 		logger:   logger,
 	}
@@ -32,17 +29,17 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 
 func (client *Client) reConnect() (err error) {
 	if client.password != "" {
-		client.logger.Printf("connecting to %s:%d with %s", client.host, client.port, client.password)
-		client.mpc, err = mpd.DialAuthenticated("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password)
+		client.logger.Printf("connecting to %s with %s", client.addr, client.password)
+		client.mpc, err = mpd.DialAuthenticated("tcp", client.addr, client.password)
 	} else {
-		client.logger.Printf("connecting to %s:%d", client.host, client.port)
-		client.mpc, err = mpd.Dial("tcp", fmt.Sprintf("%s:%d", client.host, client.port))
+		client.logger.Printf("connecting to %s", client.addr)
+		client.mpc, err = mpd.Dial("tcp", client.addr)
 	}
 	if err == nil {
-		client.logger.Printf("connected to %s:%d", client.host, client.port)
-		client.mpw, err = mpd.NewWatcher("tcp", fmt.Sprintf("%s:%d", client.host, client.port), client.password, "")
+		client.logger.Printf("connected to %s", client.addr)
+		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
-			client.logger.Printf("listening to %s:%d", client.host, client.port)
+			client.logger.Printf("listening to %s", client.addr)
 		}
 	}
 	return
