@@ -10,7 +10,7 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-var addr = flag.String("addr", "127.0.0.1:8080", "http service address")
+var addr = flag.String("addr", ":6666", "http service address")
 var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
 var pass = flag.String("password", "", "MPD password")
 var devel = flag.Bool("local", false,
