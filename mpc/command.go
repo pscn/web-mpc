@@ -24,3 +24,5 @@ type Command struct {
 	Command CommandType `json:"command"`
 	Data    string      `json:"data"`
 }
+
+// eof

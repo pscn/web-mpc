@@ -209,3 +209,5 @@ func (msg *Message) SearchResult() *SearchResultData {
 	}
 	return nil
 }
+
+// eof

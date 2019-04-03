@@ -50,7 +50,7 @@ func (client *Client) Close() (err error) {
 	client.logger.Println("closing connection")
 	err = client.mpc.Close() // close client
 	if err != nil {
-		client.logger.Printf("failed to close client: %v", err)
+		client.logger.Println("failed to close client:", err)
 	}
 	return client.mpw.Close()
 }
@@ -125,7 +125,7 @@ func (client *Client) CurrentSong() *mpd.Attrs {
 	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
-		client.logger.Println("currentsong:", err)
+		client.logger.Println("currentsong: %v", err)
 	}
 	return &attrs
 }
@@ -139,16 +139,6 @@ func (client *Client) CurrentPlaylist() *[]mpd.Attrs {
 	}
 	return &attrs
 }
-
-// Search for str (as tokens)
-// func (client *Client) Search() *[]mpd.Attrs {
-// 	client.Ping()
-// 	attrs, err := client.mpc.Find(-1, -1)
-// 	if err != nil {
-// 		client.logger.Println("currentsong:", err)
-// 	}
-// 	return &attrs
-// }
 
 // RemovePlaylistEntry nr
 func (client *Client) RemovePlaylistEntry(nr int) error {
@@ -180,7 +170,7 @@ func (client *Client) Search(search string) *[]mpd.Attrs {
 	if len(searchTokens) > 0 {
 		attrs, err := client.mpc.Search(searchTokens...)
 		if err != nil {
-			client.logger.Printf("search error: %v", err)
+			client.logger.Println("search error:", err)
 			return nil
 		}
 		return &attrs
@@ -198,7 +188,7 @@ func (client *Client) EventLoop(rc chan *Message) {
 	defer client.logger.Println("stop eventloop")
 
 	go func() { // event loop
-		defer func() { // if you want to recover from any panic below, use this
+		defer func() { // FIXME: find out when this happens and fix the root cause
 			if r := recover(); r != nil {
 				client.logger.Println("recovered", r)
 			}
@@ -237,3 +227,5 @@ func (client *Client) EventLoop(rc chan *Message) {
 	}
 	return
 }
+
+// eof

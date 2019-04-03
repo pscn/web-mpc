@@ -49,7 +49,7 @@ func getTemplateParameters() *map[string]interface{} {
 func (h *Handler) StaticPacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
 	tmplStr, err := (*box).FindString(fileName)
 	if err != nil {
-		h.logger.Printf("box error: %v", err)
+		h.logger.Println("box error:", err)
 		return nil
 	}
 
@@ -227,3 +227,5 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		}
 	}
 }
+
+// eof
