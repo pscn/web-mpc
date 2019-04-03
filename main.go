@@ -18,8 +18,6 @@ var devel = flag.Bool("devel", false, "serves html, jss & css from the src templ
 var upgrader = websocket.Upgrader{} // FIXME: what is this, what does it do?
 
 var box = packr.NewBox("./templates")
-var tmplName = []string{"index.html", "script.js", "style.css"}
-var tmplType = []string{"text/html", "text/javascript", "text/css"}
 var verbosity = 2
 
 func main() {
