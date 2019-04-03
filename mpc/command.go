@@ -5,6 +5,7 @@ package mpc
 // CommandType to identify the type of command
 type CommandType uint
 
+// CommandTypes
 const (
 	Play          CommandType = 0
 	Resume        CommandType = 1
