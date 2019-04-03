@@ -1,5 +1,6 @@
 body {
-  background:black;
+  background: black;
+  /* FIXME: better font selection */
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   margin: 4px;
@@ -34,6 +35,7 @@ body {
   background: #ff1f1f;
   font-size: 24px;
 }
+
 .switchView {
   grid-area: switchView;
   border: 2px solid black;
@@ -67,7 +69,7 @@ body {
   grid-template-columns: 1fr;
   grid-template-areas:
     "playerControlPrimary"
-    "playerControlSecondary"    
+    "playerControlSecondary"
     "playerControlTertiary";
   border: 2px solid black;
   border-radius: 4px;
@@ -96,6 +98,7 @@ body {
 .playerControlSecondary {
   grid-area: playerControlSecondary;
 }
+
 .playerControlTertiary {
   grid-area: playerControlTertiary;
 }
@@ -155,8 +158,8 @@ body {
 }
 
 .textInput {
-  margin:4px;
-  padding:4px;
+  margin: 4px;
+  padding: 4px;
 }
 
 .searchResult {
@@ -250,24 +253,8 @@ button:hover {
   background: #afafaf;
 }
 
-.player button {
-  color: white;
-}
-
 .playlist button {
   color: black;
-}
-
-.player button:hover {
-  background: gray;
-}
-
-.player button:focus {
-  background: gray;
-}
-
-.player button:disabled {
-  color: gray;
 }
 
 .playlist button:hover {
@@ -282,11 +269,13 @@ button:hover {
   color: gray;
 }
 
-div.playlistRow:nth-child(even), div.searchResultRow:nth-child(even) {
-    background: #bfbfbf;
+div.playlistRow:nth-child(even),
+div.searchResultRow:nth-child(even) {
+  background: #bfbfbf;
 }
 
-div.playlistRow:nth-child(odd), div.searchResultRow:nth-child(odd) {
+div.playlistRow:nth-child(odd),
+div.searchResultRow:nth-child(odd) {
   background: #9f9f9f;
 }
 
