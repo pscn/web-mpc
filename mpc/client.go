@@ -151,10 +151,9 @@ func (client *Client) CurrentPlaylist() *[]mpd.Attrs {
 // }
 
 // RemovePlaylistEntry nr
-func (client *Client) RemovePlaylistEntry(nr int64) error {
+func (client *Client) RemovePlaylistEntry(nr int) error {
 	client.Ping()
-	return client.mpc.Delete(int(nr), -1)
-	//PlaylistDelete("", int(nr))
+	return client.mpc.Delete(nr, -1)
 }
 
 // Search for search string tokenized by space and searched in any

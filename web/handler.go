@@ -215,7 +215,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				case mpc.Add:
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
-					nr := helpers.ToInt64(cmd.Data)
+					nr := helpers.ToInt(cmd.Data)
 					err = client.RemovePlaylistEntry(nr)
 				case mpc.Search:
 					rc <- mpc.NewSearchResult(client.Search(cmd.Data))
