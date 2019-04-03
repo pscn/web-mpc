@@ -37,7 +37,7 @@ And finally run it with:
 
 `./web-mpc -addr :8080 -mpd 127.0.0.1:6600`
 
-- *-addr* specifies the interface the HTTP server listens ons.  Use `127.0.0.1:1234` to only list on localhost.  User `:1234` to listen on all interfaces.  Default is `:6666`
+- *-addr* specifies the interface the HTTP server listens ons.  Use `127.0.0.1:1234` to only list on localhost.  User `:1234` to listen on all interfaces.  Default is `:6666`.  Note: on some Linux systems providing only the port, will bind only to the IPV6 interface.  I'm not sure how to fix that.  In that case, you need to provide the IPV4 address too.
 - *-mpd* specifies the IP address and port the MPD server listens on.  Use *-pass* if you need to provide a password.  Default is `127.0.0.1:6600`.
 
 #### eof
