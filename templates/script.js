@@ -3,21 +3,11 @@ window.addEventListener("load", function (evt) {
 
   var command = function (cmd, data) {
     if (!ws) { return false; }
-    myJson = { "command": cmd, "data ": data };
+    myJson = { "command": cmd, "data": data };
     console.log("SEND: " + JSON.stringify(myJson));
     ws.send(JSON.stringify(myJson));
     return false;
   }
-
-  // hard coded event types: synchronize with message.go
-  var ev = {
-    "error": 0,
-    "info": 1,
-    "status": 2,
-    "currentSong": 3,
-    "playlist": 4,
-    "searchResult": 5,
-  };
 
   // pre-load some document.getElementById calls to have the code a little
   // shorter down the road
@@ -66,12 +56,12 @@ window.addEventListener("load", function (evt) {
     console.log("RESPONSE: " + evt.data);
     obj = JSON.parse(evt.data);
     switch (obj.type) {
-      case ev["error"], ev["info"]:
+      case "error", "info":
         el["error"].innerHTML = obj.data;
         el["error"].style.display = "";
         console.log(obj.data);
         break;
-      case ev["status"]:
+      case "status":
         if (obj.data.state == "pause") {
           pause();
           state = "pause";
@@ -89,7 +79,7 @@ window.addEventListener("load", function (evt) {
           elapsed = 0.0;
         }
         break;
-      case ev["currentSong"]:
+      case "currentSong":
         el["cs"].title = obj.data.file;
         el["csArtist"].innerHTML = obj.data.artist;
         el["csTitle"].innerHTML = obj.data.title;
@@ -101,7 +91,7 @@ window.addEventListener("load", function (evt) {
         }
         el["csAlbum"].innerHTML = obj.data.album;
         break;
-      case ev["playlist"]:
+      case "playlist":
         console.log("playlist")
         el["playlist"].innerHTML = "";
         obj.data.Playlist.map(function (entry, i) {
@@ -135,7 +125,7 @@ window.addEventListener("load", function (evt) {
           el["playlist"].append(node);
         })
         break;
-      case ev["searchResult"]:
+      case "searchResult":
         el["searchResult"].innerHTML = "";
         obj.data.Playlist.map(function (entry, i) {
           var node = el["searchEntry"].cloneNode(true);
