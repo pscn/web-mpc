@@ -17,6 +17,8 @@ import (
 type Handler struct {
 	upgrader  *websocket.Upgrader
 	verbosity int
+	websocket *websocket.Conn
+	logger    *log.Logger
 }
 
 // New *Handler
@@ -27,35 +29,61 @@ func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
 	}
 }
 
+func (h *Handler) writeMessage(msg *mpc.Message) error {
+	data, err := json.Marshal(msg)
+	if err != nil {
+		h.logger.Println("marshal:", err)
+		return err
+	}
+	err = h.websocket.WriteMessage(websocket.TextMessage, data)
+	if err != nil {
+		h.logger.Println("write:", err)
+	}
+	return err
+}
+func (h *Handler) readCommand() (*mpc.Command, error) {
+	var cmd mpc.Command
+	_, data, err := h.websocket.ReadMessage()
+	if err != nil {
+		h.logger.Println("read:", err)
+		return &cmd, err
+	}
+	err = json.Unmarshal(data, &cmd)
+	return &cmd, err
+}
+
 // Channel to websocket
 func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		logger := log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
+		var err error
+		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.Println("recovered", r)
+				h.logger.Println("recovered", r)
 			}
 		}()
-		logger.Printf("handling")
-		defer logger.Printf("stop handling")
+		h.logger.Printf("handling")
+		defer h.logger.Printf("stop handling")
 
 		// open websocket
-		c, err := h.upgrader.Upgrade(w, r, nil)
+		h.websocket, err = h.upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			logger.Println("upgrade:", err)
+			h.logger.Println("upgrade:", err)
 			return
 		}
-		defer c.Close()
+		defer h.websocket.Close()
 
 		// open connection to mpc
-		client, err := mpc.New(mpdHost, mpdPass, logger)
+		client, err := mpc.New(mpdHost, mpdPass, h.logger)
 		if err != nil {
-			logger.Println("mpc:", err)
+			h.logger.Println("mpc:", err)
+			h.writeMessage(mpc.NewErrorEvent(err))
 			return
 		}
 		defer client.Close()
 
+		// return channel
 		rc := make(chan *mpc.Message, 1)
 		defer close(rc)
 
@@ -65,61 +93,38 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 			for event := range rc {
 				if h.verbosity > 5 {
-					logger.Printf("Event: %d\n", event.Type)
+					h.logger.Printf("Event: %d\n", event.Type)
 				}
-				var data []byte
-				var err error
 				switch event.Type {
 				case mpc.Error:
-					logger.Println("error:", event.Error())
+					h.logger.Println("error:", event.Error())
 					break
 				case mpc.Info:
 					if h.verbosity > 5 {
-						logger.Println("string:", event.String())
+						h.logger.Println("string:", event.String())
 					}
 				case mpc.Status:
 					if h.verbosity > 5 {
-						logger.Println("status:", event.Status())
+						h.logger.Println("status:", event.Status())
 					}
 				case mpc.CurrentSong:
 					if h.verbosity > 5 {
-						logger.Println("current song:", event.CurrentSong())
+						h.logger.Println("current song:", event.CurrentSong())
 					}
 				case mpc.Playlist:
 					if h.verbosity > 5 {
-						logger.Println("current playlist:", event.CurrentPlaylist())
+						h.logger.Println("current playlist:", event.CurrentPlaylist())
 					}
 				}
-				data, err = json.Marshal(event)
-				if err != nil {
-					logger.Println("marshal:", err)
-					break
-				}
-				if data != nil {
-					if h.verbosity > 5 {
-						logger.Println("writing:", string(data))
-					}
-					c.WriteMessage(websocket.TextMessage, []byte(data))
-					if err != nil {
-						logger.Println("write:", err)
-						break
-					}
-				}
+				h.writeMessage(event)
 			}
 		}()
 
 		for { // read commands from the webpage
-			_, data, err := c.ReadMessage()
-			if err != nil {
-				logger.Println("read:", err)
-				break
-			}
+			cmd, err := h.readCommand() // FIXME: handle err
 			if h.verbosity > 5 {
-				logger.Printf("recv: %v", string(data))
+				h.logger.Printf("recv: %v", *cmd)
 			}
-			var cmd mpc.Command
-			err = json.Unmarshal(data, &cmd)
-			logger.Printf("Command: %v", cmd)
 			switch cmd.Command {
 			case mpc.Play:
 				var nr int
@@ -151,7 +156,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			}
 
 			if err != nil {
-				logger.Printf("Command error: %v", err)
+				h.logger.Printf("Command error: %v", err)
 			}
 		}
 	}
