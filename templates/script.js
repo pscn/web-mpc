@@ -12,7 +12,7 @@ window.addEventListener("load", function (evt) {
     "add": 6,
     "remove": 7,
     "search": 8,
-    "statusrRequest": 9,
+    "statusRequest": 9,
   };
 
   // hard coded event types: synchronize with message.go
@@ -22,7 +22,7 @@ window.addEventListener("load", function (evt) {
     "status": 2,
     "currentSong": 3,
     "playlist": 4,
-    "searchResult":5,
+    "searchResult": 5,
   };
 
   // pre-load some document.getElementById calls to have the code a little
@@ -181,7 +181,7 @@ window.addEventListener("load", function (evt) {
   var command = function (cmdType, data) {
     if (!ws) { return false; }
     myJson = { "command": cmd[cmdType], "data": data };
-    console.log("SEND: " + JSON.stringify(myJson));
+    console.log("SEND(" + cmdType + "): " + JSON.stringify(myJson));
     ws.send(JSON.stringify(myJson));
     return false;
   }
