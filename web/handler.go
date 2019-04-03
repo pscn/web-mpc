@@ -103,6 +103,10 @@ func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.H
 }
 
 func (h *Handler) writeMessage(ws *websocket.Conn, msg *mpc.Message) error {
+	if msg == nil {
+		h.logger.Println("cowardly refusing to work with nil")
+		return nil
+	}
 	data, err := json.Marshal(msg)
 	if err != nil {
 		h.logger.Println("marshal:", err)
@@ -157,15 +161,9 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		}
 		defer client.Close()
 
-		// return channel mpc
-		rc := make(chan *mpc.Message, 10)
-		defer close(rc)
-
 		// channel for websocket
 		wc := make(chan *mpc.Command, 10)
 		defer close(wc)
-
-		go client.EventLoop(rc)
 
 		go func() {
 			for {
@@ -179,18 +177,23 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			close(wc)
 		}()
 
+		// update the web client with the current status
+		h.writeMessage(ws, client.Status())
+		h.writeMessage(ws, client.CurrentSong())
+		h.writeMessage(ws, client.CurrentPlaylist())
+
 		for {
 			select {
-			case msg := <-rc:
-				h.logger.Printf("event: %s\n", msg.String()) // FIXME: why does it not use String() automatically?
-				switch msg.Type {
-				case mpc.Error:
-					h.logger.Println("error:", msg.Error())
-					break
+			case event := <-*client.Event:
+				h.logger.Println("event:", event)
+				switch event {
+				case "player", "playlist":
+					h.writeMessage(ws, client.Status())
+					h.writeMessage(ws, client.CurrentSong())
+					h.writeMessage(ws, client.CurrentPlaylist())
 				}
-				h.writeMessage(ws, msg)
 			case cmd := <-wc:
-				h.logger.Printf("cmd: %v\n", *cmd)
+				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
 				case mpc.Play:
 					var nr int
@@ -211,14 +214,14 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				case mpc.Previous:
 					err = client.Previous()
 				case mpc.StatusRequest:
-					rc <- mpc.NewStatus(client.Status())
+					h.writeMessage(ws, client.Status())
 				case mpc.Add:
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
 					nr := helpers.ToInt(cmd.Data)
 					err = client.RemovePlaylistEntry(nr)
 				case mpc.Search:
-					rc <- mpc.NewSearchResult(client.Search(cmd.Data))
+					h.writeMessage(ws, client.Search(cmd.Data))
 				}
 				if err != nil {
 					h.logger.Println("command error:", err)
