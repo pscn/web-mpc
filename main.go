@@ -11,7 +11,7 @@ import (
 )
 
 var addr = flag.String("addr", "127.0.0.1:8080", "http service address")
-var mpdHost = flag.String("mpd", "127.0.0.1:6000", "MPD service address")
+var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
 var pass = flag.String("password", "", "MPD password")
 var devel = flag.Bool("local", false,
 	"serves html, jss & css from the local templates directory")
