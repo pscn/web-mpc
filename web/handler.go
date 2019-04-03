@@ -75,7 +75,7 @@ func (h *Handler) StaticFile(contentType string, fileName string) http.HandlerFu
 func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
 	tmplStr, err := (*box).FindString(fileName)
 	if err != nil {
-		h.logger.Printf("box error: %v", err)
+		h.logger.Println("box error:", err)
 		return nil
 	}
 	tmpl := template.Must(template.New("").Parse(tmplStr))
@@ -171,7 +171,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			for {
 				cmd, err := h.readCommand(ws)
 				if err != nil {
-					h.logger.Printf("read error: %v", err)
+					h.logger.Println("read error:", err)
 					break
 				}
 				wc <- cmd
@@ -221,7 +221,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 					rc <- mpc.NewSearchResult(client.Search(cmd.Data))
 				}
 				if err != nil {
-					h.logger.Printf("Command error: %v", err)
+					h.logger.Println("command error:", err)
 				}
 			}
 		}
