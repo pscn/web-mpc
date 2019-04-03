@@ -49,11 +49,12 @@ func (client *Client) reConnect() (err error) {
 // Close the MPDClient
 func (client *Client) Close() (err error) {
 	client.logger.Println("closing connection")
-	err = client.mpc.Close() // close client
+	err = client.mpw.Close() // close client
 	if err != nil {
-		client.logger.Println("failed to close client:", err)
+		client.logger.Println("failed to close watcher:", err)
 	}
-	return client.mpw.Close()
+	client.Event = nil
+	return client.mpc.Close()
 }
 
 // Ping and try to re-connect if ping fails
