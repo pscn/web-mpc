@@ -25,10 +25,15 @@ type Handler struct {
 	logger    *log.Logger
 }
 
-// New *Handler
-func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
+// New handler
+func New(verbosity int, checkOrigin bool) *Handler {
+	upgrader := websocket.Upgrader{}
+	if !checkOrigin {
+		// disable origin check to test from static html, css & js
+		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	}
 	return &Handler{
-		upgrader:  upgrader,
+		upgrader:  &upgrader,
 		verbosity: verbosity,
 	}
 }
@@ -184,6 +189,9 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 					h.writeMessage(ws, client.CurrentPlaylist())
 				}
 			case cmd := <-wc:
+				if cmd == nil {
+					break
+				}
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
 				case mpc.Play:
@@ -206,6 +214,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
 					err = client.RemovePlaylistEntry(helpers.ToInt(cmd.Data))
+
 				case mpc.StatusRequest:
 					h.writeMessage(ws, client.Status())
 				case mpc.Search:

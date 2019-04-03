@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gobuffalo/packr"
-	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/web"
 )
 
@@ -16,17 +15,13 @@ var pass = flag.String("password", "", "MPD password")
 var devel = flag.Bool("local", false,
 	"serves html, jss & css from the local templates directory")
 
-var upgrader = websocket.Upgrader{} // FIXME: what is this, what does it do?
-
 var box = packr.NewBox("./templates")
 var verbosity = 2
 
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	// disable origin check to test from static html, css & js (FIXME: remove this)
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	h := web.New(&upgrader, verbosity)
+	h := web.New(verbosity, !*devel)
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {
