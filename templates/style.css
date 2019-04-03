@@ -17,6 +17,7 @@ body {
   display: grid;
   grid-template-columns: 4px auto 1fr auto 4px;
   grid-template-areas:
+    ". error error error ."
     ". switchView playerCurrentSong playerElapsedDuration ."
     ". playerControl playerCurrentSong playerElapsedDuration ."
     ". searchBox searchBox searchBox ."
@@ -24,6 +25,15 @@ body {
     ". searchResult searchResult searchResult .";
 }
 
+.error {
+  grid-area: error;
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+  background: #ff1f1f;
+  font-size: 24px;
+}
 .switchView {
   grid-area: switchView;
   border: 2px solid black;

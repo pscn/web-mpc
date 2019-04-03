@@ -28,6 +28,7 @@ window.addEventListener("load", function (evt) {
   // pre-load some document.getElementById calls to have the code a little
   // shorter down the road
   var elementIDs = [
+    "error",
     "playlist", "searchBox", "searchText", "searchResult",
     "search", "submitSearch", "closeSearch", "searchText", "list",
     "ws",
@@ -72,6 +73,8 @@ window.addEventListener("load", function (evt) {
     obj = JSON.parse(evt.data);
     switch (obj.type) {
       case ev["error"], ev["info"]:
+        el["error"].innerHTML = obj.data;
+        el["error"].style.display = "";
         console.log(obj.data);
         break;
       case ev["status"]:
