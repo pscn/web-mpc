@@ -154,14 +154,14 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 		// channel for commands from the webclient
 		wc := make(chan *mpc.Command, 10)
-		defer close(wc)
 
 		go func() {
+			defer close(wc)
 			for {
 				cmd, err := h.readCommand(ws)
 				if err != nil {
 					h.logger.Println("read error:", err)
-					break
+					return
 				}
 				wc <- cmd
 			}
@@ -187,13 +187,11 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
 				case mpc.Play:
-					var nr int
 					if cmd.Data != "" {
-						nr = helpers.ToInt(cmd.Data)
+						err = client.Play(helpers.ToInt(cmd.Data))
 					} else {
-						nr = -1
+						err = client.Play(-1)
 					}
-					err = client.Play(nr)
 				case mpc.Resume:
 					err = client.Resume()
 				case mpc.Pause:
@@ -204,13 +202,12 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 					err = client.Next()
 				case mpc.Previous:
 					err = client.Previous()
-				case mpc.StatusRequest:
-					h.writeMessage(ws, client.Status())
 				case mpc.Add:
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
-					nr := helpers.ToInt(cmd.Data)
-					err = client.RemovePlaylistEntry(nr)
+					err = client.RemovePlaylistEntry(helpers.ToInt(cmd.Data))
+				case mpc.StatusRequest:
+					h.writeMessage(ws, client.Status())
 				case mpc.Search:
 					h.writeMessage(ws, client.Search(cmd.Data))
 				}
