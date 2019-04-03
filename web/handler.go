@@ -154,10 +154,10 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 		// channel for commands from the webclient
 		wc := make(chan *mpc.Command, 10)
+		defer close(wc)
 
 		go func() {
 			for {
-				defer close(wc)
 				cmd, err := h.readCommand(ws)
 				if err != nil {
 					h.logger.Println("read error:", err)
