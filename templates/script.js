@@ -1,19 +1,13 @@
 window.addEventListener("load", function (evt) {
   var ws;
 
-  // hard coded command types: synchronize with command.go
-  var cmd = {
-    "play": 0,
-    "resume": 1,
-    "pause": 2,
-    "stop": 3,
-    "next": 4,
-    "previous": 5,
-    "add": 6,
-    "remove": 7,
-    "search": 8,
-    "statusRequest": 9,
-  };
+  var command = function (cmd, data) {
+    if (!ws) { return false; }
+    myJson = { "command": cmd, "data": data };
+    console.log("SEND: " + JSON.stringify(myJson));
+    ws.send(JSON.stringify(myJson));
+    return false;
+  }
 
   // hard coded event types: synchronize with message.go
   var ev = {
@@ -171,6 +165,7 @@ window.addEventListener("load", function (evt) {
   ws.onerror = function (evt) {
     console.log("ERROR: " + evt.data);
   }
+
   window.onfocus = function (event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress bar setTimeout functions
@@ -178,13 +173,6 @@ window.addEventListener("load", function (evt) {
   }
   updateProgress();
 
-  var command = function (cmdType, data) {
-    if (!ws) { return false; }
-    myJson = { "command": cmd[cmdType], "data": data };
-    console.log("SEND(" + cmdType + "): " + JSON.stringify(myJson));
-    ws.send(JSON.stringify(myJson));
-    return false;
-  }
 
   // add onclick function for all controls
   var pause = function () {
@@ -251,7 +239,6 @@ window.addEventListener("load", function (evt) {
   }
 
   showList();
-
 });
 
 // eof

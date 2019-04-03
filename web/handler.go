@@ -155,18 +155,22 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		client, err := mpc.New(mpdHost, mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
+			// FIXME: either the host & port for MPD is wrong, or MPD is
+			// down / restarting
+			// we could try again after some time?
+			// right now the user needs to reload the page to try again
 			h.writeMessage(ws, mpc.NewInfo(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
 		defer client.Close()
 
-		// channel for websocket
+		// channel for commands from the webclient
 		wc := make(chan *mpc.Command, 10)
-		defer close(wc)
 
 		go func() {
 			for {
+				defer close(wc)
 				cmd, err := h.readCommand(ws)
 				if err != nil {
 					h.logger.Println("read error:", err)
@@ -174,7 +178,6 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				}
 				wc <- cmd
 			}
-			close(wc)
 		}()
 
 		// update the web client with the current status
@@ -195,7 +198,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			case cmd := <-wc:
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
-				case mpc.Play:
+				case "play":
 					var nr int
 					if cmd.Data != "" {
 						nr = helpers.ToInt(cmd.Data)
@@ -203,24 +206,24 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 						nr = -1
 					}
 					err = client.Play(nr)
-				case mpc.Resume:
+				case "resume":
 					err = client.Resume()
-				case mpc.Pause:
+				case "pause":
 					err = client.Pause()
-				case mpc.Stop:
+				case "stop":
 					err = client.Stop()
-				case mpc.Next:
+				case "next":
 					err = client.Next()
-				case mpc.Previous:
+				case "previous":
 					err = client.Previous()
-				case mpc.StatusRequest:
+				case "statusRequest":
 					h.writeMessage(ws, client.Status())
-				case mpc.Add:
+				case "add":
 					err = client.Add(cmd.Data)
-				case mpc.Remove:
+				case "remove":
 					nr := helpers.ToInt(cmd.Data)
 					err = client.RemovePlaylistEntry(nr)
-				case mpc.Search:
+				case "search":
 					h.writeMessage(ws, client.Search(cmd.Data))
 				}
 				if err != nil {
