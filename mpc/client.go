@@ -1,7 +1,6 @@
 package mpc
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -15,6 +14,7 @@ type Client struct {
 	logger   *log.Logger
 	mpc      *mpd.Client
 	mpw      *mpd.Watcher
+	Event    *chan string
 }
 
 // New with host, port, password and in & out channels
@@ -40,6 +40,7 @@ func (client *Client) reConnect() (err error) {
 		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
 			client.logger.Printf("listening to %s", client.addr)
+			client.Event = &client.mpw.Event
 		}
 	}
 	return
@@ -67,17 +68,6 @@ func (client *Client) Ping() (err error) {
 		}
 	}
 	return
-}
-
-// Status returns mpd.Attrs
-func (client *Client) Status() *mpd.Attrs {
-	// we get EOF here sometimes.  why?
-	client.Ping()
-	status, err := client.mpc.Status()
-	if err != nil {
-		client.logger.Panic(err) // FIXME: no panic
-	}
-	return &status
 }
 
 // Play start playing
@@ -116,28 +106,35 @@ func (client *Client) Previous() error {
 	return client.mpc.Previous()
 }
 
-// func (client *Client) Cover() []byte {
-// return client.mpc.
-// }
+// Status returns mpd.Attrs
+func (client *Client) Status() *Message {
+	// we get EOF here sometimes.  why?
+	client.Ping()
+	status, err := client.mpc.Status()
+	if err != nil {
+		client.logger.Panic(err) // FIXME: no panic
+	}
+	return NewStatus(&status)
+}
 
 // CurrentSong returns the currently active song
-func (client *Client) CurrentSong() *mpd.Attrs {
+func (client *Client) CurrentSong() *Message {
 	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
-		client.logger.Println("currentsong: %v", err)
+		client.logger.Println("currentsong:", err)
 	}
-	return &attrs
+	return NewCurrentSong(&attrs)
 }
 
 // CurrentPlaylist returns the currently active playlist / queue
-func (client *Client) CurrentPlaylist() *[]mpd.Attrs {
+func (client *Client) CurrentPlaylist() *Message {
 	client.Ping()
 	attrs, err := client.mpc.PlaylistInfo(-1, -1)
 	if err != nil {
 		client.logger.Println("currentsong:", err)
 	}
-	return &attrs
+	return NewCurrentPlaylist(&attrs)
 }
 
 // RemovePlaylistEntry nr
@@ -147,7 +144,7 @@ func (client *Client) RemovePlaylistEntry(nr int) error {
 }
 
 // Search for search string tokenized by space and searched in any
-func (client *Client) Search(search string) *[]mpd.Attrs {
+func (client *Client) Search(search string) *Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
@@ -173,7 +170,7 @@ func (client *Client) Search(search string) *[]mpd.Attrs {
 			client.logger.Println("search error:", err)
 			return nil
 		}
-		return &attrs
+		return NewSearchResult(&attrs)
 	}
 	return nil
 }
@@ -181,51 +178,6 @@ func (client *Client) Search(search string) *[]mpd.Attrs {
 // Add file to playlist
 func (client *Client) Add(file string) error {
 	return client.mpc.Add(file)
-}
-
-// EventLoop with a return channel for messages
-func (client *Client) EventLoop(rc chan *Message) {
-	defer client.logger.Println("stop eventloop")
-
-	go func() { // event loop
-		defer func() { // FIXME: find out when this happens and fix the root cause
-			if r := recover(); r != nil {
-				client.logger.Println("recovered", r)
-			}
-		}()
-		rc <- NewStatus(client.Status())
-		rc <- NewCurrentSong(client.CurrentSong())
-		rc <- NewCurrentPlaylist(client.CurrentPlaylist())
-		for subsystem := range client.mpw.Event {
-			client.logger.Printf("MPD subsystem: %s", subsystem)
-			switch subsystem {
-			case "update":
-				status := *client.Status()
-				client.logger.Printf("Status: %v\n", status)
-				if _, ok := status["updating_db"]; !ok { // if present, it's still in progress
-					rc <- NewInfo("database updating")
-				}
-			case "player", "playlist":
-				status := *client.Status()
-				currentSong := *client.CurrentSong()
-				rc <- NewStatus(client.Status())
-				rc <- NewCurrentSong(client.CurrentSong())
-				rc <- NewCurrentPlaylist(client.CurrentPlaylist())
-				client.logger.Printf("Status: %v\n", status)
-				client.logger.Printf("CurrentSong: %v\n", currentSong)
-			}
-		}
-		client.logger.Printf("mpw loop exited")
-	}()
-
-	// error loop
-	for err := range client.mpw.Error {
-		// Seen so far:
-		// mpd shutdown → write: broken pipe
-		rc <- NewError(fmt.Sprintf("MPD watcher error: %v", err))
-		break
-	}
-	return
 }
 
 // eof
