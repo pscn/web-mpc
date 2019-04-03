@@ -223,6 +223,7 @@ func (client *Client) EventLoop(rc chan *Message) {
 		// Seen so far:
 		// mpd shutdown → write: broken pipe
 		rc <- NewError(fmt.Sprintf("MPD watcher error: %v", err))
+		break
 	}
 	return
 }
