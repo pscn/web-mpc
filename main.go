@@ -2,12 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/gobuffalo/packr/v2"
+	"github.com/gobuffalo/packr"
 	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/web"
 )
@@ -19,7 +17,7 @@ var devel = flag.Bool("devel", false, "serves html, jss & css from the src templ
 
 var upgrader = websocket.Upgrader{} // FIXME: what is this, what does it do?
 
-var box = packr.New("templates", "./templates")
+var box = packr.NewBox("./templates")
 var tmplName = []string{"index.html", "script.js", "style.css"}
 var tmplType = []string{"text/html", "text/javascript", "text/css"}
 var verbosity = 2
@@ -27,42 +25,19 @@ var verbosity = 2
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	logger := log.New(os.Stdout, "web-mpc ", log.LstdFlags|log.Lshortfile)
 	// disable origin check to test from static html, css & js (FIXME: remove this)
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	h := web.New(&upgrader, verbosity)
 	mux := http.NewServeMux()
 	// read templates and add listener
-	for i := range tmplName {
-		if verbosity > 5 {
-			logger.Printf("preparing handler for: %s", tmplName[i])
-		}
-		if verbosity > 5 {
-			logger.Printf("adding handler: %s", tmplName[i])
-		}
-		if tmplName[i] == "index.html" {
-			if *devel {
-				mux.HandleFunc("/", h.StaticTemplateFile(tmplType[i], tmplName[i]))
-			} else {
-				tmplStr, err := box.FindString(tmplName[i])
-				if err != nil {
-					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
-				}
-				mux.HandleFunc("/", h.StaticTemplateString(tmplType[i], tmplStr))
-			}
-		} else {
-			if *devel {
-				mux.HandleFunc(fmt.Sprintf("/%s", tmplName[i]),
-					h.StaticFile(tmplType[i], tmplName[i]))
-			} else {
-				tmplByte, err := box.Find(tmplName[i])
-				if err != nil {
-					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
-				}
-				mux.HandleFunc(fmt.Sprintf("/%s", tmplName[i]),
-					h.StaticString(tmplType[i], string(tmplByte)))
-			}
-		}
+	if *devel {
+		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
+		mux.HandleFunc("/script.js", h.StaticFile("text/javascript", "script.js"))
+		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
+	} else {
+		mux.HandleFunc("/", h.StaticTemplatePacked("text/html", "index.html", &box))
+		mux.HandleFunc("/script.js", h.StaticPacked("text/javascript", "script.js", &box))
+		mux.HandleFunc("/style.css", h.StaticPacked("text/css", "style.css", &box))
 	}
 	mux.HandleFunc("/echo", h.Channel(*mpdHost, *pass))
 

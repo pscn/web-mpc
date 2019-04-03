@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/gobuffalo/packr"
 	"github.com/pscn/web-mpc/helpers"
 
 	"github.com/gorilla/websocket"
@@ -31,11 +32,17 @@ func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
 	}
 }
 
-// StaticString serves content with contenType
-func (h *Handler) StaticString(contentType string, content string) http.HandlerFunc {
+// StaticPacked serves content with contenType
+func (h *Handler) StaticPacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
+	tmplStr, err := (*box).FindString(fileName)
+	if err != nil {
+		h.logger.Printf("box error: %v", err)
+		return nil
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", contentType)
-		w.Write([]byte(content))
+		w.Write([]byte(tmplStr))
 	}
 }
 
@@ -61,9 +68,14 @@ func getTemplateParameters() *map[string]interface{} {
 	return &p
 }
 
-// StaticTemplateString serves content with contenType
-func (h *Handler) StaticTemplateString(contentType string, content string) http.HandlerFunc {
-	tmpl := template.Must(template.New("").Parse(content))
+// StaticTemplatePacked serves content with contenType
+func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
+	tmplStr, err := (*box).FindString(fileName)
+	if err != nil {
+		h.logger.Printf("box error: %v", err)
+		return nil
+	}
+	tmpl := template.Must(template.New("").Parse(tmplStr))
 	p := *getTemplateParameters()
 	return func(w http.ResponseWriter, r *http.Request) {
 		p["ws"] = "ws://" + r.Host + "/echo"
@@ -112,7 +124,6 @@ func (h *Handler) readCommand(ws *websocket.Conn) (*mpc.Command, error) {
 
 // Channel to websocket
 func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 		defer func() {
