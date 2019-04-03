@@ -1,7 +1,7 @@
 
 # Web MPC
 
-A small web client for [MPD](https://www.musicpd.org/) written in [go](https://linkhttps://golang.org/) using websockets.
+A small web client for [MPD](https://www.musicpd.org/) written in [go](https://golang.org/) using websockets.
 
 At the moment it has 2 views:
 
@@ -25,17 +25,11 @@ Click on the search icon to submit the search.  Click on the plus icon to add th
 
 ## Installation
 
-The HTML, JS and CSS files are included in the binary with [packr](https://github.com/gobuffalo/packr).  To build web-mpc you need to install packr first:
+`go get -u github.com/pscn/web-mpc`
 
-`go get -u github.com/gobuffalo/packr/packr`
+Run it with:
 
-The build it with:
-
-`packr2 build`
-
-And finally run it with:
-
-`./web-mpc -addr :8080 -mpd 127.0.0.1:6600`
+`web-mpc -addr :8080 -mpd 127.0.0.1:6600`
 
 - *-addr* specifies the interface the HTTP server listens ons.  Use `127.0.0.1:1234` to only list on localhost.  User `:1234` to listen on all interfaces.  Default is `:8666`.
 - *-mpd* specifies the IP address and port the MPD server listens on.  Use *-pass* if you need to provide a password.  Default is `127.0.0.1:6600`.
