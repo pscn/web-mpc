@@ -161,8 +161,19 @@ func (client *Client) Search(search string) *[]mpd.Attrs {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
-			searchTokens = append(searchTokens, "any")
-			searchTokens = append(searchTokens, token)
+			if strings.HasPrefix(token, "t:") {
+				searchTokens = append(searchTokens, "title")
+				searchTokens = append(searchTokens, token[2:])
+			} else if strings.HasPrefix(token, "a:") {
+				searchTokens = append(searchTokens, "artist")
+				searchTokens = append(searchTokens, token[2:])
+			} else if strings.HasPrefix(token, "al:") {
+				searchTokens = append(searchTokens, "album")
+				searchTokens = append(searchTokens, token[3:])
+			} else {
+				searchTokens = append(searchTokens, "any")
+				searchTokens = append(searchTokens, token)
+			}
 		}
 	}
 	client.logger.Printf("tokens: %v", searchTokens)
