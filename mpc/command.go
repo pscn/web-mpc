@@ -28,7 +28,10 @@ type Command struct {
 }
 
 func (cmd *Command) String() string {
-	return fmt.Sprintf("%s: %s", cmd.Command, cmd.Data)
+	if cmd.Data == "" {
+		return fmt.Sprintf("%s", cmd.Command)
+	}
+	return fmt.Sprintf("%s(%s)", cmd.Command, cmd.Data)
 }
 
 // eof
