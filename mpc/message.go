@@ -9,7 +9,7 @@ import (
 type MessageType uint
 
 const (
-	// Error the Event contains an error as payload
+	// Error the Event contains a string describing as payload
 	Error MessageType = 0
 	// Info the Event contains a string as payload
 	Info MessageType = 1
@@ -34,24 +34,24 @@ func NewMessage(msgType MessageType, data interface{}) *Message {
 	return &Message{msgType, data}
 }
 
-// NewErrorEvent creates a new Event including an error
-func NewErrorEvent(err error) *Message {
-	return NewMessage(Error, err)
+// NewError creates a new Event including an error
+func NewError(str string) *Message {
+	return NewMessage(Error, str)
 }
 
-func (msg *Message) Error() error {
+func (msg *Message) Error() string {
 	if msg.Type == Error { // FIXME: how to inform the develeoper?
-		return msg.Data.(error)
+		return msg.Data.(string)
 	}
-	return nil
+	return ""
 }
 
-// NewStringEvent creates a new Event including an error
-func NewStringEvent(str string) *Message {
+// NewInfo creates a new Event including an error
+func NewInfo(str string) *Message {
 	return NewMessage(Info, str)
 }
 
-func (msg *Message) String() string {
+func (msg *Message) Info() string {
 	if msg.Type == Info { // FIXME: how to inform the develeoper?
 		return msg.Data.(string)
 	}

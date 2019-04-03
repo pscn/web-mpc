@@ -17,7 +17,6 @@ import (
 type Handler struct {
 	upgrader  *websocket.Upgrader
 	verbosity int
-	websocket *websocket.Conn
 	logger    *log.Logger
 }
 
@@ -29,21 +28,21 @@ func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
 	}
 }
 
-func (h *Handler) writeMessage(msg *mpc.Message) error {
+func (h *Handler) writeMessage(ws *websocket.Conn, msg *mpc.Message) error {
 	data, err := json.Marshal(msg)
 	if err != nil {
 		h.logger.Println("marshal:", err)
 		return err
 	}
-	err = h.websocket.WriteMessage(websocket.TextMessage, data)
+	err = ws.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		h.logger.Println("write:", err)
 	}
 	return err
 }
-func (h *Handler) readCommand() (*mpc.Command, error) {
+func (h *Handler) readCommand(ws *websocket.Conn) (*mpc.Command, error) {
 	var cmd mpc.Command
-	_, data, err := h.websocket.ReadMessage()
+	_, data, err := ws.ReadMessage()
 	if err != nil {
 		h.logger.Println("read:", err)
 		return &cmd, err
@@ -56,7 +55,6 @@ func (h *Handler) readCommand() (*mpc.Command, error) {
 func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		var err error
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 		defer func() {
 			if r := recover(); r != nil {
@@ -67,18 +65,18 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		defer h.logger.Printf("stop handling")
 
 		// open websocket
-		h.websocket, err = h.upgrader.Upgrade(w, r, nil)
+		ws, err := h.upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			h.logger.Println("upgrade:", err)
 			return
 		}
-		defer h.websocket.Close()
+		defer ws.Close()
 
 		// open connection to mpc
 		client, err := mpc.New(mpdHost, mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
-			h.writeMessage(mpc.NewStringEvent(
+			h.writeMessage(ws, mpc.NewInfo(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
@@ -102,7 +100,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 					break
 				case mpc.Info:
 					if h.verbosity > 5 {
-						h.logger.Println("string:", event.String())
+						h.logger.Println("string:", event.Info())
 					}
 				case mpc.Status:
 					if h.verbosity > 5 {
@@ -117,12 +115,12 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 						h.logger.Println("current playlist:", event.CurrentPlaylist())
 					}
 				}
-				h.writeMessage(event)
+				h.writeMessage(ws, event)
 			}
 		}()
 
 		for { // read commands from the webpage
-			cmd, err := h.readCommand() // FIXME: handle err
+			cmd, err := h.readCommand(ws) // FIXME: handle err
 			if h.verbosity > 5 {
 				h.logger.Printf("recv: %v", *cmd)
 			}

@@ -1,11 +1,11 @@
 package mpc
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
 	"github.com/fhs/gompd/mpd"
-	"github.com/pkg/errors"
 )
 
 // Client with host, port & password & mpc reference
@@ -203,7 +203,7 @@ func (client *Client) EventLoop(rc chan *Message) {
 				status := *client.Status()
 				client.logger.Printf("Status: %v\n", status)
 				if _, ok := status["updating_db"]; !ok { // if present, it's still in progress
-					rc <- NewStringEvent("database updating")
+					rc <- NewInfo("database updating")
 				}
 			case "player", "playlist":
 				status := *client.Status()
@@ -222,7 +222,7 @@ func (client *Client) EventLoop(rc chan *Message) {
 	for err := range client.mpw.Error {
 		// Seen so far:
 		// mpd shutdown → write: broken pipe
-		rc <- NewErrorEvent(errors.Wrapf(err, "MPDClient error loop"))
+		rc <- NewError(fmt.Sprintf("MPD watcher error: %v", err))
 	}
 	return
 }
