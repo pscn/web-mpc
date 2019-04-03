@@ -78,7 +78,8 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		client, err := mpc.New(mpdHost, mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
-			h.writeMessage(mpc.NewErrorEvent(err))
+			h.writeMessage(mpc.NewStringEvent(
+				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
 		defer client.Close()
