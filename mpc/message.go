@@ -10,18 +10,13 @@ import (
 // MessageType to identify the type of message
 type MessageType uint
 
+// MessageTypes
 const (
-	// Error the Event contains a string describing as payload
-	Error MessageType = 0
-	// Info the Event contains a string as payload
-	Info MessageType = 1
-	// Status the Event contains a status as payload
-	Status MessageType = 2
-	// CurrentSong the Event contains the currently active song
-	CurrentSong MessageType = 3
-	// Playlist the Event contains the currently active song
-	Playlist MessageType = 4
-	// SearchResult the result of a search
+	Error        MessageType = 0
+	Info         MessageType = 1
+	Status       MessageType = 2
+	CurrentSong  MessageType = 3
+	Playlist     MessageType = 4
 	SearchResult MessageType = 5
 )
 
@@ -71,19 +66,12 @@ func NewInfo(str string) *Message {
 	return NewMessage(Info, str)
 }
 
-func (msg *Message) Info() string {
-	if msg.Type == Info { // FIXME: how to inform the develeoper?
-		return msg.Data.(string)
-	}
-	return ""
-}
-
 // StatusData represents the data we get as MPC status
 type StatusData struct {
-	Duration float64 `json:"duration"`
-	Elapsed  float64 `json:"elapsed"`
+	Duration float32 `json:"duration"`
+	Elapsed  float32 `json:"elapsed"`
 	State    string  `json:"state"`
-	Volume   int64   `json:"volume"`
+	Volume   int     `json:"volume"`
 	Consume  bool    `json:"consume"`
 	Random   bool    `json:"random"`
 	Single   bool    `json:"single"`
@@ -93,13 +81,13 @@ type StatusData struct {
 // NewStatus creates a new Event including the status data mapped from mpd.Attrs
 func NewStatus(attrs *mpd.Attrs) *Message {
 	return NewMessage(Status, &StatusData{
-		Duration: helpers.ToFloat64((*attrs)["duration"]),
-		Elapsed:  helpers.ToFloat64((*attrs)["elapsed"]),
+		Duration: helpers.ToFloat((*attrs)["duration"]),
+		Elapsed:  helpers.ToFloat((*attrs)["elapsed"]),
 		Consume:  helpers.ToBool((*attrs)["consume"]),
 		Random:   helpers.ToBool((*attrs)["random"]),
 		Single:   helpers.ToBool((*attrs)["single"]),
 		Repeat:   helpers.ToBool((*attrs)["repeat"]),
-		Volume:   helpers.ToInt64((*attrs)["volume"]),
+		Volume:   helpers.ToInt((*attrs)["volume"]),
 		State:    (*attrs)["state"],
 	})
 }
@@ -118,7 +106,7 @@ type SongData struct {
 	Album       string `json:"album"`
 	AlbumArtist string `json:"album_artist"`
 	Title       string `json:"title"`
-	Duration    int64  `json:"duration"`
+	Duration    int    `json:"duration"`
 	File        string `json:"file"`
 	Genre       string `json:"genre"`
 	Released    string `json:"released"`
@@ -134,7 +122,7 @@ func NewCurrentSong(attrs *mpd.Attrs) *Message {
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
 		Title:       (*attrs)["Title"],
-		Duration:    helpers.ToInt64((*attrs)["Time"]),
+		Duration:    helpers.ToInt((*attrs)["Time"]),
 		File:        (*attrs)["file"],
 		Genre:       (*attrs)["Genre"],
 		Released:    (*attrs)["Date"],
@@ -167,7 +155,7 @@ func NewCurrentPlaylist(attrArr *[]mpd.Attrs) *Message {
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
 			Title:       attrs["Title"],
-			Duration:    helpers.ToInt64(attrs["Time"]),
+			Duration:    helpers.ToInt(attrs["Time"]),
 			File:        attrs["file"],
 			Genre:       attrs["Genre"],
 			Released:    attrs["Date"],
@@ -205,7 +193,7 @@ func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
 			Title:       attrs["Title"],
-			Duration:    helpers.ToInt64(attrs["Time"]),
+			Duration:    helpers.ToInt(attrs["Time"]),
 			File:        attrs["file"],
 			Genre:       attrs["Genre"],
 			Released:    attrs["Date"],
