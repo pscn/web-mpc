@@ -3,15 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/websocket"
-	"github.com/pscn/web-mpc/mpc"
 	"github.com/pscn/web-mpc/web"
 )
 
@@ -36,82 +33,34 @@ func main() {
 	h := web.New(&upgrader, verbosity)
 	mux := http.NewServeMux()
 	// read templates and add listener
-	p := map[string]interface{}{
-		"error":           mpc.Error,
-		"string":          mpc.Info,
-		"status":          mpc.Status,
-		"currentSong":     mpc.CurrentSong,
-		"currentPlaylist": mpc.Playlist,
-	}
 	for i := range tmplName {
 		if verbosity > 5 {
 			logger.Printf("preparing handler for: %s", tmplName[i])
 		}
-		{
-			// FIXME: this is hackish, maybe use gorillas muxer or ...
-			var tmplNr = i // copy to new scope so we can use it safelly in the callback functions
-			if verbosity > 5 {
-				logger.Printf("adding handler: %s", tmplName[tmplNr])
-			}
-			if tmplName[tmplNr] == "index.html" {
-				if *devel {
-					mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-						if verbosity > 5 {
-							logger.Printf("serving / to %s", r.RemoteAddr)
-						}
-						p["ws"] = "ws://" + r.Host + "/echo"
-						w.Header().Set("Content-type", tmplType[tmplNr])
-						dat, err := ioutil.ReadFile(fmt.Sprintf("templates/%s", tmplName[tmplNr]))
-						if err != nil {
-							logger.Fatal(err)
-						}
-						tmpl := template.Must(template.New("").Parse(string(dat)))
-						tmpl.Execute(w, p)
-					})
-				} else {
-					tmplStr, err := box.FindString(tmplName[i])
-					if err != nil {
-						logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
-					}
-					tmpl := template.Must(template.New("").Parse(tmplStr))
-					mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-						if verbosity > 5 {
-							logger.Printf("serving / to %s", r.RemoteAddr)
-						}
-						p["ws"] = "ws://" + r.Host + "/echo"
-						w.Header().Set("Content-type", tmplType[tmplNr])
-						tmpl.Execute(w, p)
-					})
-				}
+		if verbosity > 5 {
+			logger.Printf("adding handler: %s", tmplName[i])
+		}
+		if tmplName[i] == "index.html" {
+			if *devel {
+				mux.HandleFunc("/", h.StaticTemplateFile(tmplType[i], tmplName[i]))
 			} else {
-				if *devel {
-					mux.HandleFunc(fmt.Sprintf("/%s", tmplName[tmplNr]), func(w http.ResponseWriter, r *http.Request) {
-						if verbosity > 5 {
-							logger.Printf("serving /%s to %s", tmplName[tmplNr],
-								r.RemoteAddr)
-						}
-						p["ws"] = "ws://" + r.Host + "/echo"
-						w.Header().Set("Content-type", tmplType[tmplNr])
-						dat, err := ioutil.ReadFile(fmt.Sprintf("templates/%s", tmplName[tmplNr]))
-						if err != nil {
-							logger.Fatal(err)
-						}
-						w.Write(dat)
-					})
-				} else {
-					tmplByte, err := box.Find(tmplName[i])
-					if err != nil {
-						logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
-					}
-					mux.HandleFunc(fmt.Sprintf("/%s", tmplName[tmplNr]), func(w http.ResponseWriter, r *http.Request) {
-						if verbosity > 5 {
-							logger.Printf("serving /%s to %s", tmplName[tmplNr], r.RemoteAddr)
-						}
-						p["ws"] = "ws://" + r.Host + "/echo"
-						w.Header().Set("Content-type", tmplType[tmplNr])
-						w.Write(tmplByte)
-					})
+				tmplStr, err := box.FindString(tmplName[i])
+				if err != nil {
+					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
 				}
+				mux.HandleFunc("/", h.StaticTemplateString(tmplType[i], tmplStr))
+			}
+		} else {
+			if *devel {
+				mux.HandleFunc(fmt.Sprintf("/%s", tmplName[i]),
+					h.StaticFile(tmplType[i], tmplName[i]))
+			} else {
+				tmplByte, err := box.Find(tmplName[i])
+				if err != nil {
+					logger.Panicf("Failed to load template '%s': %v", tmplName[i], err)
+				}
+				mux.HandleFunc(fmt.Sprintf("/%s", tmplName[i]),
+					h.StaticString(tmplType[i], string(tmplByte)))
 			}
 		}
 	}

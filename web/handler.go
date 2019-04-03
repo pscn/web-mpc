@@ -3,9 +3,12 @@ package web
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/pscn/web-mpc/helpers"
 
@@ -25,6 +28,62 @@ func New(upgrader *websocket.Upgrader, verbosity int) *Handler {
 	return &Handler{
 		upgrader:  upgrader,
 		verbosity: verbosity,
+	}
+}
+
+// StaticString serves content with contenType
+func (h *Handler) StaticString(contentType string, content string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-type", contentType)
+		w.Write([]byte(content))
+	}
+}
+
+// StaticFile serves fileName with contenType
+func (h *Handler) StaticFile(contentType string, fileName string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-type", contentType)
+		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
+		if err != nil {
+			h.logger.Fatal(err)
+		}
+		w.Write(dat)
+	}
+}
+func getTemplateParameters() *map[string]interface{} {
+	p := map[string]interface{}{
+		"error":           mpc.Error,
+		"string":          mpc.Info,
+		"status":          mpc.Status,
+		"currentSong":     mpc.CurrentSong,
+		"currentPlaylist": mpc.Playlist,
+	}
+	return &p
+}
+
+// StaticTemplateString serves content with contenType
+func (h *Handler) StaticTemplateString(contentType string, content string) http.HandlerFunc {
+	tmpl := template.Must(template.New("").Parse(content))
+	p := *getTemplateParameters()
+	return func(w http.ResponseWriter, r *http.Request) {
+		p["ws"] = "ws://" + r.Host + "/echo"
+		w.Header().Set("Content-type", contentType)
+		tmpl.Execute(w, p)
+	}
+}
+
+// StaticTemplateFile serves content with contenType
+func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.HandlerFunc {
+	p := *getTemplateParameters()
+	return func(w http.ResponseWriter, r *http.Request) {
+		p["ws"] = "ws://" + r.Host + "/echo"
+		w.Header().Set("Content-type", contentType)
+		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
+		if err != nil {
+			h.logger.Fatal(err)
+		}
+		tmpl := template.Must(template.New("").Parse(string(dat)))
+		tmpl.Execute(w, p)
 	}
 }
 
@@ -121,6 +180,10 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 
 		for { // read commands from the webpage
 			cmd, err := h.readCommand(ws) // FIXME: handle err
+			if err != nil {
+				h.logger.Printf("read error: %v", err)
+				break
+			}
 			if h.verbosity > 5 {
 				h.logger.Printf("recv: %v", *cmd)
 			}
