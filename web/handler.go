@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/gobuffalo/packr"
 	"github.com/pscn/web-mpc/helpers"
@@ -171,6 +172,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		h.writeMessage(ws, client.CurrentSong())
 		h.writeMessage(ws, client.CurrentPlaylist())
 
+		ping := time.Tick(5 * time.Second)
 		for {
 			select {
 			case event := <-*client.Event:
@@ -214,6 +216,11 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				}
 				if err != nil {
 					h.logger.Println("command error:", err)
+				}
+			case <-ping:
+				err := client.Ping()
+				if err != nil {
+					h.logger.Println("ping failed:", err)
 				}
 			}
 		}
