@@ -8,16 +8,16 @@ import (
 )
 
 // MessageType to identify the type of message
-type MessageType uint
+type MessageType string
 
 // MessageTypes
 const (
-	Error        MessageType = 0
-	Info         MessageType = 1
-	Status       MessageType = 2
-	CurrentSong  MessageType = 3
-	Playlist     MessageType = 4
-	SearchResult MessageType = 5
+	Error        MessageType = "error"
+	Info         MessageType = "info"
+	Status       MessageType = "status"
+	CurrentSong  MessageType = "currentSong"
+	Playlist     MessageType = "playlist"
+	SearchResult MessageType = "searchResult"
 )
 
 // Message from the clients EventLoop
@@ -33,20 +33,18 @@ func NewMessage(msgType MessageType, data interface{}) *Message {
 
 func (msg *Message) String() string {
 	switch msg.Type {
-	case Error:
-		return fmt.Sprintf("Error: %s", msg.Data.(string))
-	case Info:
-		return fmt.Sprintf("Info: %s", msg.Data.(string))
+	case Error, Info:
+		return fmt.Sprintf("%s: %s", msg.Type, msg.Data.(string))
 	case Status:
-		return fmt.Sprintf("Status: %+v", msg.Data.(*StatusData))
+		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*StatusData))
 	case CurrentSong:
-		return fmt.Sprintf("CurrentSong: %+v", msg.Data.(*SongData))
+		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SongData))
 	case Playlist:
-		return fmt.Sprintf("Playlist: %+v", msg.Data.(*PlaylistData))
+		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*PlaylistData))
 	case SearchResult:
-		return fmt.Sprintf("SearchResult: %+v", msg.Data.(*SearchResultData))
+		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SearchResultData))
 	}
-	return fmt.Sprintf("Unknown type: %d", msg.Type)
+	return fmt.Sprintf("Unknown type: %s", msg.Type)
 }
 
 // NewError creates a new Event including an error
