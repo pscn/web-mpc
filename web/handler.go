@@ -182,7 +182,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		for {
 			select {
 			case msg := <-rc:
-				h.logger.Printf("event: %s\n", *msg)
+				h.logger.Printf("event: %s\n", msg.String()) // FIXME: why does it not use String() automatically?
 				switch msg.Type {
 				case mpc.Error:
 					h.logger.Println("error:", msg.Error())

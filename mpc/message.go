@@ -1,6 +1,8 @@
 package mpc
 
 import (
+	"fmt"
+
 	"github.com/fhs/gompd/mpd"
 	"github.com/pscn/web-mpc/helpers"
 )
@@ -32,6 +34,24 @@ type Message struct {
 // NewMessage creates a new event with type and data
 func NewMessage(msgType MessageType, data interface{}) *Message {
 	return &Message{msgType, data}
+}
+
+func (msg *Message) String() string {
+	switch msg.Type {
+	case Error:
+		return fmt.Sprintf("Error: %s", msg.Data.(string))
+	case Info:
+		return fmt.Sprintf("Info: %s", msg.Data.(string))
+	case Status:
+		return fmt.Sprintf("Status: %+v", msg.Data.(*StatusData))
+	case CurrentSong:
+		return fmt.Sprintf("CurrentSong: %+v", msg.Data.(*SongData))
+	case Playlist:
+		return fmt.Sprintf("Playlist: %+v", msg.Data.(*PlaylistData))
+	case SearchResult:
+		return fmt.Sprintf("SearchResult: %+v", msg.Data.(*SearchResultData))
+	}
+	return fmt.Sprintf("Unknown type: %d", msg.Type)
 }
 
 // NewError creates a new Event including an error
