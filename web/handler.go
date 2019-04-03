@@ -198,7 +198,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			case cmd := <-wc:
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
-				case "play":
+				case mpc.Play:
 					var nr int
 					if cmd.Data != "" {
 						nr = helpers.ToInt(cmd.Data)
@@ -206,24 +206,24 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 						nr = -1
 					}
 					err = client.Play(nr)
-				case "resume":
+				case mpc.Resume:
 					err = client.Resume()
-				case "pause":
+				case mpc.Pause:
 					err = client.Pause()
-				case "stop":
+				case mpc.Stop:
 					err = client.Stop()
-				case "next":
+				case mpc.Next:
 					err = client.Next()
-				case "previous":
+				case mpc.Previous:
 					err = client.Previous()
-				case "statusRequest":
+				case mpc.StatusRequest:
 					h.writeMessage(ws, client.Status())
-				case "add":
+				case mpc.Add:
 					err = client.Add(cmd.Data)
-				case "remove":
+				case mpc.Remove:
 					nr := helpers.ToInt(cmd.Data)
 					err = client.RemovePlaylistEntry(nr)
-				case "search":
+				case mpc.Search:
 					h.writeMessage(ws, client.Search(cmd.Data))
 				}
 				if err != nil {
