@@ -26,9 +26,11 @@
       <div id="error" class="error" style="display:none;">&nbsp;
       </div>
       <div class="switchView"><!-- switch between playlist and search view -->
+        <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
         <button id="search"><i class="fas fa-search"></i></button>
-        <button id="list" disabled="disabled"><i class="fas
-            fa-list"></i></button>
+        <!-- FIXME: split into primary and secondary for mobile view-->
+        <button id="browse"><i class="fas fa-folder"></i></button>
+        <button id="config"><i class="fas fa-cog"></i></button>
       </div>
 
       <div class="playerControl"><!-- play, pause etc. -->
@@ -42,13 +44,13 @@
           <button id="previous"><i class="fas fa-step-backward"></i></button>
           <button id="next"><i class="fas fa-step-forward"></i></button>
         </div>
-<!--
+        <!--
         <div class="playerControlTertiary">
           <button id="repeat"><i class="fas fa-redo"></i></button>
           <button id="consume"><i class="fas fa-utensils"></i></button>
           <button id="single"><i class="fas fa-redo">1</i></button>
         </div>
--->
+        -->
       </div>
 
       <div class="playerElapsedDuration">
