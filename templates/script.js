@@ -1,15 +1,16 @@
 window.addEventListener('load', function (evt) {
-  var ws
-
-  // Functions
   // short for document.getElementById
-  var el = function (id) {
+  var e = function (id) {
     return document.getElementById(id)
   }
 
+  var ws_addr = e('ws').value // read from hidden input field
+  var ws
+
+
   // https://www.w3schools.com/js/js_cookies.asp
-  var getCookie = function (cname) {
-    var name = cname + '='
+  var getCookie = function (cookieName) {
+    var name = cookieName + '='
     var decodedCookie = decodeURIComponent(document.cookie)
     var ca = decodedCookie.split(';')
     for (var i = 0; i < ca.length; i++) {
@@ -28,9 +29,9 @@ window.addEventListener('load', function (evt) {
     mpdAddr = getCookie('mpd')
     if (mpdAddr != '') {
       parts = mpdAddr.split(':')
-      el('configHost').value = parts[0]
-      el('configPort').value = parts[1]
-      el('configPass').value = parts[2]
+      e('configHost').value = parts[0]
+      e('configPort').value = parts[1]
+      e('configPass').value = parts[2]
     }
   }
   updateConfig()
@@ -38,17 +39,17 @@ window.addEventListener('load', function (evt) {
   var command = function (cmd, data) {
     if (!ws) { return false; }
     myJson = { 'command': cmd, 'data': data }
-    console.log('SEND: ' + JSON.stringify(myJson))
+    // console.log('SEND: ' + JSON.stringify(myJson))
     ws.send(JSON.stringify(myJson))
     return false
   }
 
   var previousDirectory = '' // for browsing
 
-  // a few "globals" to track the process and current state of the player
-  var duration = 1.0
-  var elapsed = 0.0
-  var state = 'pause'
+  // a few 'globals' to track the process and current state of the player
+  var gDuration = 1.0
+  var gElapsed = 0.0
+  var gState = 'pause'
   var readableSeconds = function (value) {
     var min = parseInt(value / 60)
     var sec = parseInt(value % 60)
@@ -56,146 +57,133 @@ window.addEventListener('load', function (evt) {
     return min + ':' + sec
   }
   var updateProgress = function () {
-    el('elapsed').innerHTML = readableSeconds(elapsed)
-    el('duration').innerHTML = readableSeconds(duration)
-    if ((state == 'play') && (elapsed < duration)) {
-      elapsed += 1.0
+    e('elapsed').innerHTML = readableSeconds(gElapsed)
+    e('duration').innerHTML = readableSeconds(gDuration)
+    if ((gState == 'play') && (gElapsed < gDuration)) {
+      gElapsed += 1.0
     }
     setTimeout(updateProgress, 1000)
   }
 
-  el('connectionStatus').onclick = function () {
+  e('connectionStatus').onclick = function () {
     openWebSocket()
   }
   var showError = function (msg) {
-    el('error').innerHTML = el('error').innerHTML + '<br />' + msg
-    el('error').style.display = ''
+    e('error').innerHTML = e('error').innerHTML + '<br />' + msg
+    e('error').style.display = ''
   }
   var hideError = function () {
-    el('error').innerHTML = ''
-    el('error').style.display = 'none'
+    e('error').innerHTML = ''
+    e('error').style.display = 'none'
   }
 
-  var updateActiveSong = function (data) {
-    el('activeSong').title = data.file
-    el('artist').innerHTML = data.artist
-    el('title').innerHTML = data.title
-    if (obj.data.artist != data.album_artist) {
-      el('albumArtist').style.display = ''
-      el('albumArtist').innerHTML = '[' + data.album_artist + ']&nbsp;'
-    } else {
-      el('albumArtist').style.display = 'none'
+  var updateStatus = function (data) {
+    const { state, duration, elapsed, consume, repeat, random, single } = data
+    gState = state
+    console.log(`updateStatus(${state})`)
+    switch (state) {
+      case 'pause':
+      case 'play':
+        togglePlayPause(state)
+        gDuration = duration
+        gElapsed = elapsed
+        break
+      case 'stop':
+        stop()
+        gDuration = 0.0
+        gElapsed = 0.0
+        break
     }
-    el('album').innerHTML = obj.data.album
+    // update the config view
+    e('consume').checked = consume ? 'checked' : '';
+    e('repeat').checked = repeat ? 'checked' : '';
+    e('random').checked = random ? 'checked' : '';
+    e('single').checked = single ? 'checked' : '';
+  }
+  var updateActiveSong = function (data) {
+    const { file, artist, title, album_artist, album } = data
+    e('activeSong').title = file
+    e('artist').innerHTML = artist
+    e('title').innerHTML = title
+    if (artist != album_artist) { // only show album artist if it's different
+      e('albumArtist').style.display = ''
+      e('albumArtist').innerHTML = '[' + album_artist + ']&nbsp;'
+    } else {
+      e('albumArtist').style.display = 'none'
+    }
+    e('album').innerHTML = album
   }
 
   var newSongNode = function (id, entry) {
-    var node = el(id).cloneNode(true)
+    const { file, artist, title, album, album_artist, duration } = entry;
+    var node = e(id).cloneNode(true)
     node.style.display = ''
-    node.querySelector('#songCellArtist').innerHTML = entry.artist
-    node.querySelector('#songCellTitle').innerHTML = entry.title
-    node.querySelector('#songCellAlbum').innerHTML = entry.album
-    if (entry.artist != entry.album_artist) {
+    node.title = file
+    node.querySelector('#songCellArtist').innerHTML = artist
+    node.querySelector('#songCellTitle').innerHTML = title
+    node.querySelector('#songCellAlbum').innerHTML = album
+    if (artist != album_artist) { // only show album artist if it's different
       node.querySelector('#songCellAlbumArtist').innerHTML =
-        '[' + entry.album_artist + ']&nbsp;'
+        '[' + album_artist + ']&nbsp;'
     } else {
       node.querySelector('#songCellAlbumArtist').style.display = 'none'
     }
-    node.querySelector('#songCellArtist').innerHTML = entry.artist
+    node.querySelector('#songCellArtist').innerHTML = artist
     node.querySelector('#songCellDuration').innerHTML =
-      readableSeconds(entry.duration)
+      readableSeconds(duration)
     return node
   }
+  var playSong = function (nr) { // assing this to onclick = playSong(1)
+    return function () {
+      return command('play', nr.toString())
+    }
+  }
+  var removeSong = function (nr) { // assign this to onclick = removeSong(1)
+    return function () {
+      return command('remove', nr.toString())
+    }
+  }
+
   var openWebSocket = function () {
-    var ws_addr = el('ws').value
     ws = new WebSocket(ws_addr)
     ws.onopen = function (evt) {
       console.log('OPEN')
       hideError()
-      el('connect').disabled = 'disabled'
+      e('connect').disabled = 'disabled'
     }
     ws.onclose = function (evt) {
       console.log('CLOSE')
       ws = null
       showError('no connection')
-      el('connect').disabled = ''
+      e('connect').disabled = ''
     }
     ws.onmessage = function (evt) {
-      console.log('RESPONSE: ' + evt.data)
+      console.log({ evt })
       obj = JSON.parse(evt.data)
       switch (obj.type) {
         case 'error', 'info':
           showError(obj.data)
           break
         case 'status':
-          switch (obj.data.state) {
-            case 'pause':
-              pause()
-              state = 'pause'
-              duration = obj.data.duration
-              elapsed = obj.data.elapsed
-              break
-            case 'play':
-              play()
-              state = 'play'
-              duration = obj.data.duration
-              elapsed = obj.data.elapsed
-              break
-            case 'stop':
-              stop()
-              state = 'stop'
-              duration = 0.0
-              elapsed = 0.0
-              break
-          }
-          if (obj.data.consume) {
-            el('consume').checked = 'checked'
-          } else {
-            el('consume').checked = ''
-          }
-          if (obj.data.repeat) {
-            el('repeat').checked = 'checked'
-          } else {
-            el('repeat').checked = ''
-          }
-          if (obj.data.random) {
-            el('random').checked = 'checked'
-          } else {
-            el('random').checked = ''
-          }
-          if (obj.data.single) {
-            el('single').checked = 'checked'
-          } else {
-            el('single').checked = ''
-          }
+          updateStatus(obj.data)
           break
         case 'activeSong':
           updateActiveSong(obj.data)
           break
         case 'activePlaylist':
-          el('playlist').innerHTML = ''
+          e('playlist').innerHTML = '' // delete old playlist
           obj.data.Playlist.map(function (entry, i) {
             var node = newSongNode('playlistEntry', entry)
-            {
-              const j = i
-              const file = entry.file
-              if (file == el('activeSong').title) {
-                node.querySelector('#plPlay').disabled = 'disabled'
-              } else {
-                node.querySelector('#plPlay').disabled = ''
-              }
-              node.querySelector('#plPlay').onclick = function (evt) {
-                return command('play', j.toString())
-              }
-              node.querySelector('#plRemove').onclick = function (evt) {
-                return command('remove', j.toString())
-              }
-            }
-            el('playlist').append(node)
+            // disable the play button for the active song
+            node.querySelector('#plPlay').disabled = (entry.file == e('activeSong').title)
+              ? 'disabled' : ''
+            node.querySelector('#plPlay').onclick = playSong(i)
+            node.querySelector('#plRemove').onclick = removeSong(i)
+            e('playlist').append(node)
           })
           break
         case 'searchResult':
-          el('searchResult').innerHTML = ''
+          e('searchResult').innerHTML = '' // delete old search result
           obj.data.SearchResult.map(function (entry, i) {
             var node = newSongNode('searchEntry', entry)
             {
@@ -204,13 +192,13 @@ window.addEventListener('load', function (evt) {
                 return command('add', file)
               }
             }
-            el('searchResult').append(node)
+            e('searchResult').append(node)
           })
           break
         case 'directoryList':
-          el('directoryList').innerHTML = ''
+          e('directoryList').innerHTML = ''
           if (previousDirectory != '') {
-            node = el('directoryListEntry').cloneNode(true)
+            node = e('directoryListEntry').cloneNode(true)
             node.id = 'dlRowParent'
             node.style.display = ''
             node.querySelector('#dlName').innerHTML = previousDirectory
@@ -220,12 +208,12 @@ window.addEventListener('load', function (evt) {
                 return command('browse', name)
               }
             }
-            el('directoryList').append(node)
+            e('directoryList').append(node)
           }
           obj.data.directoryList.map(function (entry, i) {
             var node
             if (entry.type == 'directory') {
-              node = el('directoryListEntry').cloneNode(true)
+              node = e('directoryListEntry').cloneNode(true)
               node.id = 'dlRow' + i
               node.style.display = ''
               node.querySelector('#dlName').innerHTML = entry.directory
@@ -237,7 +225,7 @@ window.addEventListener('load', function (evt) {
                 }
               }
             } else {
-              node = el('searchEntry').cloneNode(true)
+              node = e('searchEntry').cloneNode(true)
               node.id = 'srRow' + i
               node.style.display = ''
               node.querySelector('#srArtist').innerHTML = entry.artist
@@ -257,7 +245,7 @@ window.addEventListener('load', function (evt) {
                 }
               }
             }
-            el('directoryList').append(node)
+            e('directoryList').append(node)
           })
           break
       }
@@ -276,123 +264,95 @@ window.addEventListener('load', function (evt) {
   updateProgress()
 
   // add onclick function for all controls
-  var pause = function () {
-    el('play').style.display = 'none'
-    el('pause').style.display = 'none'
-    el('resume').style.display = ''
-    el('stop').style.display = ''; el('stop').disabled = ''
-    el('next').style.display = ''; el('next').disabled = ''
-    el('previous').style.display = ''; el('previous').disabled = ''
-  }
-
-  var play = function () {
-    el('play').style.display = 'none'
-    el('pause').style.display = ''
-    el('resume').style.display = 'none'
-    el('stop').style.display = ''; el('stop').disabled = ''
-    el('next').style.display = ''; el('next').disabled = ''
-    el('previous').style.display = ''; el('previous').disabled = ''
+  var togglePlayPause = function (state) {
+    console.log(`togglePlayPause(${state})`)
+    switch (state) {
+      case 'play':
+        e('pause').style.display = ''
+        e('resume').style.display = 'none'
+        break
+      case 'pause':
+        e('pause').style.display = 'none'
+        e('resume').style.display = ''
+        break
+    }
+    e('play').style.display = 'none'
+    e('stop').disabled = ''
+    e('next').disabled = ''
+    e('previous').disabled = ''
   }
 
   var stop = function () {
-    el('play').style.display = ''
-    el('pause').style.display = 'none'
-    el('resume').style.display = 'none'
-    el('stop').style.display = ''; el('stop').disabled = 'disabled'
-    el('next').style.display = ''; el('next').disabled = 'disabled'
-    el('previous').style.display = ''; el('previous').disabled = 'disabled'
+    e('play').style.display = ''
+    e('pause').style.display = 'none'
+    e('resume').style.display = 'none'
+    e('stop').disabled = 'disabled'
+    e('next').disabled = 'disabled'
+    e('previous').disabled = 'disabled'
   }
 
   var buttonIDs = ['play', 'resume', 'pause', 'stop', 'next', 'previous']
   buttonIDs.map(function (value) {
     document.getElementById(value).onclick = function (evt) {
-      console.log(value)
+      console.log(`Control: ${value}`)
       return command(value, '')
     }
   })
 
-  var showList = function (evt) {
-    el('playlistView').style.display = ''
-    el('searchView').style.display = 'none'
-    el('folderView').style.display = 'none'
-    el('configView').style.display = 'none'
+  var views = {
+    'playlistView': 'list',
+    'searchView': 'search',
+    'folderView': 'browser',
+    'configView': 'config'
+  }
+  var show = function (view) {
+    return function () {
+      switch (view) {
+        case 'folderView':
+          command('browse', '')
+          break
+      }
+      for (var k in views) {
+        switch (k) {
+          case view: // show matching view
+            e(k).style.display = ''
+            e(views[k]).disabled = 'disabled'
+            break
+          default: // hidde others
+            e(k).style.display = 'none'
+            e(views[k]).disabled = ''
+            break
+        }
 
-    // enable/disable buttons
-    el('search').disabled = ''
-    el('list').disabled = 'disabled'
-    el('browser').disabled = ''
-    el('config').disabled = ''
+      }
+    }
   }
 
-  var showSearch = function (evt) {
-    el('playlistView').style.display = 'none'
-    el('searchView').style.display = ''
-    el('folderView').style.display = 'none'
-    el('configView').style.display = 'none'
+  e('list').onclick = show('playlistView')
+  e('search').onclick = show('searchView')
+  e('browser').onclick = show('folderView')
+  e('config').onclick = show('configView')
 
-    el('searchText').focus()
-    el('searchText').select()
-    el('searchResult').innerHTML = ''
-    el('searchResult').style.display = ''
-    // enable/disable buttons
-    el('search').disabled = 'disabled'
-    el('list').disabled = ''
-    el('browser').disabled = ''
-    el('config').disabled = ''
-  }
-  var showBrowser = function (evt) {
-    previousDirectory = ''
-    el('playlistView').style.display = 'none'
-    el('searchView').style.display = 'none'
-    el('folderView').style.display = ''
-    el('configView').style.display = 'none'
-
-    // enable/disable buttons // enable/disable buttons
-    el('search').disabled = ''
-    el('list').disabled = ''
-    el('browser').disabled = 'disabled'
-    el('config').disabled = ''
-
-    command('browse', '')
-  }
-  var showConfig = function (evt) {
-    el('playlistView').style.display = 'none'
-    el('searchView').style.display = 'none'
-    el('folderView').style.display = 'none'
-    el('configView').style.display = ''
-
-    // enable/disable buttons // enable/disable buttons
-    el('search').disabled = ''
-    el('list').disabled = ''
-    el('browser').disabled = ''
-    el('config').disabled = 'disabled'
+  e('submitSearch').onclick = function (evt) {
+    return command('search', e('searchText').value)
   }
 
-  el('search').onclick = showSearch
-
-  el('browser').onclick = showBrowser
-
-  el('config').onclick = showConfig
-
-  el('list').onclick = showList
-
-  el('submitSearch').onclick = function (evt) {
-    return command('search', el('searchText').value)
-  }
-  el('submitConfig').onclick = function (evt) {
-    document.cookie = 'mpd=' + el('configHost').value + ':'
-      + el('configPort').value + ':'
-      + el('configPass').value
+  e('submitConfig').onclick = function (evt) {
+    // update the cookie and reconnect to the websocket
+    // which will read the cookie and so apply the changes
+    document.cookie = 'mpd=' + e('configHost').value + ':'
+      + e('configPort').value + ':'
+      + e('configPass').value
     if (ws != null) {
       ws.close()
     }
     setTimeout(openWebSocket, 1000)
   }
-  el('searchText').onchange = function (evt) {
-    return command('search', el('searchText').value)
+  e('searchText').onchange = function (evt) {
+    return command('search', e('searchText').value)
   }
 
-  showList()
+  show('playlistView')
 })
 
 // eof
