@@ -133,21 +133,16 @@ window.addEventListener('load', function (evt) {
       readableSeconds(duration)
     return node
   }
-  var playSong = function (nr) { // assing this to onclick = playSong(1)
+  var btnCommand = function (cmd, data) {
     return function () {
-      return command('play', nr.toString())
-    }
-  }
-  var removeSong = function (nr) { // assign this to onclick = removeSong(1)
-    return function () {
-      return command('remove', nr.toString())
+      return command(cmd, data)
     }
   }
 
   var processResponse = function (obj) {
     console.log({ obj })
     const { type, data } = obj
-    
+
     switch (type) {
       case 'error', 'info':
         showError(data)
@@ -161,25 +156,22 @@ window.addEventListener('load', function (evt) {
       case 'activePlaylist':
         e('playlist').innerHTML = '' // delete old playlist
         data.Playlist.map(function (entry, i) {
+          const { file } = entry
           var node = newSongNode('playlistEntry', entry)
           // disable the play button for the active song
-          node.querySelector('#plPlay').disabled = (entry.file == e('activeSong').title)
+          node.querySelector('#plPlay').disabled = (file == e('activeSong').title)
             ? 'disabled' : ''
-          node.querySelector('#plPlay').onclick = playSong(i)
-          node.querySelector('#plRemove').onclick = removeSong(i)
+          node.querySelector('#plPlay').onclick = btnCommand('play', i.toString())
+          node.querySelector('#plRemove').onclick = btnCommand('remove', i.toString())
           e('playlist').append(node)
         })
         break
       case 'searchResult':
         e('searchResult').innerHTML = '' // delete old search result
-        data.SearchResult.map(function (entry, i) {
+        data.SearchResult.map(function (entry) {
+          const { file } = entry
           var node = newSongNode('searchEntry', entry)
-          {
-            const file = entry.file
-            node.querySelector('#srAdd').onclick = function (evt) {
-              return command('add', file)
-            }
-          }
+          node.querySelector('#srAdd').onclick = btnCommand('add', file)
           e('searchResult').append(node)
         })
         break
