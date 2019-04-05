@@ -190,7 +190,8 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				}
 			case cmd := <-wc:
 				if cmd == nil {
-					break
+					// wc closed → exit
+					return
 				}
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
