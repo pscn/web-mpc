@@ -144,6 +144,100 @@ window.addEventListener('load', function (evt) {
     }
   }
 
+  var processResponse = function (obj) {
+    console.log({ obj })
+    const { type, data } = obj
+    
+    switch (type) {
+      case 'error', 'info':
+        showError(data)
+        break
+      case 'status':
+        updateStatus(data)
+        break
+      case 'activeSong':
+        updateActiveSong(data)
+        break
+      case 'activePlaylist':
+        e('playlist').innerHTML = '' // delete old playlist
+        data.Playlist.map(function (entry, i) {
+          var node = newSongNode('playlistEntry', entry)
+          // disable the play button for the active song
+          node.querySelector('#plPlay').disabled = (entry.file == e('activeSong').title)
+            ? 'disabled' : ''
+          node.querySelector('#plPlay').onclick = playSong(i)
+          node.querySelector('#plRemove').onclick = removeSong(i)
+          e('playlist').append(node)
+        })
+        break
+      case 'searchResult':
+        e('searchResult').innerHTML = '' // delete old search result
+        data.SearchResult.map(function (entry, i) {
+          var node = newSongNode('searchEntry', entry)
+          {
+            const file = entry.file
+            node.querySelector('#srAdd').onclick = function (evt) {
+              return command('add', file)
+            }
+          }
+          e('searchResult').append(node)
+        })
+        break
+      case 'directoryList':
+        e('directoryList').innerHTML = ''
+        if (previousDirectory != '') {
+          node = e('directoryListEntry').cloneNode(true)
+          node.id = 'dlRowParent'
+          node.style.display = ''
+          node.querySelector('#dlName').innerHTML = previousDirectory
+          {
+            const name = parent
+            node.querySelector('#dlBrowse').onclick = function (evt) {
+              return command('browse', name)
+            }
+          }
+          e('directoryList').append(node)
+        }
+        data.directoryList.map(function (entry, i) {
+          var node
+          if (entry.type == 'directory') {
+            node = e('directoryListEntry').cloneNode(true)
+            node.id = 'dlRow' + i
+            node.style.display = ''
+            node.querySelector('#dlName').innerHTML = entry.directory
+
+            {
+              const name = entry.directory
+              node.querySelector('#dlBrowse').onclick = function (evt) {
+                return command('browse', name)
+              }
+            }
+          } else {
+            node = e('searchEntry').cloneNode(true)
+            node.id = 'srRow' + i
+            node.style.display = ''
+            node.querySelector('#srArtist').innerHTML = entry.artist
+            node.querySelector('#srTitle').innerHTML = entry.title
+            node.querySelector('#srAlbum').innerHTML = entry.album
+            if (entry.artist != entry.album_artist) {
+              node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+            } else {
+              node.querySelector('#srAlbumArtist').style.display = 'none'
+            }
+            node.querySelector('#srArtist').innerHTML = entry.artist
+            node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
+            {
+              const file = entry.file
+              node.querySelector('#srAdd').onclick = function (evt) {
+                return command('add', file)
+              }
+            }
+          }
+          e('directoryList').append(node)
+        })
+        break
+    }
+  }
   var openWebSocket = function () {
     ws = new WebSocket(ws_addr)
     ws.onopen = function (evt) {
@@ -158,97 +252,7 @@ window.addEventListener('load', function (evt) {
       e('connect').disabled = ''
     }
     ws.onmessage = function (evt) {
-      console.log({ evt })
-      obj = JSON.parse(evt.data)
-      switch (obj.type) {
-        case 'error', 'info':
-          showError(obj.data)
-          break
-        case 'status':
-          updateStatus(obj.data)
-          break
-        case 'activeSong':
-          updateActiveSong(obj.data)
-          break
-        case 'activePlaylist':
-          e('playlist').innerHTML = '' // delete old playlist
-          obj.data.Playlist.map(function (entry, i) {
-            var node = newSongNode('playlistEntry', entry)
-            // disable the play button for the active song
-            node.querySelector('#plPlay').disabled = (entry.file == e('activeSong').title)
-              ? 'disabled' : ''
-            node.querySelector('#plPlay').onclick = playSong(i)
-            node.querySelector('#plRemove').onclick = removeSong(i)
-            e('playlist').append(node)
-          })
-          break
-        case 'searchResult':
-          e('searchResult').innerHTML = '' // delete old search result
-          obj.data.SearchResult.map(function (entry, i) {
-            var node = newSongNode('searchEntry', entry)
-            {
-              const file = entry.file
-              node.querySelector('#srAdd').onclick = function (evt) {
-                return command('add', file)
-              }
-            }
-            e('searchResult').append(node)
-          })
-          break
-        case 'directoryList':
-          e('directoryList').innerHTML = ''
-          if (previousDirectory != '') {
-            node = e('directoryListEntry').cloneNode(true)
-            node.id = 'dlRowParent'
-            node.style.display = ''
-            node.querySelector('#dlName').innerHTML = previousDirectory
-            {
-              const name = parent
-              node.querySelector('#dlBrowse').onclick = function (evt) {
-                return command('browse', name)
-              }
-            }
-            e('directoryList').append(node)
-          }
-          obj.data.directoryList.map(function (entry, i) {
-            var node
-            if (entry.type == 'directory') {
-              node = e('directoryListEntry').cloneNode(true)
-              node.id = 'dlRow' + i
-              node.style.display = ''
-              node.querySelector('#dlName').innerHTML = entry.directory
-
-              {
-                const name = entry.directory
-                node.querySelector('#dlBrowse').onclick = function (evt) {
-                  return command('browse', name)
-                }
-              }
-            } else {
-              node = e('searchEntry').cloneNode(true)
-              node.id = 'srRow' + i
-              node.style.display = ''
-              node.querySelector('#srArtist').innerHTML = entry.artist
-              node.querySelector('#srTitle').innerHTML = entry.title
-              node.querySelector('#srAlbum').innerHTML = entry.album
-              if (entry.artist != entry.album_artist) {
-                node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
-              } else {
-                node.querySelector('#srAlbumArtist').style.display = 'none'
-              }
-              node.querySelector('#srArtist').innerHTML = entry.artist
-              node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
-              {
-                const file = entry.file
-                node.querySelector('#srAdd').onclick = function (evt) {
-                  return command('add', file)
-                }
-              }
-            }
-            e('directoryList').append(node)
-          })
-          break
-      }
+      processResponse(JSON.parse(evt.data))
     }
     ws.onerror = function (evt) {
       showError(evt.data)
@@ -258,7 +262,7 @@ window.addEventListener('load', function (evt) {
 
   window.onfocus = function (event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
-    // progress bar setTimeout functions
+    // progress setTimeout functions
     command('statusRequest', '')
   }
   updateProgress()
