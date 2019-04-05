@@ -94,6 +94,39 @@ body {
   grid-area: configView;
 }
 
+.configItem {
+  grid-area: configItem;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-areas: "configLabel configValue";
+}
+
+@media (min-width: 768px) {
+  .configItem {
+    grid-template-columns: 1fr 8fr;
+    grid-template-areas: "configLabel configValue";
+  }
+}
+
+.configLabel,
+.configValue {
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+}
+
+.configLabel {
+  grid-area: configLabel;
+  text-align: right;
+  background: #bfbfbf;
+}
+
+.configValue {
+  grid-area: configValue;
+  background: #9f9f9f;
+}
+
 .playerCurrentSong {
   grid-area: playerCurrentSong;
   border: 2px solid black;
@@ -155,9 +188,19 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas:
+    "connectionStatus"
     "playerElapsed"
     "playerDuration";
-  height: 2em;
+}
+
+.connectionStatus {
+  grid-area: connectionStatus;
+  text-align: right;
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+  background: #9f9f9f;
 }
 
 .playerElapsed {
@@ -180,15 +223,15 @@ body {
   background: #bfbfbf;
 }
 
-.playlist {
-  grid-area: playlist;
+.listing {
+  grid-area: listing;
 }
 
-.playlistRow {
+.listingRow {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
-    "playlistControl playlistSong";
+    "listingControl listingEntry";
   border: 2px solid black;
   border-radius: 4px;
   margin: 2px;
@@ -209,58 +252,43 @@ body {
   padding: 4px;
 }
 
-.searchResult {
-  grid-area: searchResult;
-}
-
-.searchResultRow {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "playlistControl playlistSong";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-}
-
-.playlistControl {
-  grid-area: playlistControl;
+.listingControl {
+  grid-area: listingControl;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas:
-    "playlistControlPrimary"
-    "playlistControlSecondary";
+    "listingControlPrimary"
+    "listingControlSecondary";
 }
 
 @media (min-width: 768px) {
-  .playlistControl {
+  .listingControl {
     grid-template-columns: 1fr 1fr;
 
   }
 }
 
-.playlistSong {
-  grid-area: playlistSong;
+.listingEntry {
+  grid-area: listingEntry;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "playlistTitle playlistDuration"
     "playlistArtist playlistArtist"
     "playlistAlbum playlistAlbum"
-    "playlistAlbumArtist playlistAlbumArtist";
+    "playlistAlbumArtist playlistAlbumArtist"
+    "directoryName directoryName";
   font-size: 20px;
 }
 
 @media (min-width: 768px) {
 
   /* desktop */
-  .playlistSong {
-    grid-area: playlistSong;
-    display: grid;
+  .listingEntry {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
     grid-template-areas:
-      "playlistTitle playlistArtist playlistAlbum playlistAlbumArtist playlistDuration";
+      "playlistTitle playlistArtist playlistAlbum playlistAlbumArtist playlistDuration"
+      "directoryName directoryName directoryName directoryName directoryName";
   }
 }
 
@@ -316,13 +344,11 @@ button:hover {
   color: gray;
 }
 
-div.playlistRow:nth-child(even),
-div.searchResultRow:nth-child(even) {
+div.listingRow:nth-child(even) {
   background: #bfbfbf;
 }
 
-div.playlistRow:nth-child(odd),
-div.searchResultRow:nth-child(odd) {
+div.listingRow:nth-child(odd) {
   background: #9f9f9f;
 }
 

@@ -19,6 +19,7 @@ const (
 	Remove        CommandType = "remove"
 	Search        CommandType = "search"
 	StatusRequest CommandType = "statusRequest"
+	Browse        CommandType = "browse"
 )
 
 // Command from the web

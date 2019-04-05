@@ -2,6 +2,7 @@ package mpc
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/fhs/gompd/mpd"
 	"github.com/pscn/web-mpc/helpers"
@@ -12,12 +13,13 @@ type MessageType string
 
 // MessageTypes
 const (
-	Error        MessageType = "error"
-	Info         MessageType = "info"
-	Status       MessageType = "status"
-	CurrentSong  MessageType = "currentSong"
-	Playlist     MessageType = "playlist"
-	SearchResult MessageType = "searchResult"
+	Error         MessageType = "error"
+	Info          MessageType = "info"
+	Status        MessageType = "status"
+	CurrentSong   MessageType = "currentSong"
+	Playlist      MessageType = "playlist"
+	SearchResult  MessageType = "searchResult"
+	DirectoryList MessageType = "directoryList"
 )
 
 // Message from the clients EventLoop
@@ -172,7 +174,7 @@ func (msg *Message) CurrentPlaylist() *PlaylistData {
 
 // SearchResultData converted from *mpd.attrs
 type SearchResultData struct {
-	Playlist []SongData
+	SearchResult []SongData
 }
 
 // NewSearchResult from mpd.Attrs
@@ -181,12 +183,12 @@ func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
 	}
-	event.Playlist = make([]SongData, len(*attrArr))
+	event.SearchResult = make([]SongData, len(*attrArr))
 	for i, attrs := range *attrArr {
 		if attrs["AlbumArtist"] == "" {
 			attrs["AlbumArtist"] = attrs["Artist"]
 		}
-		event.Playlist[i] = SongData{
+		event.SearchResult[i] = SongData{
 			Artist:      attrs["Artist"],
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
@@ -204,6 +206,79 @@ func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
 func (msg *Message) SearchResult() *SearchResultData {
 	if msg.Type == SearchResult { // FIXME: how to inform the develeoper?
 		return msg.Data.(*SearchResultData)
+	}
+	return nil
+}
+
+type DirectoryListEntry struct {
+	Type      string `json:"type"`
+	Directory string `json:"directory"`
+
+	Artist      string `json:"artist"`
+	Album       string `json:"album"`
+	AlbumArtist string `json:"album_artist"`
+	Title       string `json:"title"`
+	Duration    int    `json:"duration"`
+	File        string `json:"file"`
+	Genre       string `json:"genre"`
+	Released    string `json:"released"`
+}
+type DirectoryListData struct {
+	Parent        string               `json:"parent"`
+	DirectoryList []DirectoryListEntry `json:"directoryList"`
+}
+
+// NewDirectoryList from mpd.Attrs
+func NewDirectoryList(currentDirectory string, attrArr *[]mpd.Attrs) *Message {
+	event := &DirectoryListData{
+		Parent: currentDirectory,
+	}
+	if attrArr == nil {
+		return NewMessage(DirectoryList, event)
+	}
+	cnt := 0
+	for _, attrs := range *attrArr {
+		if attrs["directory"] != "" {
+			cnt++
+		} else if attrs["file"] != "" {
+			cnt++
+		}
+	}
+	event.DirectoryList = make([]DirectoryListEntry, cnt)
+	i := 0
+	for _, attrs := range *attrArr {
+		log.Printf("%+v\n", attrs)
+		if attrs["directory"] != "" {
+			event.DirectoryList[i] = DirectoryListEntry{
+				Type:      "directory",
+				Directory: attrs["directory"],
+			}
+			i++
+		} else if attrs["file"] != "" {
+			if attrs["albumartist"] == "" {
+				attrs["albumartist"] = attrs["artist"]
+			}
+			event.DirectoryList[i] = DirectoryListEntry{
+				Type:        "file",
+				Artist:      attrs["artist"],
+				Album:       attrs["album"],
+				AlbumArtist: attrs["albumartist"],
+				Title:       attrs["title"],
+				Duration:    helpers.ToInt(attrs["time"]),
+				File:        attrs["file"],
+				Genre:       attrs["genre"],
+				Released:    attrs["date"],
+			}
+			i++
+		}
+	}
+	return NewMessage(DirectoryList, event)
+}
+
+// DirectoryList payload of an event
+func (msg *Message) DirectoryList() *DirectoryListData {
+	if msg.Type == DirectoryList { // FIXME: how to inform the develeoper?
+		return msg.Data.(*DirectoryListData)
 	}
 	return nil
 }

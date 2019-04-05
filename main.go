@@ -25,15 +25,15 @@ func main() {
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {
-		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
+		mux.HandleFunc("/", h.EnsureCookie(h.StaticTemplateFile("text/html", "index.html")))
 		mux.HandleFunc("/script.js", h.StaticFile("text/javascript", "script.js"))
 		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
 	} else {
-		mux.HandleFunc("/", h.StaticTemplatePacked("text/html", "index.html", &box))
+		mux.HandleFunc("/", h.EnsureCookie(h.StaticTemplatePacked("text/html", "index.html", &box)))
 		mux.HandleFunc("/script.js", h.StaticPacked("text/javascript", "script.js", &box))
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css", "style.css", &box))
 	}
-	mux.HandleFunc("/echo", h.Channel())
+	mux.HandleFunc("/ws", h.Channel())
 
 	log.Fatal(http.ListenAndServe(*addr, mux))
 }

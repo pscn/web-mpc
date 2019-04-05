@@ -186,4 +186,13 @@ func (client *Client) Add(file string) error {
 	return client.mpc.Add(file)
 }
 
+func (client *Client) ListDirectory(directory string) *Message {
+	attrs, err := client.mpc.ListInfo(directory)
+	if err != nil {
+		client.logger.Println("directory list error:", err)
+		return nil
+	}
+	return NewDirectoryList(directory, &attrs)
+}
+
 // eof

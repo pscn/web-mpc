@@ -1,6 +1,40 @@
 window.addEventListener('load', function (evt) {
   var ws
 
+  // Functions
+  // short for document.getElementById
+  var el = function (id) {
+    return document.getElementById(id)
+  }
+
+  // https://www.w3schools.com/js/js_cookies.asp
+  var getCookie = function (cname) {
+    var name = cname + '='
+    var decodedCookie = decodeURIComponent(document.cookie)
+    var ca = decodedCookie.split(';')
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i]
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return ''
+  }
+
+  var updateConfig = function () {
+    mpdAddr = getCookie('mpd')
+    if (mpdAddr != '') {
+      parts = mpdAddr.split(':')
+      el('configHost').value = parts[0]
+      el('configPort').value = parts[1]
+      el('configPass').value = parts[2]
+    }
+  }
+  updateConfig()
+
   var command = function (cmd, data) {
     if (!ws) { return false; }
     myJson = { 'command': cmd, 'data': data }
@@ -9,21 +43,7 @@ window.addEventListener('load', function (evt) {
     return false
   }
 
-  // pre-load some document.getElementById calls to have the code a little
-  // shorter down the road
-  var elementIDs = [
-    'error', 'playlistView', 'searchView', 'browserView', 'browser',
-    'playlist', 'searchBox', 'searchText', 'searchResult',
-    'search', 'submitSearch', 'searchText', 'list',
-    'ws', 'config', 'configView',
-    'playlistEntry', 'playlist', 'searchEntry',
-    'cs', 'csTitle', 'csArtist', 'csAlbumArtist', 'csAlbum',
-    'csElapsed', 'csDuration',
-    'play', 'resume', 'pause', 'stop', 'next', 'previous']
-  var el = {}
-  elementIDs.map(function (value) {
-    el[value] = document.getElementById(value)
-  })
+  var previousDirectory = '' // for browsing
 
   // a few "globals" to track the process and current state of the player
   var duration = 1.0
@@ -36,125 +56,215 @@ window.addEventListener('load', function (evt) {
     return min + ':' + sec
   }
   var updateProgress = function () {
-    el['csElapsed'].innerHTML = readableSeconds(elapsed)
-    el['csDuration'].innerHTML = readableSeconds(duration)
+    el('csElapsed').innerHTML = readableSeconds(elapsed)
+    el('csDuration').innerHTML = readableSeconds(duration)
     if ((state == 'play') && (elapsed < duration)) {
       elapsed += 1.0
     }
     setTimeout(updateProgress, 1000)
   }
 
-  ws_addr = el['ws'].value
-  ws = new WebSocket(ws_addr)
-  ws.onopen = function (evt) {
-    console.log('OPEN')
+  el('connectionStatus').onclick = function () {
+    openWebSocket()
   }
-  ws.onclose = function (evt) {
-    console.log('CLOSE'); ws = null
+  var showError = function (msg) {
+    el('error').innerHTML = el('error').innerHTML + '<br />' + msg
+    el('error').style.display = ''
   }
-  ws.onmessage = function (evt) {
-    console.log('RESPONSE: ' + evt.data)
-    obj = JSON.parse(evt.data)
-    switch (obj.type) {
-      case 'error', 'info':
-        el['error'].innerHTML = obj.data
-        el['error'].style.display = ''
-        console.log(obj.data)
-        break
-      case 'status':
-        if (obj.data.state == 'pause') {
-          pause()
-          state = 'pause'
-          duration = obj.data.duration
-          elapsed = obj.data.elapsed
-        } else if (obj.data.state == 'play') {
-          play()
-          state = 'play'
-          duration = obj.data.duration
-          elapsed = obj.data.elapsed
-        } else if (obj.data.state == 'stop') {
-          stop()
-          state = 'stop'
-          duration = 0.0
-          elapsed = 0.0
-        }
-        break
-      case 'currentSong':
-        el['cs'].title = obj.data.file
-        el['csArtist'].innerHTML = obj.data.artist
-        el['csTitle'].innerHTML = obj.data.title
-        if (obj.data.artist != obj.data.album_artist) {
-          el['csAlbumArtist'].style.display = ''
-          el['csAlbumArtist'].innerHTML = '[' + obj.data.album_artist + ']&nbsp;'
-        } else {
-          el['csAlbumArtist'].style.display = 'none'
-        }
-        el['csAlbum'].innerHTML = obj.data.album
-        break
-      case 'playlist':
-        console.log('playlist')
-        el['playlist'].innerHTML = ''
-        obj.data.Playlist.map(function (entry, i) {
-          var node = el['playlistEntry'].cloneNode(true)
-          node.id = 'plRow' + i
-          node.style.display = ''
-          node.querySelector('#plArtist').innerHTML = entry.artist
-          node.querySelector('#plTitle').innerHTML = entry.title
-          node.querySelector('#plAlbum').innerHTML = entry.album
-          if (entry.artist != entry.album_artist) {
-            node.querySelector('#plAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+  var hideError = function () {
+    el('error').innerHTML = ''
+    el('error').style.display = 'none'
+  }
+  var openWebSocket = function () {
+    var ws_addr = el('ws').value
+    ws = new WebSocket(ws_addr)
+    ws.onopen = function (evt) {
+      console.log('OPEN')
+      hideError()
+      el('connect').disabled = 'disabled'
+    }
+    ws.onclose = function (evt) {
+      console.log('CLOSE')
+      ws = null
+      showError('no connection')
+      el('connect').disabled = ''
+    }
+    ws.onmessage = function (evt) {
+      console.log('RESPONSE: ' + evt.data)
+      obj = JSON.parse(evt.data)
+      switch (obj.type) {
+        case 'error', 'info':
+          showError(obj.data)
+          break
+        case 'status':
+          if (obj.data.state == 'pause') {
+            pause()
+            state = 'pause'
+            duration = obj.data.duration
+            elapsed = obj.data.elapsed
+          } else if (obj.data.state == 'play') {
+            play()
+            state = 'play'
+            duration = obj.data.duration
+            elapsed = obj.data.elapsed
+          } else if (obj.data.state == 'stop') {
+            stop()
+            state = 'stop'
+            duration = 0.0
+            elapsed = 0.0
+          }
+          if (obj.data.consume) {
+            el('consume').checked = 'checked'
+          }else {
+            el('consume').checked = ''
+          }
+          if (obj.data.repeat) {
+            el('repeat').checked = 'checked'
+          }else {
+            el('repeat').checked = ''
+          }
+          if (obj.data.random) {
+            el('random').checked = 'checked'
+          }else {
+            el('random').checked = ''
+          }
+          if (obj.data.single) {
+            el('single').checked = 'checked'
+          }else {
+            el('single').checked = ''
+          }
+          break
+        case 'currentSong':
+          el('cs').title = obj.data.file
+          el('csArtist').innerHTML = obj.data.artist
+          el('csTitle').innerHTML = obj.data.title
+          if (obj.data.artist != obj.data.album_artist) {
+            el('csAlbumArtist').style.display = ''
+            el('csAlbumArtist').innerHTML = '[' + obj.data.album_artist + ']&nbsp;'
           } else {
-            node.querySelector('#plAlbumArtist').style.display = 'none'
+            el('csAlbumArtist').style.display = 'none'
           }
-          node.querySelector('#plArtist').innerHTML = entry.artist
-          node.querySelector('#plDuration').innerHTML =
-            readableSeconds(entry.duration)
-          {
-            const j = i
-            const file = entry.file
-            if (file == cs.title) {
-              node.querySelector('#plPlay').disabled = 'disabled'
+          el('csAlbum').innerHTML = obj.data.album
+          break
+        case 'playlist':
+          console.log('playlist')
+          el('playlist').innerHTML = ''
+          obj.data.Playlist.map(function (entry, i) {
+            var node = el('playlistEntry').cloneNode(true)
+            node.id = 'plRow' + i
+            node.style.display = ''
+            node.querySelector('#plArtist').innerHTML = entry.artist
+            node.querySelector('#plTitle').innerHTML = entry.title
+            node.querySelector('#plAlbum').innerHTML = entry.album
+            if (entry.artist != entry.album_artist) {
+              node.querySelector('#plAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+            } else {
+              node.querySelector('#plAlbumArtist').style.display = 'none'
             }
-            node.querySelector('#plPlay').onclick = function (evt) {
-              return command('play', j.toString())
+            node.querySelector('#plArtist').innerHTML = entry.artist
+            node.querySelector('#plDuration').innerHTML =
+              readableSeconds(entry.duration)
+            {
+              const j = i
+              const file = entry.file
+              if (file == cs.title) {
+                node.querySelector('#plPlay').disabled = 'disabled'
+              }
+              node.querySelector('#plPlay').onclick = function (evt) {
+                return command('play', j.toString())
+              }
+              node.querySelector('#plRemove').onclick = function (evt) {
+                return command('remove', j.toString())
+              }
             }
-            node.querySelector('#plRemove').onclick = function (evt) {
-              return command('remove', j.toString())
+            el('playlist').append(node)
+          })
+          break
+        case 'searchResult':
+          el('searchResult').innerHTML = ''
+          obj.data.SearchResult.map(function (entry, i) {
+            var node = el('searchEntry').cloneNode(true)
+            node.id = 'srRow' + i
+            node.style.display = ''
+            node.querySelector('#srArtist').innerHTML = entry.artist
+            node.querySelector('#srTitle').innerHTML = entry.title
+            node.querySelector('#srAlbum').innerHTML = entry.album
+            if (entry.artist != entry.album_artist) {
+              node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+            } else {
+              node.querySelector('#srAlbumArtist').style.display = 'none'
             }
+            node.querySelector('#srArtist').innerHTML = entry.artist
+            node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
+            {
+              const file = entry.file
+              node.querySelector('#srAdd').onclick = function (evt) {
+                return command('add', file)
+              }
+            }
+            el('searchResult').append(node)
+          })
+          break
+        case 'directoryList':
+          el('directoryList').innerHTML = ''
+          if (previousDirectory != '') {
+            node = el('directoryListEntry').cloneNode(true)
+            node.id = 'dlRowParent'
+            node.style.display = ''
+            node.querySelector('#dlName').innerHTML = previousDirectory
+            {
+              const name = parent
+              node.querySelector('#dlBrowse').onclick = function (evt) {
+                return command('browse', name)
+              }
+            }
+            el('directoryList').append(node)
           }
-          el['playlist'].append(node)
-        })
-        break
-      case 'searchResult':
-        el['searchResult'].innerHTML = ''
-        obj.data.Playlist.map(function (entry, i) {
-          var node = el['searchEntry'].cloneNode(true)
-          node.id = 'srRow' + i
-          node.style.display = ''
-          node.querySelector('#srArtist').innerHTML = entry.artist
-          node.querySelector('#srTitle').innerHTML = entry.title
-          node.querySelector('#srAlbum').innerHTML = entry.album
-          if (entry.artist != entry.album_artist) {
-            node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
-          } else {
-            node.querySelector('#srAlbumArtist').style.display = 'none'
-          }
-          node.querySelector('#srArtist').innerHTML = entry.artist
-          node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
-          {
-            const file = entry.file
-            node.querySelector('#srAdd').onclick = function (evt) {
-              return command('add', file)
+          obj.data.directoryList.map(function (entry, i) {
+            var node
+            if (entry.type == 'directory') {
+              node = el('directoryListEntry').cloneNode(true)
+              node.id = 'dlRow' + i
+              node.style.display = ''
+              node.querySelector('#dlName').innerHTML = entry.directory
+
+              {
+                const name = entry.directory
+                node.querySelector('#dlBrowse').onclick = function (evt) {
+                  return command('browse', name)
+                }
+              }
+            } else {
+              node = el('searchEntry').cloneNode(true)
+              node.id = 'srRow' + i
+              node.style.display = ''
+              node.querySelector('#srArtist').innerHTML = entry.artist
+              node.querySelector('#srTitle').innerHTML = entry.title
+              node.querySelector('#srAlbum').innerHTML = entry.album
+              if (entry.artist != entry.album_artist) {
+                node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+              } else {
+                node.querySelector('#srAlbumArtist').style.display = 'none'
+              }
+              node.querySelector('#srArtist').innerHTML = entry.artist
+              node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
+              {
+                const file = entry.file
+                node.querySelector('#srAdd').onclick = function (evt) {
+                  return command('add', file)
+                }
+              }
             }
-          }
-          el['searchResult'].append(node)
-        })
-        break
+            el('directoryList').append(node)
+          })
+          break
+      }
+    }
+    ws.onerror = function (evt) {
+      showError(evt.data)
     }
   }
-  ws.onerror = function (evt) {
-    console.log('ERROR: ' + evt.data)
-  }
+  openWebSocket()
 
   window.onfocus = function (event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
@@ -165,106 +275,119 @@ window.addEventListener('load', function (evt) {
 
   // add onclick function for all controls
   var pause = function () {
-    el['play'].style.display = 'none'
-    el['pause'].style.display = 'none'
-    el['resume'].style.display = ''
-    el['stop'].style.display = ''; el['stop'].disabled = ''
-    el['next'].style.display = ''; el['next'].disabled = ''
-    el['previous'].style.display = ''; el['previous'].disabled = ''
+    el('play').style.display = 'none'
+    el('pause').style.display = 'none'
+    el('resume').style.display = ''
+    el('stop').style.display = ''; el('stop').disabled = ''
+    el('next').style.display = ''; el('next').disabled = ''
+    el('previous').style.display = ''; el('previous').disabled = ''
   }
 
   var play = function () {
-    el['play'].style.display = 'none'
-    el['pause'].style.display = ''
-    el['resume'].style.display = 'none'
-    el['stop'].style.display = ''; el['stop'].disabled = ''
-    el['next'].style.display = ''; el['next'].disabled = ''
-    el['previous'].style.display = ''; el['previous'].disabled = ''
+    el('play').style.display = 'none'
+    el('pause').style.display = ''
+    el('resume').style.display = 'none'
+    el('stop').style.display = ''; el('stop').disabled = ''
+    el('next').style.display = ''; el('next').disabled = ''
+    el('previous').style.display = ''; el('previous').disabled = ''
   }
 
   var stop = function () {
-    el['play'].style.display = ''
-    el['pause'].style.display = 'none'
-    el['resume'].style.display = 'none'
-    el['stop'].style.display = ''; el['stop'].disabled = 'disabled'
-    el['next'].style.display = ''; el['next'].disabled = 'disabled'
-    el['previous'].style.display = ''; el['previous'].disabled = 'disabled'
+    el('play').style.display = ''
+    el('pause').style.display = 'none'
+    el('resume').style.display = 'none'
+    el('stop').style.display = ''; el('stop').disabled = 'disabled'
+    el('next').style.display = ''; el('next').disabled = 'disabled'
+    el('previous').style.display = ''; el('previous').disabled = 'disabled'
   }
 
   var buttonIDs = ['play', 'resume', 'pause', 'stop', 'next', 'previous']
   buttonIDs.map(function (value) {
     document.getElementById(value).onclick = function (evt) {
+      console.log(value)
       return command(value, '')
     }
   })
 
   var showList = function (evt) {
-    el['playlistView'].style.display = ''
-    el['searchView'].style.display = 'none'
-    el['browserView'].style.display = 'none'
-    el['configView'].style.display = 'none'
+    el('playlistView').style.display = ''
+    el('searchView').style.display = 'none'
+    el('browserView').style.display = 'none'
+    el('configView').style.display = 'none'
 
     // enable/disable buttons
-    el['search'].disabled = ''
-    el['list'].disabled = 'disabled'
-    el['browser'].disabled = ''
-    el['config'].disabled = ''
+    el('search').disabled = ''
+    el('list').disabled = 'disabled'
+    el('browser').disabled = ''
+    el('config').disabled = ''
   }
 
   var showSearch = function (evt) {
-    el['playlistView'].style.display = 'none'
-    el['searchView'].style.display = ''
-    el['browserView'].style.display = 'none'
-    el['configView'].style.display = 'none'
+    el('playlistView').style.display = 'none'
+    el('searchView').style.display = ''
+    el('browserView').style.display = 'none'
+    el('configView').style.display = 'none'
 
-    el['searchText'].focus()
-    el['searchText'].select()
-    el['searchResult'].innerHTML = ''
-    el['searchResult'].style.display = ''
+    el('searchText').focus()
+    el('searchText').select()
+    el('searchResult').innerHTML = ''
+    el('searchResult').style.display = ''
     // enable/disable buttons
-    el['search'].disabled = 'disabled'
-    el['list'].disabled = ''
-    el['browser'].disabled = ''
-    el['config'].disabled = ''
+    el('search').disabled = 'disabled'
+    el('list').disabled = ''
+    el('browser').disabled = ''
+    el('config').disabled = ''
   }
   var showBrowser = function (evt) {
-    el['playlistView'].style.display = 'none'
-    el['searchView'].style.display = 'none'
-    el['browserView'].style.display = ''
-    el['configView'].style.display = 'none'
+    previousDirectory = ''
+    el('playlistView').style.display = 'none'
+    el('searchView').style.display = 'none'
+    el('browserView').style.display = ''
+    el('configView').style.display = 'none'
 
     // enable/disable buttons // enable/disable buttons
-    el['search'].disabled = ''
-    el['list'].disabled = ''
-    el['browser'].disabled = 'disabled'
-    el['config'].disabled = ''
+    el('search').disabled = ''
+    el('list').disabled = ''
+    el('browser').disabled = 'disabled'
+    el('config').disabled = ''
+
+    command('browse', '')
   }
   var showConfig = function (evt) {
-    el['playlistView'].style.display = 'none'
-    el['searchView'].style.display = 'none'
-    el['browserView'].style.display = 'none'
-    el['configView'].style.display = ''
+    el('playlistView').style.display = 'none'
+    el('searchView').style.display = 'none'
+    el('browserView').style.display = 'none'
+    el('configView').style.display = ''
 
     // enable/disable buttons // enable/disable buttons
-    el['search'].disabled = ''
-    el['list'].disabled = ''
-    el['browser'].disabled = ''
-    el['config'].disabled = 'disabled'
+    el('search').disabled = ''
+    el('list').disabled = ''
+    el('browser').disabled = ''
+    el('config').disabled = 'disabled'
   }
 
-  el['search'].onclick = showSearch
+  el('search').onclick = showSearch
 
-  el['browser'].onclick = showBrowser
+  el('browser').onclick = showBrowser
 
-  el['config'].onclick = showConfig
+  el('config').onclick = showConfig
 
-  el['list'].onclick = showList
+  el('list').onclick = showList
 
-  el['submitSearch'].onclick = function (evt) {
-    return command('search', el['searchText'].value)
+  el('submitSearch').onclick = function (evt) {
+    return command('search', el('searchText').value)
   }
-  el['searchText'].onchange = function (evt) {
-    return command('search', el['searchText'].value)
+  el('submitConfig').onclick = function (evt) {
+    document.cookie = 'mpd=' + el('configHost').value + ':'
+    + el('configPort').value + ':'
+    + el('configPass').value
+    if (ws != null) {
+      ws.close()
+    }
+    setTimeout(openWebSocket, 1000)
+  }
+  el('searchText').onchange = function (evt) {
+    return command('search', el('searchText').value)
   }
 
   showList()
