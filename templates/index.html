@@ -26,12 +26,14 @@
       <div id="error" class="error" style="display:none;">&nbsp;
       </div>
       <div class="switchView"><!-- switch between playlist and search view -->
-        <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
-        <button id="search"><i class="fas fa-search"></i></button>
-        <!-- FIXME: split into primary and secondary for mobile view
-        <button id="browse"><i class="fas fa-folder"></i></button>
-        <button id="config"><i class="fas fa-cog"></i></button>
-        -->
+        <div class="switchViewPrimary">
+          <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
+          <button id="search"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="switchViewSecondary">
+          <button id="browser"><i class="fas fa-folder"></i></button>
+          <button id="config"><i class="fas fa-cog"></i></button>
+        </div>
       </div>
 
       <div class="playerControl"><!-- play, pause etc. -->
@@ -66,19 +68,37 @@
         <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
       </div>
 
-      <div id="playlist" class="playlist"><!-- currently active playlist -->
+      <div id="playlistView" class="playlistView">
+        <div id="playlist" class="playlist"><!-- currently active playlist -->
+        </div>
       </div>
 
-      <div id="searchBox" class="searchBox"><!-- search input field -->
-        <input id="searchText" type="text" name="search" class="textInput">
-        <button id="submitSearch"><i class="fas fa-search"></i></button>
-        <button id="closeSearch"><i class="fas
-            fa-window-close"></i></button>
+      <div id="searchView" class="searchView" style="display:none">
+        <div id="searchBox" class="searchBox"><!-- search input field -->
+          <input id="searchText" type="text" name="search" class="textInput">
+          <button id="submitSearch"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div id="searchResult" class="searchResult"><!-- search result -->
+        </div>
+
       </div>
 
-      <div id="searchResult" class="searchResult"><!-- search result -->
+      <div id="browserView" class="browserView" style="display: none">
       </div>
+
+      <div id="configView" class="configView" style="display: none">
+        <div id="configBox" class="configBox">
+          <label>Address</label><input id="configHost" type="text" name="host" class="textInput" value="{{.host}}">
+          <label>Password</label><input id="configPass" type="password" name="pass" class="textInput" value="{{.pass}}">
+          <button id="submitConfig"><i class="fas fa-search"></i></button>
+        </div>
+      </div>
+
     </div>
+
+
+    <!-- Template below -->
 
     <!-- playlist entry template will be placed into id="playlist" -->
     <div id="playlistEntry" class="playlistRow" style="display: none">

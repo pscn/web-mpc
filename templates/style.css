@@ -21,9 +21,10 @@ body {
     ". error error error ."
     ". switchView playerCurrentSong playerElapsedDuration ."
     ". playerControl playerCurrentSong playerElapsedDuration ."
-    ". searchBox searchBox searchBox ."
-    ". playlist playlist playlist ."
-    ". searchResult searchResult searchResult .";
+    ". searchView searchView searchView ."
+    ". playlistView playlistView playlistView ."
+    ". browserView browserView browserView ."
+    ". configView configView configView .";
 }
 
 .error {
@@ -38,11 +39,59 @@ body {
 
 .switchView {
   grid-area: switchView;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "switchViewPrimary"
+    "switchViewSecondary"
+    "switchViewTertiary";
   border: 2px solid black;
   border-radius: 4px;
   margin: 2px;
   padding: 2px;
   background: #9f9f9f;
+}
+
+@media (min-width: 768px) {
+
+  /* desktop */
+  .switchView {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "switchViewPrimary switchViewSecondary switchViewTertiary";
+  }
+
+}
+
+.switchViewPrimary {
+  grid-area: switchViewPrimary;
+}
+
+.switchViewSecondary {
+  grid-area: switchViewSecondary;
+}
+
+.playlistView {
+  grid-area: playlistView;
+  grid-template-columns: 1fr;
+  grid-template-areas: "playlist";
+}
+
+.searchView {
+  grid-area: searchView;
+}
+
+.playlistView {
+  grid-area: playlistView;
+}
+
+.browserView {
+  grid-area: browserView;
+}
+
+.configView {
+  grid-area: configView;
 }
 
 .playerCurrentSong {
@@ -82,8 +131,6 @@ body {
 
   /* desktop */
   .playerControl {
-    grid-area: playerControl;
-    display: grid;
     grid-template-columns: auto auto;
     grid-template-areas:
       "playerControlPrimary playerControlSecondary playerControlTertiary";

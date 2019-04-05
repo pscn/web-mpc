@@ -21,7 +21,7 @@ var verbosity = 2
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	h := web.New(verbosity, !*devel)
+	h := web.New(verbosity, !*devel, mpdHost, pass)
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {
@@ -33,7 +33,7 @@ func main() {
 		mux.HandleFunc("/script.js", h.StaticPacked("text/javascript", "script.js", &box))
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css", "style.css", &box))
 	}
-	mux.HandleFunc("/echo", h.Channel(*mpdHost, *pass))
+	mux.HandleFunc("/echo", h.Channel())
 
 	log.Fatal(http.ListenAndServe(*addr, mux))
 }

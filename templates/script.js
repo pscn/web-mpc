@@ -12,10 +12,10 @@ window.addEventListener("load", function (evt) {
   // pre-load some document.getElementById calls to have the code a little
   // shorter down the road
   var elementIDs = [
-    "error",
+    "error", "playlistView", "searchView", "browserView", "browser",
     "playlist", "searchBox", "searchText", "searchResult",
-    "search", "submitSearch", "closeSearch", "searchText", "list",
-    "ws",
+    "search", "submitSearch", "searchText", "list",
+    "ws", "config", "configView",
     "playlistEntry", "playlist", "searchEntry",
     "cs", "csTitle", "csArtist", "csAlbumArtist", "csAlbum",
     "csElapsed", "csDuration",
@@ -200,26 +200,66 @@ window.addEventListener("load", function (evt) {
   });
 
   var showList = function (evt) {
-    el["playlist"].style.display = "";
-    el["searchBox"].style.display = "none";
-    el["searchResult"].style.display = "none";
+    el["playlistView"].style.display = "";
+    el["searchView"].style.display = "none";
+    el["browserView"].style.display = "none";
+    el["configView"].style.display = "none";
+
+    // enable/disable buttons
     el["search"].disabled = "";
     el["list"].disabled = "disabled";
+    el["browser"].disabled = "";
+    el["config"].disabled = "";
   }
+
   var showSearch = function (evt) {
-    el["playlist"].style.display = "none";
-    el["searchBox"].style.display = "";
+    el["playlistView"].style.display = "none";
+    el["searchView"].style.display = "";
+    el["browserView"].style.display = "none";
+    el["configView"].style.display = "none";
+
     el["searchText"].focus();
     el["searchText"].select();
     el["searchResult"].innerHTML = "";
     el["searchResult"].style.display = "";
+    // enable/disable buttons
     el["search"].disabled = "disabled";
     el["list"].disabled = "";
+    el["browser"].disabled = "";
+    el["config"].disabled = "";
   }
+  var showBrowser = function (evt) {
+    el["playlistView"].style.display = "none";
+    el["searchView"].style.display = "none";
+    el["browserView"].style.display = "";
+    el["configView"].style.display = "none";
+
+    // enable/disable buttons // enable/disable buttons
+    el["search"].disabled = "";
+    el["list"].disabled = "";
+    el["browser"].disabled = "disabled";
+    el["config"].disabled = "";
+  }
+  var showConfig = function (evt) {
+    el["playlistView"].style.display = "none";
+    el["searchView"].style.display = "none";
+    el["browserView"].style.display = "none";
+    el["configView"].style.display = "";
+
+    // enable/disable buttons // enable/disable buttons
+    el["search"].disabled = "";
+    el["list"].disabled = "";
+    el["browser"].disabled = "";
+    el["config"].disabled = "disabled";
+  }
+
   el["search"].onclick = showSearch;
 
+  el["browser"].onclick = showBrowser;
+
+  el["config"].onclick = showConfig;
+
   el["list"].onclick = showList;
-  el["closeSearch"].onclick = showList;
 
   el["submitSearch"].onclick = function (evt) {
     return command("search", el["searchText"].value);

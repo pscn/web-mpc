@@ -20,19 +20,23 @@ import (
 
 // Handler a websocket, a logger and two channels come into a bar
 type Handler struct {
+	mpdHost   *string
+	mpdPass   *string
 	upgrader  *websocket.Upgrader
 	verbosity int
 	logger    *log.Logger
 }
 
 // New handler
-func New(verbosity int, checkOrigin bool) *Handler {
+func New(verbosity int, checkOrigin bool, mpdHost *string, mpdPass *string) *Handler {
 	upgrader := websocket.Upgrader{}
 	if !checkOrigin {
 		// disable origin check to test from static html, css & js
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	}
 	return &Handler{
+		mpdHost:   mpdHost,
+		mpdPass:   mpdPass,
 		upgrader:  &upgrader,
 		verbosity: verbosity,
 	}
@@ -74,7 +78,11 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 	tmpl := template.Must(template.New("").Parse(tmplStr))
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
+		p := map[string]interface{}{
+			"ws":   "ws://" + r.Host + "/echo",
+			"host": *h.mpdHost,
+			"pass": *h.mpdPass,
+		}
 		w.Header().Set("Content-type", contentType)
 		tmpl.Execute(w, p)
 	}
@@ -83,7 +91,11 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 // StaticTemplateFile serves content with contenType
 func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
+		p := map[string]interface{}{
+			"ws":   "ws://" + r.Host + "/echo",
+			"host": *h.mpdHost,
+			"pass": *h.mpdPass,
+		}
 		w.Header().Set("Content-type", contentType)
 		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
 		if err != nil {
@@ -123,7 +135,7 @@ func (h *Handler) readCommand(ws *websocket.Conn) (*mpc.Command, error) {
 }
 
 // Channel to websocket
-func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
+func (h *Handler) Channel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 
@@ -144,7 +156,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		defer ws.Close()
 
 		// open connection to mpc
-		client, err := mpc.New(mpdHost, mpdPass, h.logger)
+		client, err := mpc.New(h.mpdHost, h.mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
 			// FIXME: either the host & port for MPD is wrong, or MPD is
