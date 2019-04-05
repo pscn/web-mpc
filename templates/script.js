@@ -56,8 +56,8 @@ window.addEventListener('load', function (evt) {
     return min + ':' + sec
   }
   var updateProgress = function () {
-    el('csElapsed').innerHTML = readableSeconds(elapsed)
-    el('csDuration').innerHTML = readableSeconds(duration)
+    el('elapsed').innerHTML = readableSeconds(elapsed)
+    el('duration').innerHTML = readableSeconds(duration)
     if ((state == 'play') && (elapsed < duration)) {
       elapsed += 1.0
     }
@@ -74,6 +74,37 @@ window.addEventListener('load', function (evt) {
   var hideError = function () {
     el('error').innerHTML = ''
     el('error').style.display = 'none'
+  }
+
+  var updateActiveSong = function (data) {
+    el('activeSong').title = data.file
+    el('artist').innerHTML = data.artist
+    el('title').innerHTML = data.title
+    if (obj.data.artist != data.album_artist) {
+      el('albumArtist').style.display = ''
+      el('albumArtist').innerHTML = '[' + data.album_artist + ']&nbsp;'
+    } else {
+      el('albumArtist').style.display = 'none'
+    }
+    el('album').innerHTML = obj.data.album
+  }
+
+  var newSongNode = function (id, entry) {
+    var node = el(id).cloneNode(true)
+    node.style.display = ''
+    node.querySelector('#songCellArtist').innerHTML = entry.artist
+    node.querySelector('#songCellTitle').innerHTML = entry.title
+    node.querySelector('#songCellAlbum').innerHTML = entry.album
+    if (entry.artist != entry.album_artist) {
+      node.querySelector('#songCellAlbumArtist').innerHTML =
+        '[' + entry.album_artist + ']&nbsp;'
+    } else {
+      node.querySelector('#songCellAlbumArtist').style.display = 'none'
+    }
+    node.querySelector('#songCellArtist').innerHTML = entry.artist
+    node.querySelector('#songCellDuration').innerHTML =
+      readableSeconds(entry.duration)
+    return node
   }
   var openWebSocket = function () {
     var ws_addr = el('ws').value
@@ -97,78 +128,61 @@ window.addEventListener('load', function (evt) {
           showError(obj.data)
           break
         case 'status':
-          if (obj.data.state == 'pause') {
-            pause()
-            state = 'pause'
-            duration = obj.data.duration
-            elapsed = obj.data.elapsed
-          } else if (obj.data.state == 'play') {
-            play()
-            state = 'play'
-            duration = obj.data.duration
-            elapsed = obj.data.elapsed
-          } else if (obj.data.state == 'stop') {
-            stop()
-            state = 'stop'
-            duration = 0.0
-            elapsed = 0.0
+          switch (obj.data.state) {
+            case 'pause':
+              pause()
+              state = 'pause'
+              duration = obj.data.duration
+              elapsed = obj.data.elapsed
+              break
+            case 'play':
+              play()
+              state = 'play'
+              duration = obj.data.duration
+              elapsed = obj.data.elapsed
+              break
+            case 'stop':
+              stop()
+              state = 'stop'
+              duration = 0.0
+              elapsed = 0.0
+              break
           }
           if (obj.data.consume) {
             el('consume').checked = 'checked'
-          }else {
+          } else {
             el('consume').checked = ''
           }
           if (obj.data.repeat) {
             el('repeat').checked = 'checked'
-          }else {
+          } else {
             el('repeat').checked = ''
           }
           if (obj.data.random) {
             el('random').checked = 'checked'
-          }else {
+          } else {
             el('random').checked = ''
           }
           if (obj.data.single) {
             el('single').checked = 'checked'
-          }else {
+          } else {
             el('single').checked = ''
           }
           break
-        case 'currentSong':
-          el('cs').title = obj.data.file
-          el('csArtist').innerHTML = obj.data.artist
-          el('csTitle').innerHTML = obj.data.title
-          if (obj.data.artist != obj.data.album_artist) {
-            el('csAlbumArtist').style.display = ''
-            el('csAlbumArtist').innerHTML = '[' + obj.data.album_artist + ']&nbsp;'
-          } else {
-            el('csAlbumArtist').style.display = 'none'
-          }
-          el('csAlbum').innerHTML = obj.data.album
+        case 'activeSong':
+          updateActiveSong(obj.data)
           break
-        case 'playlist':
-          console.log('playlist')
+        case 'activePlaylist':
           el('playlist').innerHTML = ''
           obj.data.Playlist.map(function (entry, i) {
-            var node = el('playlistEntry').cloneNode(true)
-            node.id = 'plRow' + i
-            node.style.display = ''
-            node.querySelector('#plArtist').innerHTML = entry.artist
-            node.querySelector('#plTitle').innerHTML = entry.title
-            node.querySelector('#plAlbum').innerHTML = entry.album
-            if (entry.artist != entry.album_artist) {
-              node.querySelector('#plAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
-            } else {
-              node.querySelector('#plAlbumArtist').style.display = 'none'
-            }
-            node.querySelector('#plArtist').innerHTML = entry.artist
-            node.querySelector('#plDuration').innerHTML =
-              readableSeconds(entry.duration)
+            var node = newSongNode('playlistEntry', entry)
             {
               const j = i
               const file = entry.file
-              if (file == cs.title) {
+              if (file == el('activeSong').title) {
                 node.querySelector('#plPlay').disabled = 'disabled'
+              } else {
+                node.querySelector('#plPlay').disabled = ''
               }
               node.querySelector('#plPlay').onclick = function (evt) {
                 return command('play', j.toString())
@@ -183,19 +197,7 @@ window.addEventListener('load', function (evt) {
         case 'searchResult':
           el('searchResult').innerHTML = ''
           obj.data.SearchResult.map(function (entry, i) {
-            var node = el('searchEntry').cloneNode(true)
-            node.id = 'srRow' + i
-            node.style.display = ''
-            node.querySelector('#srArtist').innerHTML = entry.artist
-            node.querySelector('#srTitle').innerHTML = entry.title
-            node.querySelector('#srAlbum').innerHTML = entry.album
-            if (entry.artist != entry.album_artist) {
-              node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
-            } else {
-              node.querySelector('#srAlbumArtist').style.display = 'none'
-            }
-            node.querySelector('#srArtist').innerHTML = entry.artist
-            node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
+            var node = newSongNode('searchEntry', entry)
             {
               const file = entry.file
               node.querySelector('#srAdd').onclick = function (evt) {
@@ -312,7 +314,7 @@ window.addEventListener('load', function (evt) {
   var showList = function (evt) {
     el('playlistView').style.display = ''
     el('searchView').style.display = 'none'
-    el('browserView').style.display = 'none'
+    el('folderView').style.display = 'none'
     el('configView').style.display = 'none'
 
     // enable/disable buttons
@@ -325,7 +327,7 @@ window.addEventListener('load', function (evt) {
   var showSearch = function (evt) {
     el('playlistView').style.display = 'none'
     el('searchView').style.display = ''
-    el('browserView').style.display = 'none'
+    el('folderView').style.display = 'none'
     el('configView').style.display = 'none'
 
     el('searchText').focus()
@@ -342,7 +344,7 @@ window.addEventListener('load', function (evt) {
     previousDirectory = ''
     el('playlistView').style.display = 'none'
     el('searchView').style.display = 'none'
-    el('browserView').style.display = ''
+    el('folderView').style.display = ''
     el('configView').style.display = 'none'
 
     // enable/disable buttons // enable/disable buttons
@@ -356,7 +358,7 @@ window.addEventListener('load', function (evt) {
   var showConfig = function (evt) {
     el('playlistView').style.display = 'none'
     el('searchView').style.display = 'none'
-    el('browserView').style.display = 'none'
+    el('folderView').style.display = 'none'
     el('configView').style.display = ''
 
     // enable/disable buttons // enable/disable buttons
@@ -379,8 +381,8 @@ window.addEventListener('load', function (evt) {
   }
   el('submitConfig').onclick = function (evt) {
     document.cookie = 'mpd=' + el('configHost').value + ':'
-    + el('configPort').value + ':'
-    + el('configPass').value
+      + el('configPort').value + ':'
+      + el('configPass').value
     if (ws != null) {
       ws.close()
     }

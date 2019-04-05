@@ -197,7 +197,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 			// down / restarting
 			// we could try again after some time?
 			// right now the user needs to reload the page to try again
-			h.writeMessage(ws, mpc.NewInfo(
+			h.writeMessage(ws, mpc.InfoMsg(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
@@ -223,8 +223,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 
 		// update the web client with the current status
 		h.writeMessage(ws, client.Status())
-		h.writeMessage(ws, client.CurrentSong())
-		h.writeMessage(ws, client.CurrentPlaylist())
+		h.writeMessage(ws, client.ActiveSong())
+		h.writeMessage(ws, client.ActivePlaylist())
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -234,8 +234,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 				switch event {
 				case "player", "playlist":
 					h.writeMessage(ws, client.Status())
-					h.writeMessage(ws, client.CurrentSong())
-					h.writeMessage(ws, client.CurrentPlaylist())
+					h.writeMessage(ws, client.ActiveSong())
+					h.writeMessage(ws, client.ActivePlaylist())
 				}
 			case cmd := <-wc:
 				if cmd == nil {

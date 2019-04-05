@@ -120,27 +120,27 @@ func (client *Client) Status() *Message {
 	if err != nil {
 		client.logger.Panic(err) // FIXME: no panic
 	}
-	return NewStatus(&status)
+	return StatusMsg(&status)
 }
 
-// CurrentSong returns the currently active song
-func (client *Client) CurrentSong() *Message {
+// ActiveSong returns the currently active song
+func (client *Client) ActiveSong() *Message {
 	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
-		client.logger.Println("currentsong:", err)
+		client.logger.Println("ActiveSong:", err)
 	}
-	return NewCurrentSong(&attrs)
+	return ActiveSongMsg(&attrs)
 }
 
-// CurrentPlaylist returns the currently active playlist / queue
-func (client *Client) CurrentPlaylist() *Message {
+// ActivePlaylist returns the currently active playlist / queue
+func (client *Client) ActivePlaylist() *Message {
 	client.Ping()
 	attrs, err := client.mpc.PlaylistInfo(-1, -1)
 	if err != nil {
-		client.logger.Println("currentsong:", err)
+		client.logger.Println("ActivePlaylist:", err)
 	}
-	return NewCurrentPlaylist(&attrs)
+	return ActivePlaylistMsg(&attrs)
 }
 
 // RemovePlaylistEntry nr
@@ -176,7 +176,7 @@ func (client *Client) Search(search string) *Message {
 			client.logger.Println("search error:", err)
 			return nil
 		}
-		return NewSearchResult(&attrs)
+		return SearchResultMsg(&attrs)
 	}
 	return nil
 }
@@ -192,7 +192,7 @@ func (client *Client) ListDirectory(directory string) *Message {
 		client.logger.Println("directory list error:", err)
 		return nil
 	}
-	return NewDirectoryList(directory, &attrs)
+	return DirectoryListMsg(directory, &attrs)
 }
 
 // eof

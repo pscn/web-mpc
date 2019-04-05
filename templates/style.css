@@ -1,98 +1,200 @@
 body {
-  background: black;
   /* FIXME: better font selection */
   font-family: 'Roboto', sans-serif;
+  /*font-family: 'Bowlby One SC';*/
   font-size: 16px;
   margin: 4px;
   padding: 0px;
+  background: #8f8f8f;
 }
 
 @media (min-width: 768px) {
   body {
-    background: #efefef;
+    /*background: #efefef;*/
   }
 }
 
-/* Main grid */
+/* common styles */
+
+.big {
+  font-size: 24px;
+}
+
+.medium {
+  font-size: 20px;
+}
+
+.small {
+  font-size: 16px;
+}
+
+.bordered {
+  /* add a round border & set the background */
+  border: 2px solid black;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 2px;
+  background: #efefef;
+}
+
+.textInput {
+  margin: 4px;
+  padding: 4px;
+}
+
+.boxResponsive {
+  /* switching between column (mobile) and row (desktop) */
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .boxResponsive {
+    flex-direction: row;
+  }
+}
+
+.boxColumn {
+  /* always column */
+  display: flex;
+  flex-direction: column;
+}
+
+.boxRow {
+  /* always row */
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  display: flex;
+}
+
+/* main grid */
 .main {
   display: grid;
   grid-template-columns: 4px auto 1fr auto 4px;
   grid-template-areas:
     ". error error error ."
-    ". switchView playerCurrentSong playerElapsedDuration ."
-    ". playerControl playerCurrentSong playerElapsedDuration ."
-    ". searchView searchView searchView ."
+    ". viewControl activeSong timeDisplay ."
+    ". playerControl activeSong timeDisplay ."
     ". playlistView playlistView playlistView ."
-    ". browserView browserView browserView ."
+    ". searchView searchView searchView ."
+    ". folderView folderView folderView ."
     ". configView configView configView .";
 }
 
 .error {
   grid-area: error;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
   background: #ff1f1f;
   font-size: 24px;
 }
 
-.switchView {
-  grid-area: switchView;
-
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "switchViewPrimary"
-    "switchViewSecondary"
-    "switchViewTertiary";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
+.viewControl {
+  grid-area: viewControl;
 }
 
-@media (min-width: 768px) {
-
-  /* desktop */
-  .switchView {
-    grid-template-columns: auto auto;
-    grid-template-areas:
-      "switchViewPrimary switchViewSecondary switchViewTertiary";
-  }
-
+.activeSong {
+  grid-area: activeSong;
 }
 
-.switchViewPrimary {
-  grid-area: switchViewPrimary;
+.timeDisplay {
+  grid-area: timeDisplay;
 }
 
-.switchViewSecondary {
-  grid-area: switchViewSecondary;
+.playerControl {
+  grid-area: playerControl;
 }
 
 .playlistView {
   grid-area: playlistView;
-  grid-template-columns: 1fr;
-  grid-template-areas: "playlist";
 }
 
 .searchView {
   grid-area: searchView;
 }
 
-.playlistView {
-  grid-area: playlistView;
-}
-
-.browserView {
-  grid-area: browserView;
+.folderView {
+  grid-area: folderView;
 }
 
 .configView {
   grid-area: configView;
 }
+
+/* activeSong */
+
+.title {
+  font-size: 22px;
+}
+
+.artist {
+  font-size: 22px;
+}
+
+.album {
+  font-size: 20px;
+}
+
+.albumArtist {
+  font-size: 20px;
+}
+
+/* a song in a list */
+.songRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "songControl songCell";
+}
+
+.songCell {
+  grid-area: songCell;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "songTitle songDuration"
+    "songArtist songArtist"
+    "songAlbum songAlbum"
+    "songAlbumArtist songAlbumArtist";
+  font-size: 20px;
+  padding-top: 2px;
+}
+
+@media (min-width: 768px) {
+
+  /* desktop */
+  .songCell {
+    grid-template-columns: 3fr 2fr 3fr 1fr auto;
+    grid-template-areas:
+      "songTitle songArtist songAlbum songAlbumArtist songDuration";
+  }
+}
+
+.songTitle {
+  grid-area: songTitle;
+}
+
+.songArtist {
+  grid-area: songArtist;
+}
+
+.songAlbum {
+  grid-area: songAlbum;
+}
+
+.songAlbumArtist {
+  grid-area: songAlbumArtist;
+}
+
+.songDuration {
+  grid-area: songDuration;
+}
+
+
+/* search form */
+
+/* unverified */
 
 .configItem {
   grid-area: configItem;
@@ -127,101 +229,9 @@ body {
   background: #9f9f9f;
 }
 
-.playerCurrentSong {
-  grid-area: playerCurrentSong;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  font-size: 16px;
-  background: #bfbfbf;
-}
 
-.title {
-  font-size: 24px;
-}
 
-.artist {
-  font-size: 20px;
-}
 
-.playerControl {
-  grid-area: playerControl;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "playerControlPrimary"
-    "playerControlSecondary"
-    "playerControlTertiary";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
-}
-
-@media (min-width: 768px) {
-
-  /* desktop */
-  .playerControl {
-    grid-template-columns: auto auto;
-    grid-template-areas:
-      "playerControlPrimary playerControlSecondary playerControlTertiary";
-  }
-
-}
-
-.playerControlPrimary {
-  grid-area: playerControlPrimary;
-}
-
-.playerControlSecondary {
-  grid-area: playerControlSecondary;
-}
-
-.playerControlTertiary {
-  grid-area: playerControlTertiary;
-}
-
-.playerElapsedDuration {
-  grid-area: playerElapsedDuration;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "connectionStatus"
-    "playerElapsed"
-    "playerDuration";
-}
-
-.connectionStatus {
-  grid-area: connectionStatus;
-  text-align: right;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
-}
-
-.playerElapsed {
-  grid-area: playerElapsed;
-  text-align: right;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
-}
-
-.playerDuration {
-  grid-area: playerDuration;
-  text-align: right;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #bfbfbf;
-}
 
 .listing {
   grid-area: listing;
@@ -232,25 +242,8 @@ body {
   grid-template-columns: auto 1fr;
   grid-template-areas:
     "listingControl listingEntry";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
 }
 
-.searchBox {
-  grid-area: searchBox;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
-}
-
-.textInput {
-  margin: 4px;
-  padding: 4px;
-}
 
 .listingControl {
   grid-area: listingControl;
@@ -344,11 +337,13 @@ button:hover {
   color: gray;
 }
 
-div.listingRow:nth-child(even) {
+div.listingRow:nth-child(even),
+div.songRow:nth-child(even) {
   background: #bfbfbf;
 }
 
-div.listingRow:nth-child(odd) {
+div.listingRow:nth-child(odd),
+div.songRow:nth-child(odd) {
   background: #9f9f9f;
 }
 

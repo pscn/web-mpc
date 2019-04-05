@@ -13,13 +13,13 @@ type MessageType string
 
 // MessageTypes
 const (
-	Error         MessageType = "error"
-	Info          MessageType = "info"
-	Status        MessageType = "status"
-	CurrentSong   MessageType = "currentSong"
-	Playlist      MessageType = "playlist"
-	SearchResult  MessageType = "searchResult"
-	DirectoryList MessageType = "directoryList"
+	Error          MessageType = "error"
+	Info           MessageType = "info"
+	Status         MessageType = "status"
+	ActiveSong     MessageType = "activeSong"
+	ActivePlaylist MessageType = "activePlaylist"
+	SearchResult   MessageType = "searchResult"
+	DirectoryList  MessageType = "directoryList"
 )
 
 // Message from the clients EventLoop
@@ -39,9 +39,9 @@ func (msg *Message) String() string {
 		return fmt.Sprintf("%s: %s", msg.Type, msg.Data.(string))
 	case Status:
 		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*StatusData))
-	case CurrentSong:
+	case ActiveSong:
 		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SongData))
-	case Playlist:
+	case ActivePlaylist:
 		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*PlaylistData))
 	case SearchResult:
 		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SearchResultData))
@@ -49,8 +49,8 @@ func (msg *Message) String() string {
 	return fmt.Sprintf("Unknown type: %s", msg.Type)
 }
 
-// NewError creates a new Event including an error
-func NewError(str string) *Message {
+// ErrorMsg creates a new Event including an error
+func ErrorMsg(str string) *Message {
 	return NewMessage(Error, str)
 }
 
@@ -61,8 +61,8 @@ func (msg *Message) Error() string {
 	return ""
 }
 
-// NewInfo creates a new Event including an error
-func NewInfo(str string) *Message {
+// InfoMsg creates a new Event including an error
+func InfoMsg(str string) *Message {
 	return NewMessage(Info, str)
 }
 
@@ -78,8 +78,8 @@ type StatusData struct {
 	Repeat   bool    `json:"repeat"`
 }
 
-// NewStatus creates a new Event including the status data mapped from mpd.Attrs
-func NewStatus(attrs *mpd.Attrs) *Message {
+// StatusMsg creates a new Event including the status data mapped from mpd.Attrs
+func StatusMsg(attrs *mpd.Attrs) *Message {
 	return NewMessage(Status, &StatusData{
 		Duration: helpers.ToFloat((*attrs)["duration"]),
 		Elapsed:  helpers.ToFloat((*attrs)["elapsed"]),
@@ -112,12 +112,12 @@ type SongData struct {
 	Released    string `json:"released"`
 }
 
-// NewCurrentSong creates a new Event including the current song data mapped from mpd.Attrs
-func NewCurrentSong(attrs *mpd.Attrs) *Message {
+// ActiveSongMsg creates a new Event including the current song data mapped from mpd.Attrs
+func ActiveSongMsg(attrs *mpd.Attrs) *Message {
 	if (*attrs)["AlbumArtist"] == "" {
 		(*attrs)["AlbumArtist"] = (*attrs)["Artist"]
 	}
-	return NewMessage(CurrentSong, &SongData{
+	return NewMessage(ActiveSong, &SongData{
 		Artist:      (*attrs)["Artist"],
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
@@ -131,7 +131,7 @@ func NewCurrentSong(attrs *mpd.Attrs) *Message {
 
 // CurrentSong payload of an event
 func (msg *Message) CurrentSong() *SongData {
-	if msg.Type == CurrentSong { // FIXME: how to inform the develeoper?
+	if msg.Type == ActiveSong { // FIXME: how to inform the develeoper?
 		return msg.Data.(*SongData)
 	}
 	return nil
@@ -142,8 +142,8 @@ type PlaylistData struct {
 	Playlist []SongData
 }
 
-// NewCurrentPlaylist creates a new Event including the current song data mapped from mpd.Attrs
-func NewCurrentPlaylist(attrArr *[]mpd.Attrs) *Message {
+// ActivePlaylistMsg creates a new Event including the current song data mapped from mpd.Attrs
+func ActivePlaylistMsg(attrArr *[]mpd.Attrs) *Message {
 	event := &PlaylistData{}
 	event.Playlist = make([]SongData, len(*attrArr))
 	for i, attrs := range *attrArr {
@@ -161,12 +161,12 @@ func NewCurrentPlaylist(attrArr *[]mpd.Attrs) *Message {
 			Released:    attrs["Date"],
 		}
 	}
-	return NewMessage(Playlist, event)
+	return NewMessage(ActivePlaylist, event)
 }
 
 // CurrentPlaylist payload of an event
 func (msg *Message) CurrentPlaylist() *PlaylistData {
-	if msg.Type == Playlist { // FIXME: how to inform the develeoper?
+	if msg.Type == ActivePlaylist { // FIXME: how to inform the develeoper?
 		return msg.Data.(*PlaylistData)
 	}
 	return nil
@@ -177,8 +177,8 @@ type SearchResultData struct {
 	SearchResult []SongData
 }
 
-// NewSearchResult from mpd.Attrs
-func NewSearchResult(attrArr *[]mpd.Attrs) *Message {
+// SearchResultMsg from mpd.Attrs
+func SearchResultMsg(attrArr *[]mpd.Attrs) *Message {
 	event := &SearchResultData{}
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
@@ -228,8 +228,8 @@ type DirectoryListData struct {
 	DirectoryList []DirectoryListEntry `json:"directoryList"`
 }
 
-// NewDirectoryList from mpd.Attrs
-func NewDirectoryList(currentDirectory string, attrArr *[]mpd.Attrs) *Message {
+// DirectoryListMsg from mpd.Attrs
+func DirectoryListMsg(currentDirectory string, attrArr *[]mpd.Attrs) *Message {
 	event := &DirectoryListData{
 		Parent: currentDirectory,
 	}
