@@ -11,7 +11,7 @@ import (
 
 var addr = flag.String("addr", ":8666", "http service address")
 var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
-var pass = flag.String("password", "", "MPD password")
+var mpdPass = flag.String("password", "", "MPD password")
 var devel = flag.Bool("local", false,
 	"serves html, jss & css from the local templates directory")
 
@@ -21,7 +21,7 @@ var verbosity = 2
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	h := web.New(verbosity, !*devel, mpdHost, pass)
+	h := web.New(verbosity, !*devel, *mpdHost, *mpdPass)
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {

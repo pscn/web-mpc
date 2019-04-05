@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -20,22 +21,25 @@ import (
 
 // Handler a websocket, a logger and two channels come into a bar
 type Handler struct {
-	mpdHost   *string
-	mpdPass   *string
+	mpdHost   string
+	mpdPort   int
+	mpdPass   string
 	upgrader  *websocket.Upgrader
 	verbosity int
 	logger    *log.Logger
 }
 
 // New handler
-func New(verbosity int, checkOrigin bool, mpdHost *string, mpdPass *string) *Handler {
+func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handler {
 	upgrader := websocket.Upgrader{}
 	if !checkOrigin {
 		// disable origin check to test from static html, css & js
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	}
+	host, port, _ := net.SplitHostPort(mpdHost) // FIXME: handle err
 	return &Handler{
-		mpdHost:   mpdHost,
+		mpdHost:   host,
+		mpdPort:   helpers.ToInt(port),
 		mpdPass:   mpdPass,
 		upgrader:  &upgrader,
 		verbosity: verbosity,
@@ -80,8 +84,9 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := map[string]interface{}{
 			"ws":   "ws://" + r.Host + "/echo",
-			"host": *h.mpdHost,
-			"pass": *h.mpdPass,
+			"host": h.mpdHost,
+			"port": h.mpdPort,
+			"pass": h.mpdPass,
 		}
 		w.Header().Set("Content-type", contentType)
 		tmpl.Execute(w, p)
@@ -93,8 +98,9 @@ func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.H
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := map[string]interface{}{
 			"ws":   "ws://" + r.Host + "/echo",
-			"host": *h.mpdHost,
-			"pass": *h.mpdPass,
+			"host": h.mpdHost,
+			"port": h.mpdPort,
+			"pass": h.mpdPass,
 		}
 		w.Header().Set("Content-type", contentType)
 		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
@@ -156,7 +162,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		defer ws.Close()
 
 		// open connection to mpc
-		client, err := mpc.New(h.mpdHost, h.mpdPass, h.logger)
+		client, err := mpc.New(h.mpdHost, h.mpdPort, h.mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
 			// FIXME: either the host & port for MPD is wrong, or MPD is
@@ -173,7 +179,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 		wc := make(chan *mpc.Command, 10)
 
 		go func() {
-			defer close(wc)
+			defer func() {
+				close(wc)
+				h.logger.Println("stopping webclient loop")
+			}()
 			for {
 				cmd, err := h.readCommand(ws)
 				if err != nil {
@@ -202,7 +211,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 				}
 			case cmd := <-wc:
 				if cmd == nil {
-					break
+					// wc closed → exit
+					return
 				}
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {

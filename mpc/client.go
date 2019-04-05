@@ -1,6 +1,7 @@
 package mpc
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -9,8 +10,10 @@ import (
 
 // Client with host, port & password & mpc reference
 type Client struct {
-	addr     *string // host:port
-	password *string
+	addr     string // host:port
+	host     string
+	port     int
+	password string
 	logger   *log.Logger
 	mpc      *mpd.Client
 	mpw      *mpd.Watcher
@@ -18,9 +21,11 @@ type Client struct {
 }
 
 // New with host, port, password and in & out channels
-func New(addr *string, password *string, logger *log.Logger) (*Client, error) {
+func New(host string, port int, password string, logger *log.Logger) (*Client, error) {
 	mpc := &Client{
-		addr:     addr,
+		addr:     fmt.Sprintf("%s:%d", host, port),
+		host:     host,
+		port:     port,
 		password: password,
 		logger:   logger,
 	}
@@ -28,18 +33,18 @@ func New(addr *string, password *string, logger *log.Logger) (*Client, error) {
 }
 
 func (client *Client) reConnect() (err error) {
-	if *client.password != "" {
-		client.logger.Printf("connecting to %s with %s", *client.addr, *client.password)
-		client.mpc, err = mpd.DialAuthenticated("tcp", *client.addr, *client.password)
+	if client.password != "" {
+		client.logger.Printf("connecting to %s with %s", client.addr, client.password)
+		client.mpc, err = mpd.DialAuthenticated("tcp", client.addr, client.password)
 	} else {
-		client.logger.Printf("connecting to %s", *client.addr)
-		client.mpc, err = mpd.Dial("tcp", *client.addr)
+		client.logger.Printf("connecting to %s", client.addr)
+		client.mpc, err = mpd.Dial("tcp", client.addr)
 	}
 	if err == nil {
-		client.logger.Printf("connected to %s", *client.addr)
-		client.mpw, err = mpd.NewWatcher("tcp", *client.addr, *client.password, "")
+		client.logger.Printf("connected to %s", client.addr)
+		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
-			client.logger.Printf("listening to %s", *client.addr)
+			client.logger.Printf("listening to %s", client.addr)
 			client.Event = &client.mpw.Event
 		}
 	}

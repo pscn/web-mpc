@@ -1,139 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Font Awesome for play, pause etc. buttons-->
-    <link rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
-      crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-    <title>Web MPC</title>
-  </head>
-  <body>
-    <!-- pass parameters from main.go to hidden input fields -->
-    <form style="display:none">
-      <input id="ws" type="text" value="{{.ws}}">
-    </form>
 
-    <!-- load our javascript -->
-    <script src="script.js"></script>
+<head>
+  <meta charset="utf-8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Font Awesome for play, pause etc. buttons-->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <title>Web MPC</title>
+</head>
 
-    <div class="main"><!-- main grid -->
-      <div id="error" class="error" style="display:none;">&nbsp;
+<body>
+  <!-- pass parameters from main.go to hidden input fields -->
+  <form style="display:none">
+    <input id="ws" type="text" value="{{.ws}}">
+  </form>
+
+  <!-- load our javascript -->
+  <script src="script.js"></script>
+
+  <div class="main">
+    <!-- main grid -->
+    <div id="error" class="error" style="display:none;">&nbsp;
+    </div>
+    <div class="switchView">
+      <!-- switch between playlist and search view -->
+      <div class="switchViewPrimary">
+        <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
+        <button id="search"><i class="fas fa-search"></i></button>
       </div>
-      <div class="switchView"><!-- switch between playlist and search view -->
-        <div class="switchViewPrimary">
-          <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
-          <button id="search"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="switchViewSecondary">
-          <button id="browser"><i class="fas fa-folder"></i></button>
-          <button id="config"><i class="fas fa-cog"></i></button>
-        </div>
+      <div class="switchViewSecondary">
+        <button id="browser"><i class="fas fa-folder"></i></button>
+        <button id="config"><i class="fas fa-cog"></i></button>
       </div>
+    </div>
 
-      <div class="playerControl"><!-- play, pause etc. -->
-        <div class="playerControlPrimary">
-          <button id="play"><i class="fas fa-play"></i></button>
-          <button id="resume"><i class="fas fa-play"></i></button>
-          <button id="pause" style="display: none"><i class="fas fa-pause"></i></button>
-          <button id="stop"><i class="fas fa-stop"></i></button>
-        </div>
-        <div class="playerControlSecondary">
-          <button id="previous"><i class="fas fa-step-backward"></i></button>
-          <button id="next"><i class="fas fa-step-forward"></i></button>
-        </div>
-        <!--
+    <div class="playerControl">
+      <!-- play, pause etc. -->
+      <div class="playerControlPrimary">
+        <button id="play"><i class="fas fa-play"></i></button>
+        <button id="resume"><i class="fas fa-play"></i></button>
+        <button id="pause" style="display: none"><i class="fas fa-pause"></i></button>
+        <button id="stop"><i class="fas fa-stop"></i></button>
+      </div>
+      <div class="playerControlSecondary">
+        <button id="previous"><i class="fas fa-step-backward"></i></button>
+        <button id="next"><i class="fas fa-step-forward"></i></button>
+      </div>
+      <!--
         <div class="playerControlTertiary">
           <button id="repeat"><i class="fas fa-redo"></i></button>
           <button id="consume"><i class="fas fa-utensils"></i></button>
           <button id="single"><i class="fas fa-redo">1</i></button>
         </div>
         -->
+    </div>
+
+    <div class="playerElapsedDuration">
+      <div id="csElapsed" class="playerElapsed">0:21</div>
+      <div id="csDuration" class="playerDuration">2:12</div>
+    </div>
+
+    <div id="cs" class="playerCurrentSong">
+      <!-- currently active song -->
+      <div id="csTitle" class="title">Title</div>
+      <div id="csArtist" class="artist">Artist</div>
+      <div id="csAlbum" class="album">Album</div>
+      <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
+    </div>
+
+    <div id="playlistView" class="playlistView">
+      <div id="playlist" class="playlist">
+        <!-- currently active playlist -->
+      </div>
+    </div>
+
+    <div id="searchView" class="searchView" style="display:none">
+      <div id="searchBox" class="searchBox">
+        <!-- search input field -->
+        <input id="searchText" type="text" name="search" class="textInput">
+        <button id="submitSearch"><i class="fas fa-search"></i></button>
       </div>
 
-      <div class="playerElapsedDuration">
-        <div id="csElapsed" class="playerElapsed">0:21</div>
-        <div id="csDuration" class="playerDuration">2:12</div>
-      </div>
-
-      <div id="cs" class="playerCurrentSong"><!-- currently active song -->
-        <div id="csTitle" class="title">Title</div>
-        <div id="csArtist" class="artist">Artist</div>
-        <div id="csAlbum" class="album">Album</div>
-        <div id="csAlbumArtist" class="albumArtist">[AlbumArtist]</div>
-      </div>
-
-      <div id="playlistView" class="playlistView">
-        <div id="playlist" class="playlist"><!-- currently active playlist -->
-        </div>
-      </div>
-
-      <div id="searchView" class="searchView" style="display:none">
-        <div id="searchBox" class="searchBox"><!-- search input field -->
-          <input id="searchText" type="text" name="search" class="textInput">
-          <button id="submitSearch"><i class="fas fa-search"></i></button>
-        </div>
-
-        <div id="searchResult" class="searchResult"><!-- search result -->
-        </div>
-
-      </div>
-
-      <div id="browserView" class="browserView" style="display: none">
-      </div>
-
-      <div id="configView" class="configView" style="display: none">
-        <div id="configBox" class="configBox">
-          <label>Address</label><input id="configHost" type="text" name="host" class="textInput" value="{{.host}}">
-          <label>Password</label><input id="configPass" type="password" name="pass" class="textInput" value="{{.pass}}">
-          <button id="submitConfig"><i class="fas fa-search"></i></button>
-        </div>
+      <div id="searchResult" class="searchResult">
+        <!-- search result -->
       </div>
 
     </div>
 
+    <div id="browserView" class="browserView" style="display: none">
+    </div>
 
-    <!-- Template below -->
+    <div id="configView" class="configView" style="display: none">
+      <div id="configBox" class="configBox">
+        <label>Host</label>
+        <input id="configHost" type="text" name="host" class="textInput" value="{{.host}}">
+        <label>Port</label>
+        <input id="configPort" type="number" name="port" class="textInput" value="{{.port}}">
+        <label>Password</label>
+        <input id="configPass" type="password" name="pass" class="textInput" value="{{.pass}}">
+        <button id="submitConfig"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
 
-    <!-- playlist entry template will be placed into id="playlist" -->
-    <div id="playlistEntry" class="playlistRow" style="display: none">
-      <div class="playlistControl">
-        <div class="playlistControlPrimary">
-          <button id="plPlay"><i class="fas fa-play"></i></button>
-        </div>
-        <div class="playlistControlSecondary">
-          <button id="plRemove"><i class="fas
+  </div>
+
+
+  <!-- Template below -->
+
+  <!-- playlist entry template will be placed into id="playlist" -->
+  <div id="playlistEntry" class="playlistRow" style="display: none">
+    <div class="playlistControl">
+      <div class="playlistControlPrimary">
+        <button id="plPlay"><i class="fas fa-play"></i></button>
+      </div>
+      <div class="playlistControlSecondary">
+        <button id="plRemove"><i class="fas
               fa-minus-circle"></i></button>
-        </div>
-      </div>
-      <div class="playlistSong">
-        <div id="plTitle" class="playlistTitle">Title</div>
-        <div id="plArtist" class="playlistArtist">Artist</div>
-        <div id="plAlbum" class="playlistAlbum">Album</div>
-        <div id="plAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</div>
-        <div id="plDuration" class="playlistDuration">2:31</div>
       </div>
     </div>
+    <div class="playlistSong">
+      <div id="plTitle" class="playlistTitle">Title</div>
+      <div id="plArtist" class="playlistArtist">Artist</div>
+      <div id="plAlbum" class="playlistAlbum">Album</div>
+      <div id="plAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</div>
+      <div id="plDuration" class="playlistDuration">2:31</div>
+    </div>
+  </div>
 
-    <!-- search entry template -->
-    <div id="searchEntry" class="searchResultRow" style="display: none">
-      <div class="col">
-        <button id="srAdd"><i class="fas fa-plus"></i></button>
-      </div>
-      <div class="col">
-        <div class="playlistSong">
-          <span id="srTitle" class="playlistTitle">Title</span>
-          <span id="srArtist" class="playlistArtist">Artist</span>
-          <span id="srAlbum" class="playlistAlbum">Album</span>
-          <span id="srAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</span>
-          <span id="srDuration" class="playlistDuration">2:31</span>
-        </div>
+  <!-- search entry template -->
+  <div id="searchEntry" class="searchResultRow" style="display: none">
+    <div class="col">
+      <button id="srAdd"><i class="fas fa-plus"></i></button>
+    </div>
+    <div class="col">
+      <div class="playlistSong">
+        <span id="srTitle" class="playlistTitle">Title</span>
+        <span id="srArtist" class="playlistArtist">Artist</span>
+        <span id="srAlbum" class="playlistAlbum">Album</span>
+        <span id="srAlbumArtist" class="playlistAlbumArtist">[AlbumArtist]</span>
+        <span id="srDuration" class="playlistDuration">2:31</span>
       </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>
