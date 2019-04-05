@@ -182,12 +182,7 @@ window.addEventListener('load', function (evt) {
           node.id = 'dlRowParent'
           node.style.display = ''
           node.querySelector('#dlName').innerHTML = previousDirectory
-          {
-            const name = parent
-            node.querySelector('#dlBrowse').onclick = function (evt) {
-              return command('browse', name)
-            }
-          }
+          node.querySelector('#dlBrowse').onclick = btnCommand('browse', name)
           e('directoryList').append(node)
         }
         data.directoryList.map(function (entry, i) {
