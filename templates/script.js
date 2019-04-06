@@ -3,11 +3,44 @@ window.addEventListener("load", function(evt) {
   var e = function(id) {
     return document.getElementById(id);
   };
+  // helpers to easily show/hide or enable/disable elements
+  // example: ["play"].map(eShow) // set style.display for "play" to ""
+  var eHide = function(id) {
+    e(id).style.display = "none";
+  };
+  var eShow = function(id) {
+    e(id).style.display = "";
+  };
+  var eDisable = function(id) {
+    e(id).disabled = "disabled";
+  };
+  var eEnable = function(id) {
+    e(id).disabled = "";
+  };
 
   var ws_addr = e("ws").value; // read from hidden input field
   var ws;
 
+  // send a command on the websocket
+  var command = function(cmd, data) {
+    if (!ws) {
+      return false;
+    }
+    // console.log('SEND: ' + JSON.stringify(myJson))
+    ws.send(JSON.stringify({ command: cmd, data: data }));
+    return true;
+  };
+
+  // wrapper to use command as an onclick
+  // example: e("play").onclick = btnCommand("play", 1)
+  var btnCommand = function(cmd, data) {
+    return function() {
+      return command(cmd, data);
+    };
+  };
+
   // https://www.w3schools.com/js/js_cookies.asp
+  // gets the value of the cookie cookieName
   var getCookie = function(cookieName) {
     var name = cookieName + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -27,25 +60,13 @@ window.addEventListener("load", function(evt) {
   var updateConfig = function() {
     mpdAddr = getCookie("mpd");
     if (mpdAddr != "") {
-      parts = mpdAddr.split(":");
-      e("configHost").value = parts[0];
-      e("configPort").value = parts[1];
-      e("configPass").value = parts[2];
+      const parts = mpdAddr.split(":");
+      ["configHost", "configPort", "configPass"].map(
+        (id, i) => (e(id).value = parts[i])
+      );
     }
   };
   updateConfig();
-
-  var command = function(cmd, data) {
-    if (!ws) {
-      return false;
-    }
-    myJson = { command: cmd, data: data };
-    // console.log('SEND: ' + JSON.stringify(myJson))
-    ws.send(JSON.stringify(myJson));
-    return false;
-  };
-
-  var previousDirectory = ""; // for browsing
 
   // a few 'globals' to track the process and current state of the player
   var gDuration = 1.0;
@@ -59,6 +80,8 @@ window.addEventListener("load", function(evt) {
     }
     return min + ":" + sec;
   };
+  // this functions runs forever and gets called every second to update the
+  // elapsed and duration information of the active song
   var updateProgress = function() {
     e("elapsed").innerHTML = readableSeconds(gElapsed);
     e("duration").innerHTML = readableSeconds(gDuration);
@@ -70,11 +93,11 @@ window.addEventListener("load", function(evt) {
 
   var showError = function(msg) {
     e("error").innerHTML = e("error").innerHTML + "<br />" + msg;
-    e("error").style.display = "";
+    eShow("error");
   };
   var hideError = function() {
     e("error").innerHTML = "";
-    e("error").style.display = "none";
+    eHide("error");
   };
 
   var updateStatus = function(data) {
@@ -107,10 +130,10 @@ window.addEventListener("load", function(evt) {
     e("title").innerHTML = title;
     if (artist != album_artist) {
       // only show album artist if it's different
-      e("albumArtist").style.display = "";
+      eShow("albumArtist");
       e("albumArtist").innerHTML = "[" + album_artist + "]&nbsp;";
     } else {
-      e("albumArtist").style.display = "none";
+      eHide("albumArtist");
     }
     e("album").innerHTML = album;
   };
@@ -135,11 +158,6 @@ window.addEventListener("load", function(evt) {
       duration
     );
     return node;
-  };
-  var btnCommand = function(cmd, data) {
-    return function() {
-      return command(cmd, data);
-    };
   };
 
   var processResponse = function(obj) {
@@ -266,19 +284,6 @@ window.addEventListener("load", function(evt) {
   };
   updateProgress();
 
-  var eHide = function(id) {
-    e(id).style.display = "none";
-  };
-  var eShow = function(id) {
-    e(id).style.display = "";
-  };
-  var eDisable = function(id) {
-    e(id).disabled = "disabled";
-  };
-  var eEnable = function(id) {
-    e(id).disabled = "";
-  };
-
   var stop = function() {
     ["play"].map(eShow);
     ["pause", "resume"].map(eHide);
@@ -310,6 +315,7 @@ window.addEventListener("load", function(evt) {
    * switch betwwen different views
    */
   var views = {
+    // view name: button ID
     playlistView: "list",
     searchView: "search",
     folderView: "browser",
@@ -337,11 +343,10 @@ window.addEventListener("load", function(evt) {
       }
     };
   };
-
-  e("list").onclick = show("playlistView");
-  e("search").onclick = show("searchView");
-  e("browser").onclick = show("folderView");
-  e("config").onclick = show("configView");
+  // add onclick to every button
+  for (var k in views) {
+    e(views[k]).onclick = show(k);
+  }
 
   /*
    * onclick function assignments
@@ -371,8 +376,7 @@ window.addEventListener("load", function(evt) {
   e("connectionStatus").onclick = openWebSocket;
 
   // add onclick function for all controls
-  var buttonIDs = ["play", "resume", "pause", "stop", "next", "previous"];
-  buttonIDs.map(function(value) {
+  ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
     e(value).onclick = function(evt) {
       console.log(`Control: ${value}`);
       return command(value, "");
