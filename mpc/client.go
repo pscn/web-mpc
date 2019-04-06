@@ -3,6 +3,7 @@ package mpc
 import (
 	"fmt"
 	"log"
+	"path"
 	"strings"
 
 	"github.com/fhs/gompd/mpd"
@@ -192,7 +193,11 @@ func (client *Client) ListDirectory(directory string) *Message {
 		client.logger.Println("directory list error:", err)
 		return nil
 	}
-	return DirectoryListMsg(directory, &attrs)
+	previousDirectory, _ := path.Split(directory)
+	if len(previousDirectory) > 1 {
+		previousDirectory = previousDirectory[:len(previousDirectory)-1]
+	}
+	return DirectoryListMsg(previousDirectory, &attrs)
 }
 
 // eof

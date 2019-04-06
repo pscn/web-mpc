@@ -75,7 +75,6 @@ window.addEventListener("load", function(evt) {
   var gDuration = 1.0;
   var gElapsed = 0.0;
   var gState = "pause";
-  var gPreviousDirectory = "";
   var readableSeconds = function(value) {
     const min = parseInt(value / 60);
     var sec = parseInt(value % 60);
@@ -211,14 +210,16 @@ window.addEventListener("load", function(evt) {
         break;
       case "directoryList":
         e("directoryList").innerHTML = "";
-        if (gPreviousDirectory != "") {
-          node = e("directoryListEntry").cloneNode(true);
-          node.id = "dlRowParent";
-          node.style.display = "";
-          node.querySelector("#dlName").innerHTML = previousDirectory;
-          node.querySelector("#dlBrowse").onclick = btnCommand("browse", name);
-          e("directoryList").append(node);
-        }
+        node = e("directoryListEntry").cloneNode(true);
+        node.id = "dlRowParent";
+        node.title = data.parent;
+        node.style.display = "";
+        node.querySelector("#dlName").innerHTML = data.parent;
+        node.querySelector("#dlBrowse").onclick = btnCommand(
+          "browse",
+          data.parent
+        );
+        e("directoryList").append(node);
         data.directoryList.map(function(entry, i) {
           var node;
           if (entry.type == "directory") {

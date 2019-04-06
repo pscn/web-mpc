@@ -229,9 +229,9 @@ type DirectoryListData struct {
 }
 
 // DirectoryListMsg from mpd.Attrs
-func DirectoryListMsg(currentDirectory string, attrArr *[]mpd.Attrs) *Message {
+func DirectoryListMsg(previousDirectory string, attrArr *[]mpd.Attrs) *Message {
 	event := &DirectoryListData{
-		Parent: currentDirectory,
+		Parent: previousDirectory,
 	}
 	if attrArr == nil {
 		return NewMessage(DirectoryList, event)
