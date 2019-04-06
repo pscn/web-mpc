@@ -7,7 +7,6 @@ window.addEventListener('load', function (evt) {
   var ws_addr = e('ws').value // read from hidden input field
   var ws
 
-
   // https://www.w3schools.com/js/js_cookies.asp
   var getCookie = function (cookieName) {
     var name = cookieName + '='
@@ -37,8 +36,10 @@ window.addEventListener('load', function (evt) {
   updateConfig()
 
   var command = function (cmd, data) {
-    if (!ws) { return false; }
-    myJson = { 'command': cmd, 'data': data }
+    if (!ws) {
+      return false
+    }
+    myJson = { command: cmd, data: data }
     // console.log('SEND: ' + JSON.stringify(myJson))
     ws.send(JSON.stringify(myJson))
     return false
@@ -53,13 +54,15 @@ window.addEventListener('load', function (evt) {
   var readableSeconds = function (value) {
     var min = parseInt(value / 60)
     var sec = parseInt(value % 60)
-    if (sec < 10) { sec = '0' + sec; }
+    if (sec < 10) {
+      sec = '0' + sec
+    }
     return min + ':' + sec
   }
   var updateProgress = function () {
     e('elapsed').innerHTML = readableSeconds(gElapsed)
     e('duration').innerHTML = readableSeconds(gDuration)
-    if ((gState == 'play') && (gElapsed < gDuration)) {
+    if (gState == 'play' && gElapsed < gDuration) {
       gElapsed += 1.0
     }
     setTimeout(updateProgress, 1000)
@@ -95,17 +98,18 @@ window.addEventListener('load', function (evt) {
         break
     }
     // update the config view
-    e('consume').checked = consume ? 'checked' : '';
-    e('repeat').checked = repeat ? 'checked' : '';
-    e('random').checked = random ? 'checked' : '';
-    e('single').checked = single ? 'checked' : '';
+    e('consume').checked = consume ? 'checked' : ''
+    e('repeat').checked = repeat ? 'checked' : ''
+    e('random').checked = random ? 'checked' : ''
+    e('single').checked = single ? 'checked' : ''
   }
   var updateActiveSong = function (data) {
     const { file, artist, title, album_artist, album } = data
     e('activeSong').title = file
     e('artist').innerHTML = artist
     e('title').innerHTML = title
-    if (artist != album_artist) { // only show album artist if it's different
+    if (artist != album_artist) {
+      // only show album artist if it's different
       e('albumArtist').style.display = ''
       e('albumArtist').innerHTML = '[' + album_artist + ']&nbsp;'
     } else {
@@ -115,22 +119,24 @@ window.addEventListener('load', function (evt) {
   }
 
   var newSongNode = function (id, entry) {
-    const { file, artist, title, album, album_artist, duration } = entry;
+    const { file, artist, title, album, album_artist, duration } = entry
     var node = e(id).cloneNode(true)
     node.style.display = ''
     node.title = file
     node.querySelector('#songCellArtist').innerHTML = artist
     node.querySelector('#songCellTitle').innerHTML = title
     node.querySelector('#songCellAlbum').innerHTML = album
-    if (artist != album_artist) { // only show album artist if it's different
+    if (artist != album_artist) {
+      // only show album artist if it's different
       node.querySelector('#songCellAlbumArtist').innerHTML =
         '[' + album_artist + ']&nbsp;'
     } else {
       node.querySelector('#songCellAlbumArtist').style.display = 'none'
     }
     node.querySelector('#songCellArtist').innerHTML = artist
-    node.querySelector('#songCellDuration').innerHTML =
-      readableSeconds(duration)
+    node.querySelector('#songCellDuration').innerHTML = readableSeconds(
+      duration
+    )
     return node
   }
   var btnCommand = function (cmd, data) {
@@ -144,7 +150,7 @@ window.addEventListener('load', function (evt) {
     const { type, data } = obj
 
     switch (type) {
-      case 'error', 'info':
+      case ('error', 'info'):
         showError(data)
         break
       case 'status':
@@ -159,10 +165,16 @@ window.addEventListener('load', function (evt) {
           const { file } = entry
           var node = newSongNode('playlistEntry', entry)
           // disable the play button for the active song
-          node.querySelector('#plPlay').disabled = (file == e('activeSong').title)
-            ? 'disabled' : ''
-          node.querySelector('#plPlay').onclick = btnCommand('play', i.toString())
-          node.querySelector('#plRemove').onclick = btnCommand('remove', i.toString())
+          node.querySelector('#plPlay').disabled =
+            file == e('activeSong').title ? 'disabled' : ''
+          node.querySelector('#plPlay').onclick = btnCommand(
+            'play',
+            i.toString()
+          )
+          node.querySelector('#plRemove').onclick = btnCommand(
+            'remove',
+            i.toString()
+          )
           e('playlist').append(node)
         })
         break
@@ -207,12 +219,15 @@ window.addEventListener('load', function (evt) {
             node.querySelector('#srTitle').innerHTML = entry.title
             node.querySelector('#srAlbum').innerHTML = entry.album
             if (entry.artist != entry.album_artist) {
-              node.querySelector('#srAlbumArtist').innerHTML = '[' + entry.album_artist + ']&nbsp;'
+              node.querySelector('#srAlbumArtist').innerHTML =
+                '[' + entry.album_artist + ']&nbsp;'
             } else {
               node.querySelector('#srAlbumArtist').style.display = 'none'
             }
             node.querySelector('#srArtist').innerHTML = entry.artist
-            node.querySelector('#srDuration').innerHTML = readableSeconds(entry.duration)
+            node.querySelector('#srDuration').innerHTML = readableSeconds(
+              entry.duration
+            )
             {
               const file = entry.file
               node.querySelector('#srAdd').onclick = function (evt) {
@@ -291,10 +306,10 @@ window.addEventListener('load', function (evt) {
   })
 
   var views = {
-    'playlistView': 'list',
-    'searchView': 'search',
-    'folderView': 'browser',
-    'configView': 'config'
+    playlistView: 'list',
+    searchView: 'search',
+    folderView: 'browser',
+    configView: 'config'
   }
   var show = function (view) {
     return function () {
@@ -309,12 +324,12 @@ window.addEventListener('load', function (evt) {
             e(k).style.display = ''
             e(views[k]).disabled = 'disabled'
             break
-          default: // hidde others
+          default:
+            // hidde others
             e(k).style.display = 'none'
             e(views[k]).disabled = ''
             break
         }
-
       }
     }
   }
@@ -331,9 +346,13 @@ window.addEventListener('load', function (evt) {
   e('submitConfig').onclick = function (evt) {
     // update the cookie and reconnect to the websocket
     // which will read the cookie and so apply the changes
-    document.cookie = 'mpd=' + e('configHost').value + ':'
-      + e('configPort').value + ':'
-      + e('configPass').value
+    document.cookie =
+      'mpd=' +
+      e('configHost').value +
+      ':' +
+      e('configPort').value +
+      ':' +
+      e('configPass').value
     if (ws != null) {
       ws.close()
     }
