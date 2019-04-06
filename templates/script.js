@@ -58,9 +58,12 @@ window.addEventListener("load", function(evt) {
   };
 
   var updateConfig = function() {
-    mpdAddr = getCookie("mpd");
+    const mpdAddr = getCookie("mpd");
     if (mpdAddr != "") {
       const parts = mpdAddr.split(":");
+      // having fun with javascript, this does:
+      // e("configHost").value = parts[0]
+      // e("configPort").value = parts[1] etc
       ["configHost", "configPort", "configPass"].map(
         (id, i) => (e(id).value = parts[i])
       );
@@ -72,8 +75,9 @@ window.addEventListener("load", function(evt) {
   var gDuration = 1.0;
   var gElapsed = 0.0;
   var gState = "pause";
+  var gPreviousDirectory = "";
   var readableSeconds = function(value) {
-    var min = parseInt(value / 60);
+    const min = parseInt(value / 60);
     var sec = parseInt(value % 60);
     if (sec < 10) {
       sec = "0" + sec;
@@ -86,13 +90,16 @@ window.addEventListener("load", function(evt) {
     e("elapsed").innerHTML = readableSeconds(gElapsed);
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState == "play" && gElapsed < gDuration) {
+      // increment the seconds if playing and not finished
       gElapsed += 1.0;
     }
     setTimeout(updateProgress, 1000);
   };
 
   var showError = function(msg) {
-    e("error").innerHTML = e("error").innerHTML + "<br />" + msg;
+    // FIXME: looks ugly
+    e("error").innerHTML =
+      e("error").innerHTML == "" ? msg : e("error").innerHTML + "<br />" + msg;
     eShow("error");
   };
   var hideError = function() {
@@ -204,7 +211,7 @@ window.addEventListener("load", function(evt) {
         break;
       case "directoryList":
         e("directoryList").innerHTML = "";
-        if (previousDirectory != "") {
+        if (gPreviousDirectory != "") {
           node = e("directoryListEntry").cloneNode(true);
           node.id = "dlRowParent";
           node.style.display = "";
