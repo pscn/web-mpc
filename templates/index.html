@@ -11,7 +11,9 @@
       href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
       integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
       crossorigin="anonymous">
+    <link rel="stylesheet" href="theme-default.css">
     <link rel="stylesheet" href="style.css">
+
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Bowlby+One+SC">
     <title>Web MPC</title>
@@ -58,20 +60,20 @@
         </div>
       </div>
 
+      <div id="connectionStatus" class="connectionStatus bordered">
+        <button id="connect">
+          <i class="fas fa-power-off"></i>
+        </button>
+      </div>
+
       <div class="timeDisplay boxResponsive">
-        <!-- FIXME: move this button somewhere else -->
-        <div id="connectionStatus" class="cell bordered">
-          <button id="connect">
-            <i class="fas fa-power-off"></i>
-          </button>
-        </div>
-        <div id="elapsed" class="cell bordered medium">0:21</div>
-        <div id="duration" class="cell bordered medium">2:12</div>
+        <div id="elapsed" class="cell bordered big bold">0:21</div>
+        <div id="duration" class="cell bordered big bold">2:12</div>
       </div>
 
       <div id="activeSong" class="boxColumn bordered activeSong">
         <!-- currently active song -->
-        <div id="title" class="cell big">Title</div>
+        <div id="title" class="cell big bold">Title</div>
         <div id="artist" class="cell big">Artist</div>
         <div id="album" class="cell medium">Album</div>
         <div id="albumArtist" class="cell medium">[AlbumArtist]</div>
