@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/fhs/gompd/mpd"
-	"github.com/pscn/web-mpc/helpers"
+	"github.com/pscn/web-mpc/conv"
 )
 
 // MessageType to identify the type of message
@@ -81,13 +81,13 @@ type StatusData struct {
 // StatusMsg creates a new Event including the status data mapped from mpd.Attrs
 func StatusMsg(attrs *mpd.Attrs) *Message {
 	return NewMessage(Status, &StatusData{
-		Duration: helpers.ToFloat((*attrs)["duration"]),
-		Elapsed:  helpers.ToFloat((*attrs)["elapsed"]),
-		Consume:  helpers.ToBool((*attrs)["consume"]),
-		Random:   helpers.ToBool((*attrs)["random"]),
-		Single:   helpers.ToBool((*attrs)["single"]),
-		Repeat:   helpers.ToBool((*attrs)["repeat"]),
-		Volume:   helpers.ToInt((*attrs)["volume"]),
+		Duration: conv.ToFloat((*attrs)["duration"]),
+		Elapsed:  conv.ToFloat((*attrs)["elapsed"]),
+		Consume:  conv.ToBool((*attrs)["consume"]),
+		Random:   conv.ToBool((*attrs)["random"]),
+		Single:   conv.ToBool((*attrs)["single"]),
+		Repeat:   conv.ToBool((*attrs)["repeat"]),
+		Volume:   conv.ToInt((*attrs)["volume"]),
 		State:    (*attrs)["state"],
 	})
 }
@@ -122,7 +122,7 @@ func ActiveSongMsg(attrs *mpd.Attrs) *Message {
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
 		Title:       (*attrs)["Title"],
-		Duration:    helpers.ToInt((*attrs)["Time"]),
+		Duration:    conv.ToInt((*attrs)["Time"]),
 		File:        (*attrs)["file"],
 		Genre:       (*attrs)["Genre"],
 		Released:    (*attrs)["Date"],
@@ -155,7 +155,7 @@ func ActivePlaylistMsg(attrArr *[]mpd.Attrs) *Message {
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
 			Title:       attrs["Title"],
-			Duration:    helpers.ToInt(attrs["Time"]),
+			Duration:    conv.ToInt(attrs["Time"]),
 			File:        attrs["file"],
 			Genre:       attrs["Genre"],
 			Released:    attrs["Date"],
@@ -193,7 +193,7 @@ func SearchResultMsg(attrArr *[]mpd.Attrs) *Message {
 			Album:       attrs["Album"],
 			AlbumArtist: attrs["AlbumArtist"],
 			Title:       attrs["Title"],
-			Duration:    helpers.ToInt(attrs["Time"]),
+			Duration:    conv.ToInt(attrs["Time"]),
 			File:        attrs["file"],
 			Genre:       attrs["Genre"],
 			Released:    attrs["Date"],
@@ -264,7 +264,7 @@ func DirectoryListMsg(previousDirectory string, attrArr *[]mpd.Attrs) *Message {
 				Album:       attrs["album"],
 				AlbumArtist: attrs["albumartist"],
 				Title:       attrs["title"],
-				Duration:    helpers.ToInt(attrs["time"]),
+				Duration:    conv.ToInt(attrs["time"]),
 				File:        attrs["file"],
 				Genre:       attrs["genre"],
 				Released:    attrs["date"],

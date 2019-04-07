@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/packr"
-	"github.com/pscn/web-mpc/helpers"
+	"github.com/pscn/web-mpc/conv"
 
 	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/mpc"
@@ -40,7 +40,7 @@ func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handl
 	host, port, _ := net.SplitHostPort(mpdHost) // FIXME: handle err
 	return &Handler{
 		mpdHost:   host,
-		mpdPort:   helpers.ToInt(port),
+		mpdPort:   conv.ToInt(port),
 		mpdPass:   mpdPass,
 		upgrader:  &upgrader,
 		verbosity: verbosity,
@@ -169,7 +169,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		} else {
 			parts := strings.Split(cookie.Value, ":")
 			mpdHost = parts[0]
-			mpdPort = helpers.ToInt(parts[1])
+			mpdPort = conv.ToInt(parts[1])
 			mpdPass = parts[2]
 		}
 
@@ -246,7 +246,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 				switch cmd.Command {
 				case mpc.Play:
 					if cmd.Data != "" {
-						err = client.Play(helpers.ToInt(cmd.Data))
+						err = client.Play(conv.ToInt(cmd.Data))
 					} else {
 						err = client.Play(-1)
 					}
@@ -263,7 +263,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 				case mpc.Add:
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
-					err = client.RemovePlaylistEntry(helpers.ToInt(cmd.Data))
+					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
 
 				case mpc.StatusRequest:
 					h.writeMessage(ws, client.Status())
