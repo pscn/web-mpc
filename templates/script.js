@@ -62,11 +62,9 @@ window.addEventListener("load", function(evt) {
     if (mpdAddr != "") {
       const parts = mpdAddr.split(":");
       // having fun with javascript, this does:
-      // e("configHost").value = parts[0]
-      // e("configPort").value = parts[1] etc
-      ["configHost", "configPort", "configPass"].map(
-        (id, i) => (e(id).value = parts[i])
-      );
+      // e("host").value = parts[0]
+      // e("port").value = parts[1] etc
+      ["host", "port", "pass"].map((id, i) => (e(id).value = parts[i]));
     }
   };
   updateConfig();
@@ -363,21 +361,20 @@ window.addEventListener("load", function(evt) {
     return command("search", e("searchText").value);
   };
 
-  e("submitConfig").onclick = function(evt) {
+  var updateConfig = function(evt) {
     // update the cookie and reconnect to the websocket
     // which will read the cookie and apply the changes
     document.cookie =
-      "mpd=" +
-      e("configHost").value +
-      ":" +
-      e("configPort").value +
-      ":" +
-      e("configPass").value;
+      "mpd=" + e("host").value + ":" + e("port").value + ":" + e("pass").value;
     if (ws != null) {
       ws.close();
     }
     setTimeout(openWebSocket, 1000);
   };
+  e("host").onchange = updateConfig;
+  e("port").onchange = updateConfig;
+  e("pass").onchange = updateConfig;
+
   e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);
   };
@@ -392,7 +389,7 @@ window.addEventListener("load", function(evt) {
   });
 
   // show the playlistView
-  show("playlistView");
+  show("playlistView")();
 });
 
 // eof

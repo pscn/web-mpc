@@ -27,7 +27,7 @@
     <script src="script.js"></script>
 
     <!-- main grid -->
-    <div class="main">
+    <la class="main">
       <!-- error messages -->
       <div id="error" class="error" style="display:none;"></div>
 
@@ -108,7 +108,7 @@
       <div id="searchView" class="searchView" style="display:none">
         <div id="searchBox" class="boxRow bordered">
           <!-- search input field -->
-          <input id="searchText" type="text" name="search" class="textInput">
+          <input id="searchText" type="text" name="search">
           <button id="submitSearch"><i class="fas fa-search"></i></button>
         </div>
 
@@ -139,54 +139,49 @@
         </div>
       </div>
 
-      <div id="configView" class="configView" style="display: none">
+      <la id="configView" class="configView">
         <!-- FIXME: this looks like sh*t -->
-        <div class="configItem">
-          <div class="configLabel">Host</div>
-          <div class="configValue"><input id="configHost" class="textInput"
-              size="16" style="width:8em"
-              type="text" name="host" value=""></div>
-        </div>
-
-        <div class="configItem">
-          <div class="configLabel">Port</div>
-          <div class="configValue"><input id="configPort" class="textInput"
-              size="5" maxlength="5" style="width:5em"
-              type="number" name="port" value=""></div>
-        </div>
-
-        <div class="configItem">
-          <div class="configLabel">Password</div>
-          <div class="configValue"><input id="configPass" class="textInput"
-              size="8" style="width:4em"
-              type="password" name="pass" value=""></div>
-        </div>
-
-        <div class="configItem">
-          <div class="configLabel">Random</div>
-          <div class="configValue"><input id="random" type="checkbox"></div>
-        </div>
-        <div class="configItem">
-          <div class="configLabel">Repeat</div>
-          <div class="configValue"><input id="repeat" type="checkbox"></div>
-        </div>
-        <div class="configItem">
-          <div class="configLabel">Single</div>
-          <div class="configValue"><input id="single" type="checkbox"></div>
-        </div>
-        <div class="configItem">
-          <div class="configLabel">Consume</div>
-          <div class="configValue"><input id="consume" type="checkbox"></div>
-        </div>
-        <div class="configItem">
-          <div class="configLabel"></div>
-          <div class="configValue">
-            <button id="submitConfig">Submit</button>
+        <form class="bordered">
+          <div class="configItem">
+            <label class="configLabel">Host</label>
+            <input id="host" size="16"
+              type="text" name="host" value="">
           </div>
-        </div>
-      </div>
 
-    </div>
+          <div class="configItem">
+            <label class="configLabel">Port</label>
+            <input id="port" size="5" maxlength="5"
+              type="number" name="port" value="">
+          </div>
+
+          <div class="configItem">
+            <label class="configLabel">Password</label>
+            <input id="pass" size="8"
+              type="password" name="pass" value="">
+          </div>
+
+          <div class="boxResponsive">
+            <div class="cell configItem">
+              <label class="configLabel">Random</label>
+              <input id="random" type="checkbox">
+
+              <label class="configLabel">Consume</label>
+              <input id="consume" type="checkbox">
+            </div>
+
+            <div class="cell configItem">
+              <label class="configLabel">Repeat</label>
+              <input id="repeat" type="checkbox">
+
+              <label class="configLabel">Single</label>
+              <input id="single" type="checkbox">
+            </div>
+
+          </div>
+        </form>
+      </iv>
+
+    </v>
 
 
     <!-- Template below -->

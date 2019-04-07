@@ -1,10 +1,11 @@
 body {
   /* FIXME: better font selection */
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   /*font-family: 'Bowlby One SC';*/
   font-size: 16px;
   margin: 4px;
   padding: 0px;
+  color: black;
   background: #8f8f8f;
 }
 
@@ -12,6 +13,17 @@ body {
   body {
     /*background: #efefef;*/
   }
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 4px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
 }
 
 /* common styles */
@@ -35,11 +47,6 @@ body {
   margin: 2px;
   padding: 2px;
   background: #efefef;
-}
-
-.textInput {
-  margin: 4px;
-  padding: 4px;
 }
 
 .boxResponsive {
@@ -144,8 +151,7 @@ body {
 .songRow {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "songControl songCell";
+  grid-template-areas: "songControl songCell";
 }
 
 .songCell {
@@ -162,12 +168,10 @@ body {
 }
 
 @media (min-width: 768px) {
-
   /* desktop */
   .songCell {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
-    grid-template-areas:
-      "songTitle songArtist songAlbum songAlbumArtist songDuration";
+    grid-template-areas: "songTitle songArtist songAlbum songAlbumArtist songDuration";
   }
 }
 
@@ -191,47 +195,17 @@ body {
   grid-area: songDuration;
 }
 
-
 /* search form */
-
-/* unverified */
-
 .configItem {
-  grid-area: configItem;
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-template-areas: "configLabel configValue";
+  padding: 4px;
 }
-
-@media (min-width: 768px) {
-  .configItem {
-    grid-template-columns: 1fr 8fr;
-    grid-template-areas: "configLabel configValue";
-  }
-}
-
-.configLabel,
-.configValue {
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-}
-
 .configLabel {
-  grid-area: configLabel;
-  text-align: right;
-  background: #bfbfbf;
 }
 
 .configValue {
-  grid-area: configValue;
-  background: #9f9f9f;
 }
 
-
-
-
+/* unverififed */
 
 .listing {
   grid-area: listing;
@@ -240,10 +214,8 @@ body {
 .listingRow {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "listingControl listingEntry";
+  grid-template-areas: "listingControl listingEntry";
 }
-
 
 .listingControl {
   grid-area: listingControl;
@@ -257,7 +229,6 @@ body {
 @media (min-width: 768px) {
   .listingControl {
     grid-template-columns: 1fr 1fr;
-
   }
 }
 
@@ -275,7 +246,6 @@ body {
 }
 
 @media (min-width: 768px) {
-
   /* desktop */
   .listingEntry {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
