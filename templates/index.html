@@ -30,21 +30,21 @@
 
     <!-- main grid -->
     <div class="main">
-      <!-- error messages -->
-      <div id="error" class="error boxResponsive bordered"
+      <!-- mainError messages -->
+      <div id="mainError" class="mainError boxResponsive bordered"
         style="display:none;"></div>
     </div>
 
-    <div id="control" class="control">
-      <div class="connectionStatus boxResponsive bordered">
+    <div class="mainControl">
+      <div class="ctrlConnection boxResponsive bordered">
         <button id="connect">
           <i class="fas fa-power-off"></i>
         </button>
       </div>
 
-      <div id="elapsed" class="timeElapsed boxResponsive bordered">0:21</div>
-      <div id="duration" class="timeDuration boxResponsive bordered">2:12</div>
-      <div id="activeSong" class="boxColumn bordered activeSong">
+      <div id="elapsed" class="ctrlElapsed boxResponsive bordered">0:21</div>
+      <div id="duration" class="ctrlDuration boxResponsive bordered">2:12</div>
+      <div id="ctrlSong" class="boxColumn bordered ctrlSong">
         <!-- currently active song -->
         <div id="title" class="cell big bold">Title</div>
         <div id="artist" class="cell big">Artist</div>
@@ -53,81 +53,81 @@
       </div>
 
       <!-- switch between "views" -->
-      <div class="viewControl boxResponsive bordered">
-        <div class="viewControlList">
+      <div class="ctrlView boxResponsive bordered">
+        <div class="ctrlViewList">
           <!-- list is the default view -->
           <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
         </div>
-        <div class="viewControlSearch">
+        <div class="ctrlViewSearch">
           <button id="search"><i class="fas fa-search"></i></button>
         </div>
-        <div class="viewControlBrowse">
+        <div class="ctrlViewBrowse">
           <button id="browser"><i class="fas fa-folder"></i></button>
         </div>
-        <div class="viewControlConfig">
+        <div class="ctrlViewConfig">
           <button id="config"><i class="fas fa-cog"></i></button>
         </div>
       </div>
 
       <!-- play, pause etc. -->
-      <div class="playerControl boxResponsive bordered">
-        <div class="playerControlPlay">
+      <div class="ctrlPlayer boxResponsive bordered">
+        <div class="ctrlPlayerPlay">
           <button id="play" title="Play"><i class="fas fa-play"></i></button>
           <button id="resume" title="Resume"><i class="fas fa-play"></i></button>
           <button id="pause" title="Pause" style="display: none"><i class="fas fa-pause"></i></button>
         </div>
-        <div class="playerControlStop">
+        <div class="ctrlPlayerStop">
           <button id="stop" title="Stop"><i class="fas fa-stop"></i></button>
         </div>
-        <div class="playerControlPrevious">
+        <div class="ctrlPlayerPrevious">
           <button id="previous" title="Previous"><i class="fas fa-step-backward"></i></button>
         </div>
-        <div class="playerControlNext">
+        <div class="ctrlPlayerNext">
           <button id="next" title="Next"><i class="fas fa-step-forward"></i></button>
         </div>
       </div>
 
-      <div class="statusControl boxResponsive bordered">
-        <div class="statusControlRandom" title="Disable random">
+      <div class="ctrlMode boxResponsive bordered">
+        <div class="ctrlModeRandom" title="Disable random">
           <button id="randomDisable">
             <i class="fas fa-random"></i>
           </button>
         </div>
-        <div class="statusControlRandom" title="Enable random">
+        <div class="ctrlModeRandom" title="Enable random">
           <button id="randomEnable">
             <i class="fas fa-slash"></i>
           </button>
         </div>
 
-        <div class="statusControlRepeat">
+        <div class="ctrlModeRepeat">
           <button id="repeatDisable" title="Disable repeat">
             <i class="fas fa-redo"></i>
           </button>
         </div>
-        <div class="statusControlRepeat">
+        <div class="ctrlModeRepeat">
           <button id="repeatEnable" title="Enable repeat">
             <i class="fas fa-slash"></i>
           </button>
         </div>
 
-        <div class="statusControlSingle">
+        <div class="ctrlModeSingle">
           <button id="singleDisable" title="Disable single">
             <i class="fas fa-redo"></i><span style="vertical-align:
               super;font-size: 75%">1</span>
           </button>
         </div>
-        <div class="statusControlSingle">
+        <div class="ctrlModeSingle">
           <button id="singleEnable" title="Enable single">
             <i class="fas fa-slash"></i>
           </button>
         </div>
 
-        <div class="statusControlConsume">
+        <div class="ctrlModeConsume">
           <button id="consumeDisable" title="Disable consume">
             <i class="fas fa-utensils"></i>
           </button>
         </div>
-        <div class="statusControlConsume">
+        <div class="ctrlModeConsume">
           <button id="consumeEnable" title="Enable consume">
             <i class="fas fa-slash"></i>
           </button>
@@ -136,7 +136,7 @@
     </div>
 
     <!-- playlist View -->
-    <div id="playlistView" class="view">
+    <div id="viewPlaylist" class="mainContent">
       <div id="playlist">
         <!-- playlistEntries go here -->
       </div>
@@ -163,10 +163,8 @@
       </div>
     </div>
 
-
-
     <!-- search View -->
-    <div id="searchView" class="view" style="display:none">
+    <div id="viewSearch" class="mainContent" style="display:none">
       <div id="searchBox" class="boxRow bordered">
         <!-- search input field -->
         <input id="searchText" type="text" name="search">
@@ -194,13 +192,29 @@
       </div>
     </div>
 
-    <div id="folderView" class="view" style="display: none">
+    <div id="viewDirectory" class="mainContent" style="display: none">
       <div id="directoryList" class="listing">
         <!-- directory listing -->
       </div>
     </div>
 
-    <div id="configView" class="view" style="display: none">
+    <div id="directoryListEntry" class="songRow bordered" style="display: none">
+        <div class="listingControl">
+          <div class="listingControlPrimary">
+            <button id="dlBrowse"><i class="fas fa-folder"></i></button>
+          </div>
+          <div class="listingControlSecondary">
+            <button id="dlAdd"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="listingEntry">
+            <span id="dlName" class="directoryName">Name</span>
+          </div>
+        </div>
+      </div>
+  
+    <div id="viewConfig" class="mainContent" style="display: none">
       <form class="bordered">
         <div class="configItem">
           <label class="configLabel">Host</label>
@@ -222,26 +236,6 @@
       </form>
     </div>
 
-    <!-- Template below -->
-
-
-
-    <!-- search entry template -->
-    <div id="directoryListEntry" class="listingRow" style="display: none">
-      <div class="listingControl">
-        <div class="listingControlPrimary">
-          <button id="dlBrowse"><i class="fas fa-folder"></i></button>
-        </div>
-        <div class="listingControlSecondary">
-          <button id="dlAdd"><i class="fas fa-plus"></i></button>
-        </div>
-      </div>
-      <div class="col">
-        <div class="listingEntry">
-          <span id="dlName" class="directoryName">Name</span>
-        </div>
-      </div>
-    </div>
 
   </body>
 

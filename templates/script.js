@@ -95,13 +95,13 @@ window.addEventListener("load", function(evt) {
 
   var showError = function(msg) {
     // FIXME: looks ugly
-    e("error").innerHTML =
-      e("error").innerHTML == "" ? msg : e("error").innerHTML + "<br />" + msg;
-    eShow("error");
+    e("mainError").innerHTML =
+      e("mainError").innerHTML == "" ? msg : e("mainError").innerHTML + "<br />" + msg;
+    eShow("mainError");
   };
   var hideError = function() {
-    e("error").innerHTML = "";
-    eHide("error");
+    e("mainError").innerHTML = "";
+    eHide("mainError");
   };
 
   var updateStatus = function(data) {
@@ -129,7 +129,7 @@ window.addEventListener("load", function(evt) {
   };
   var updateActiveSong = function(data) {
     const { file, artist, title, album_artist, album } = data;
-    e("activeSong").title = file;
+    e("ctrlSong").title = file;
     e("artist").innerHTML = artist;
     e("title").innerHTML = title;
     if (artist != album_artist) {
@@ -185,7 +185,7 @@ window.addEventListener("load", function(evt) {
           var node = newSongNode("playlistEntry", entry);
           // disable the play button for the active song
           node.querySelector("#plPlay").disabled =
-            file == e("activeSong").title ? "disabled" : "";
+            file == e("ctrlSong").title ? "disabled" : "";
           node.querySelector("#plPlay").onclick = btnCommand(
             "play",
             i.toString()
@@ -322,15 +322,15 @@ window.addEventListener("load", function(evt) {
    */
   var views = {
     // view name: button ID
-    playlistView: "list",
-    searchView: "search",
-    folderView: "browser",
-    configView: "config"
+    viewPlaylist: "list",
+    viewSearch: "search",
+    viewDirectory: "browser",
+    viewConfig: "config"
   };
   var show = function(view) {
     return function() {
       switch (view) {
-        case "folderView":
+        case "viewDirectory":
           command("browse", "");
           break;
       }
@@ -392,8 +392,8 @@ window.addEventListener("load", function(evt) {
     };
   });
 
-  // show the playlistView
-  show("playlistView")();
+  // show the viewPlaylist
+  show("viewPlaylist")();
 });
 
 // eof

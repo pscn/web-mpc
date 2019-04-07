@@ -63,6 +63,32 @@ input[type="password"] {
   align-items: center;
 }
 
+
+button {
+  background: none;
+  box-sizing: unset;
+  border: 0;
+  border-radius: 4px;
+  outline: none;
+  -webkit-transition-duration: 0.6s;
+  transition-duration: 0.6s;
+  /* margin: 4px;*/
+  font-size: 20px;
+}
+
+button:hover {
+  opacity: 0.5;
+  background: var(--c3);
+}
+button:focus {
+  opacity: 0.5;
+  background: var(--c3);
+}
+button:disabled {
+  opacity: 0.5;
+  color: var(--c4);
+}
+
 @media (min-width: 768px) {
   .boxResponsive {
     flex-direction: row;
@@ -90,9 +116,9 @@ input[type="password"] {
   display: grid;
   grid-template-columns: 4px 1fr 4px;
   grid-template-areas:
-    ". error ."
-    ". control ."
-    ". content .";
+    ". mainError ."
+    ". mainControl ."
+    ". mainContent .";
 }
 
 @media (min-width: 768px) {
@@ -100,160 +126,160 @@ input[type="password"] {
     grid-template-columns: 4px 1fr 4px;
     /* FIXME: layout */
     grid-template-areas:
-      ". error ."
-      ". control ."
-      ". content .";
+      ". mainError ."
+      ". mainControl ."
+      ". mainContent .";
   }
 }
 
-.error {
-  grid-area: error;
+.mainError {
+  grid-area: mainError;
   background: #ff1f1f;
   font-size: 24px;
 }
 
-.control {
-  grid-area: control;
+.mainControl {
+  grid-area: mainControl;
 }
 
-.view {
-  grid-area: view;
+.mainContent {
+  grid-area: mainContent;
 }
 
 /* end of main grid */
 
-/* control grid */
-.control {
+/* mainControl grid */
+.mainControl {
   display: grid;
   grid-template-columns: auto auto auto 1fr auto auto;
   grid-template-areas:
-    "connectionStatus activeSong activeSong activeSong activeSong activeSong"
-    "viewControl activeSong activeSong activeSong activeSong activeSong"
-    "playerControl playerControl statusControl . timeElapsed timeDuration";
+    "ctrlConnection ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlPlayer ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
 }
 @media (min-width: 768px) {
-  .control {
+  .mainControl {
     grid-template-columns: auto auto auto auto 1fr auto auto;
     grid-template-areas:
-      "activeSong activeSong activeSong activeSong activeSong activeSong activeSong"
-      "connectionStatus viewControl playerControl statusControl . timeElapsed timeDuration";
+      "ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
+      "ctrlConnection ctrlView ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
   }
 }
 
-.viewControl {
-  grid-area: viewControl;
+.ctrlView {
+  grid-area: ctrlView;
 }
 
-.connectionStatus {
-  grid-area: connectionStatus;
+.ctrlConnection {
+  grid-area: ctrlConnection;
 }
 
-.activeSong {
-  grid-area: activeSong;
+.ctrlSong {
+  grid-area: ctrlSong;
 }
 
-.timeElapsed {
-  grid-area: timeElapsed;
+.ctrlElapsed {
+  grid-area: ctrlElapsed;
   align-items: right;
 }
-.timeDuration {
-  grid-area: timeDuration;
+.ctrlDuration {
+  grid-area: ctrlDuration;
 }
 
-.playerControl {
-  grid-area: playerControl;
+.ctrlPlayer {
+  grid-area: ctrlPlayer;
 }
 
-.statusControl {
-  grid-area: statusControl;
+.ctrlMode {
+  grid-area: ctrlMode;
 }
 
-/* end of control grid */
+/* end of mainControl grid */
 
-/* viewControl grid */
-.viewControl {
+/* ctrlView grid */
+.ctrlView {
   display: grid;
   grid-template-columns: auto;
   grid-template-areas:
-    "viewControlList"
-    "viewControlSearch"
-    "viewControlBrowse"
-    "viewControlConfig";
+    "ctrlViewList"
+    "ctrlViewSearch"
+    "ctrlViewBrowse"
+    "ctrlViewConfig";
 }
 @media (min-width: 768px) {
-  .viewControl {
+  .ctrlView {
     grid-template-columns: auto auto auto auto;
-    grid-template-areas: "viewControlList viewControlSearch viewControlBrowse viewControlConfig";
+    grid-template-areas: "ctrlViewList ctrlViewSearch ctrlViewBrowse ctrlViewConfig";
   }
 }
-.viewControlList {
-  grid-area: viewControlList;
+.ctrlViewList {
+  grid-area: ctrlViewList;
 }
-.viewControlSearch {
-  grid-area: viewControlSearch;
+.ctrlViewSearch {
+  grid-area: ctrlViewSearch;
 }
-.viewControlBrowse {
-  grid-area: viewControlBrowse;
+.ctrlViewBrowse {
+  grid-area: ctrlViewBrowse;
 }
-.viewControlConfig {
-  grid-area: viewControlConfig;
+.ctrlViewConfig {
+  grid-area: ctrlViewConfig;
 }
-/* end of viewControl grid */
+/* end of ctrlView grid */
 
-/* playerControl grid */
-.playerControl {
+/* ctrlPlayer grid */
+.ctrlPlayer {
   display: grid;
   grid-template-columns: auto auto auto auto;
-  grid-template-areas: "playerControlPlay playerControlStop playerControlPrevious playerControlNext";
+  grid-template-areas: "ctrlPlayerPlay ctrlPlayerStop ctrlPlayerPrevious ctrlPlayerNext";
   /*
   grid-template-areas:
-    "playerControlPlay playerControlStop"
-    "playerControlPrevious playerControlNext";
+    "ctrlPlayerPlay ctrlPlayerStop"
+    "ctrlPlayerPrevious ctrlPlayerNext";
     */
 }
-.playerControlPlay {
-  grid-area: playerControlPlay;
+.ctrlPlayerPlay {
+  grid-area: ctrlPlayerPlay;
 }
-.playerControlStop {
-  grid-area: playerControlStop;
+.ctrlPlayerStop {
+  grid-area: ctrlPlayerStop;
 }
-.playerControlPrevious {
-  grid-area: playerControlPrevious;
+.ctrlPlayerPrevious {
+  grid-area: ctrlPlayerPrevious;
 }
-.playerControlNext {
-  grid-area: playerControlNext;
+.ctrlPlayerNext {
+  grid-area: ctrlPlayerNext;
 }
-/* end of playerControl grid */
+/* end of ctrlPlayer grid */
 
-/* statusControl grid */
-.statusControl {
+/* ctrlMode grid */
+.ctrlMode {
   display: grid;
   grid-template-columns: auto auto auto auto;
-  grid-template-areas: "statusControlConsume statusControlRepeat statusControlSingle statusControlRandom";
+  grid-template-areas: "ctrlModeConsume ctrlModeRepeat ctrlModeSingle ctrlModeRandom";
   /*
   grid-template-areas:
-    "statusControlConsume statusControlRepeat"
-    "statusControlSingle statusControlRandom";
+    "ctrlModeConsume ctrlModeRepeat"
+    "ctrlModeSingle ctrlModeRandom";
     */
 }
-.statusControlConsume {
-  grid-area: statusControlConsume;
+.ctrlModeConsume {
+  grid-area: ctrlModeConsume;
 }
-.statusControlRepeat {
-  grid-area: statusControlRepeat;
+.ctrlModeRepeat {
+  grid-area: ctrlModeRepeat;
 }
-.statusControlSingle {
-  grid-area: statusControlSingle;
+.ctrlModeSingle {
+  grid-area: ctrlModeSingle;
 }
-.statusControlRandom {
-  grid-area: statusControlRandom;
+.ctrlModeRandom {
+  grid-area: ctrlModeRandom;
 }
 .toggleOn {
   text-decoration: underline;
 }
-/* end of statusControl grid */
+/* end of ctrlMode grid */
 
-/* activeSong */
+/* ctrlSong */
 
 .title {
   font-size: 22px;
@@ -322,11 +348,6 @@ input[type="password"] {
 /* search form */
 .configItem {
   padding: 4px;
-}
-.configLabel {
-}
-
-.configValue {
 }
 
 /* unverififed */
@@ -399,30 +420,6 @@ input[type="password"] {
   grid-area: playlistDuration;
 }
 
-button {
-  background: none;
-  box-sizing: unset;
-  border: 0;
-  border-radius: 4px;
-  outline: none;
-  -webkit-transition-duration: 0.6s;
-  transition-duration: 0.6s;
-  /* margin: 4px;*/
-  font-size: 20px;
-}
-
-button:hover {
-  opacity: 0.5;
-  background: var(--c3);
-}
-button:focus {
-  opacity: 0.5;
-  background: var(--c3);
-}
-button:disabled {
-  opacity: 0.5;
-  color: var(--c4);
-}
 
 div.listingRow:nth-child(even),
 div.songRow:nth-child(even) {
