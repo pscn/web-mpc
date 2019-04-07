@@ -122,10 +122,10 @@ window.addEventListener("load", function(evt) {
         break;
     }
     // update the config view
-    e("consume").checked = consume ? "checked" : "";
-    e("repeat").checked = repeat ? "checked" : "";
-    e("random").checked = random ? "checked" : "";
-    e("single").checked = single ? "checked" : "";
+    e("consumeEnable").style.display = consume ? "none" : "";
+    e("repeatEnable").style.display = repeat ? "none" : "";
+    e("randomEnable").style.display = random ? "none" : "";
+    e("singleEnable").style.display = single ? "none" : "";
   };
   var updateActiveSong = function(data) {
     const { file, artist, title, album_artist, album } = data;
@@ -353,6 +353,10 @@ window.addEventListener("load", function(evt) {
   for (var k in views) {
     e(views[k]).onclick = show(k);
   }
+  ["random", "consume", "repeat", "single"].map(function(value) {
+    e(value + "Enable").onclick = btnCommand(value, "enable");
+    e(value + "Disable").onclick = btnCommand(value, "disable");
+  });
 
   /*
    * onclick function assignments

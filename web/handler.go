@@ -232,7 +232,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 			case event := <-*client.Event:
 				h.logger.Println("event:", event)
 				switch event {
-				case "player", "playlist":
+				case "player", "playlist", "options":
 					h.writeMessage(ws, client.Status())
 					h.writeMessage(ws, client.ActiveSong())
 					h.writeMessage(ws, client.ActivePlaylist())
@@ -264,6 +264,22 @@ func (h *Handler) Channel() http.HandlerFunc {
 					err = client.Add(cmd.Data)
 				case mpc.Remove:
 					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
+
+				case mpc.Consume, mpc.Repeat, mpc.Single, mpc.Random:
+					target := true
+					if cmd.Data == "disable" {
+						target = false
+					}
+					switch cmd.Command {
+					case mpc.Consume:
+						client.Consume(target)
+					case mpc.Repeat:
+						client.Repeat(target)
+					case mpc.Single:
+						client.Single(target)
+					case mpc.Random:
+						client.Random(target)
+					}
 
 				case mpc.StatusRequest:
 					h.writeMessage(ws, client.Status())

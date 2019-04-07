@@ -248,6 +248,9 @@ input[type="password"] {
 .statusControlRandom {
   grid-area: statusControlRandom;
 }
+.toggleOn {
+  text-decoration: underline;
+}
 /* end of statusControl grid */
 
 /* activeSong */
@@ -408,12 +411,12 @@ button {
   font-size: 20px;
 }
 
-button {
-}
 button:hover {
+  opacity: 0.5;
   background: var(--c3);
 }
 button:focus {
+  opacity: 0.5;
   background: var(--c3);
 }
 button:disabled {

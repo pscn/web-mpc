@@ -20,6 +20,10 @@ const (
 	Search        CommandType = "search"
 	StatusRequest CommandType = "statusRequest"
 	Browse        CommandType = "browse"
+	Random        CommandType = "random"
+	Repeat        CommandType = "repeat"
+	Single        CommandType = "single"
+	Consume       CommandType = "consume"
 )
 
 // Command from the web

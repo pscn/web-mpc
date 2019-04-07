@@ -150,6 +150,22 @@ func (client *Client) RemovePlaylistEntry(nr int) error {
 	return client.mpc.Delete(nr, -1)
 }
 
+func (client *Client) Consume(target bool) error {
+	return client.mpc.Consume(target)
+}
+
+func (client *Client) Repeat(target bool) error {
+	return client.mpc.Repeat(target)
+}
+
+func (client *Client) Random(target bool) error {
+	return client.mpc.Random(target)
+}
+
+func (client *Client) Single(target bool) error {
+	return client.mpc.Single(target)
+}
+
 // Search for search string tokenized by space and searched in any
 func (client *Client) Search(search string) *Message {
 	var searchTokens []string
