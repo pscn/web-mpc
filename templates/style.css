@@ -125,12 +125,19 @@ input[type="password"] {
 /* control grid */
 .control {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto auto auto 1fr auto auto;
   grid-template-areas:
-    "connectionStatus timeElapsed activeSong"
-    "connectionStatus timeDuration activeSong"
-    "viewControl viewControl activeSong"
-    "playerControl playerControl activeSong";
+    "connectionStatus activeSong activeSong activeSong activeSong activeSong"
+    "viewControl activeSong activeSong activeSong activeSong activeSong"
+    "playerControl playerControl statusControl . timeElapsed timeDuration";
+}
+@media (min-width: 768px) {
+  .control {
+    grid-template-columns: auto auto auto auto 1fr auto auto;
+    grid-template-areas:
+      "activeSong activeSong activeSong activeSong activeSong activeSong activeSong"
+      "connectionStatus viewControl playerControl statusControl . timeElapsed timeDuration";
+  }
 }
 
 .viewControl {
@@ -157,15 +164,27 @@ input[type="password"] {
   grid-area: playerControl;
 }
 
+.statusControl {
+  grid-area: statusControl;
+}
+
 /* end of control grid */
 
 /* viewControl grid */
 .viewControl {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto;
   grid-template-areas:
-    "viewControlList viewControlSearch"
-    "viewControlBrowse viewControlConfig";
+    "viewControlList"
+    "viewControlSearch"
+    "viewControlBrowse"
+    "viewControlConfig";
+}
+@media (min-width: 768px) {
+  .viewControl {
+    grid-template-columns: auto auto auto auto;
+    grid-template-areas: "viewControlList viewControlSearch viewControlBrowse viewControlConfig";
+  }
 }
 .viewControlList {
   grid-area: viewControlList;
@@ -184,10 +203,13 @@ input[type="password"] {
 /* playerControl grid */
 .playerControl {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto auto;
+  grid-template-areas: "playerControlPlay playerControlStop playerControlPrevious playerControlNext";
+  /*
   grid-template-areas:
     "playerControlPlay playerControlStop"
     "playerControlPrevious playerControlNext";
+    */
 }
 .playerControlPlay {
   grid-area: playerControlPlay;
@@ -201,6 +223,33 @@ input[type="password"] {
 .playerControlNext {
   grid-area: playerControlNext;
 }
+/* end of playerControl grid */
+
+/* statusControl grid */
+.statusControl {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-areas: "statusControlConsume statusControlRepeat statusControlSingle statusControlRandom";
+  /*
+  grid-template-areas:
+    "statusControlConsume statusControlRepeat"
+    "statusControlSingle statusControlRandom";
+    */
+}
+.statusControlConsume {
+  grid-area: statusControlConsume;
+}
+.statusControlRepeat {
+  grid-area: statusControlRepeat;
+}
+.statusControlSingle {
+  grid-area: statusControlSingle;
+}
+.statusControlRandom {
+  grid-area: statusControlRandom;
+}
+/* end of statusControl grid */
+
 /* activeSong */
 
 .title {
