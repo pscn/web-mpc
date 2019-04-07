@@ -52,7 +52,7 @@ input[type="password"] {
   /* 
   padding: 2px; 
   */
-  
+
   background: var(--c5);
 }
 
@@ -60,7 +60,7 @@ input[type="password"] {
   /* switching between column (mobile) and row (desktop) */
   display: flex;
   /* flex-direction: column; */
-  align-items:center;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -88,31 +88,21 @@ input[type="password"] {
 /* main grid */
 .main {
   display: grid;
-  grid-template-columns: 4px auto 1fr auto 4px;
+  grid-template-columns: 4px 1fr 4px;
   grid-template-areas:
-    ". error error error ."
-    ". connectionStatus viewControl timeDisplay ."
-    ". activeSong activeSong activeSong . "
-    ". playerControl playerControl playerControl ."
-    ". playlistView playlistView playlistView ."
-    ". searchView searchView searchView ."
-    ". folderView folderView folderView ."
-    ". configView configView configView .";
+    ". error ."
+    ". control ."
+    ". content .";
 }
 
 @media (min-width: 768px) {
   .main {
-    grid-template-columns: 4px auto auto 1fr auto 4px;
+    grid-template-columns: 4px 1fr 4px;
     /* FIXME: layout */
     grid-template-areas:
-      ". error error error error ."
-      ". connectionStatus timeDisplay activeSong activeSong  ."
-      ". viewControl viewControl activeSong activeSong  ."
-      ". playerControl playerControl activeSong activeSong  ."
-      ". playlistView playlistView playlistView playlistView ."
-      ". searchView searchView searchView searchView ."
-      ". folderView folderView folderView folderView ."
-      ". configView configView configView configView .";
+      ". error ."
+      ". control ."
+      ". content .";
   }
 }
 
@@ -122,45 +112,95 @@ input[type="password"] {
   font-size: 24px;
 }
 
+.control {
+  grid-area: control;
+}
+
+.view {
+  grid-area: view;
+}
+
+/* end of main grid */
+
+/* control grid */
+.control {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas:
+    "connectionStatus timeElapsed activeSong"
+    "connectionStatus timeDuration activeSong"
+    "viewControl viewControl activeSong"
+    "playerControl playerControl activeSong";
+}
+
 .viewControl {
   grid-area: viewControl;
 }
+
 .connectionStatus {
   grid-area: connectionStatus;
 }
+
 .activeSong {
   grid-area: activeSong;
 }
 
-.timeDisplay {
-  grid-area: timeDisplay;
+.timeElapsed {
+  grid-area: timeElapsed;
+  align-items: right;
 }
-@media (min-width: 768px) {
-  .timeDisplay {
-    flex-direction: row; /* FIXME: doesn't work :( */
-  }
+.timeDuration {
+  grid-area: timeDuration;
 }
 
 .playerControl {
   grid-area: playerControl;
 }
 
-.playlistView {
-  grid-area: playlistView;
-}
+/* end of control grid */
 
-.searchView {
-  grid-area: searchView;
+/* viewControl grid */
+.viewControl {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "viewControlList viewControlSearch"
+    "viewControlBrowse viewControlConfig";
 }
-
-.folderView {
-  grid-area: folderView;
+.viewControlList {
+  grid-area: viewControlList;
 }
-
-.configView {
-  grid-area: configView;
+.viewControlSearch {
+  grid-area: viewControlSearch;
 }
+.viewControlBrowse {
+  grid-area: viewControlBrowse;
+}
+.viewControlConfig {
+  grid-area: viewControlConfig;
+}
+/* end of viewControl grid */
 
+/* playerControl grid */
+.playerControl {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "playerControlPlay playerControlStop"
+    "playerControlPrevious playerControlNext";
+}
+.playerControlPlay {
+  grid-area: playerControlPlay;
+}
+.playerControlStop {
+  grid-area: playerControlStop;
+}
+.playerControlPrevious {
+  grid-area: playerControlPrevious;
+}
+.playerControlNext {
+  grid-area: playerControlNext;
+}
 /* activeSong */
 
 .title {
@@ -338,7 +378,7 @@ div.songRow:nth-child(even) {
 }
 
 div.listingRow:nth-child(even) button:disabled,
-div.songRow:nth-child(even) button:disabled{
+div.songRow:nth-child(even) button:disabled {
   color: var(--c4);
 }
 
@@ -348,7 +388,7 @@ div.songRow:nth-child(odd) {
 }
 
 div.listingRow:nth-child(odd) button:disabled,
-div.songRow:nth-child(odd) button:disabled{
+div.songRow:nth-child(odd) button:disabled {
   color: var(--c5);
 }
 /* eof */

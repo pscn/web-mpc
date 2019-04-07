@@ -378,7 +378,7 @@ window.addEventListener("load", function(evt) {
   e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);
   };
-  e("connectionStatus").onclick = openWebSocket;
+  e("connect").onclick = openWebSocket;
 
   // add onclick function for all controls
   ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {

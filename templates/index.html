@@ -11,8 +11,8 @@
       href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
       integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
       crossorigin="anonymous">
-    <link rel="stylesheet" href="theme-default.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme-juri.css">
 
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Bowlby+One+SC">
@@ -21,57 +21,29 @@
 
   <body>
     <!-- pass parameters from main.go to hidden input fields -->
-    <form style="display:none">
+    <div style="display:none">
       <input id="ws" type="text" value="{{.ws}}">
-    </form>
+    </div>
 
     <!-- load our javascript -->
     <script src="script.js"></script>
 
     <!-- main grid -->
-    <la class="main">
+    <div class="main">
       <!-- error messages -->
-      <div id="error" class="error" style="display:none;"></div>
+      <div id="error" class="error boxResponsive bordered"
+        style="display:none;"></div>
+    </div>
 
-      <!-- switch between "views" -->
-      <div class="viewControl boxResponsive bordered">
-        <div class="cell">
-          <!-- list is the default view -->
-          <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
-          <button id="search"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="cell">
-          <button id="browser"><i class="fas fa-folder"></i></button>
-          <button id="config"><i class="fas fa-cog"></i></button>
-        </div>
-      </div>
-
-      <!-- play, pause etc. -->
-      <div class="playerControl boxResponsive bordered">
-        <div class="cell">
-          <button id="play"><i class="fas fa-play"></i></button>
-          <button id="resume"><i class="fas fa-play"></i></button>
-          <button id="pause" style="display: none"><i class="fas fa-pause"></i></button>
-          <button id="stop"><i class="fas fa-stop"></i></button>
-        </div>
-        <div class="cell">
-          <button id="previous"><i class="fas fa-step-backward"></i></button>
-          <button id="next"><i class="fas fa-step-forward"></i></button>
-        </div>
-      </div>
-
-      <div id="connectionStatus" class="cell connectionStatus bordered">
+    <div id="control" class="control">
+      <div class="connectionStatus boxResponsive bordered">
         <button id="connect">
           <i class="fas fa-power-off"></i>
         </button>
       </div>
 
-      <div class="timeDisplay boxResponsive bordered big bold">
-        <div id="elapsed" class="cell">0:21</div>
-        &nbsp;
-        <div id="duration" class="cell">2:12</div>
-      </div>
-
+      <div id="elapsed" class="timeElapsed boxResponsive bordered">0:21</div>
+      <div id="duration" class="timeDuration boxResponsive bordered">2:12</div>
       <div id="activeSong" class="boxColumn bordered activeSong">
         <!-- currently active song -->
         <div id="title" class="cell big bold">Title</div>
@@ -80,113 +52,146 @@
         <div id="albumArtist" class="cell medium">[AlbumArtist]</div>
       </div>
 
-      <!-- playlist View -->
-      <div id="playlistView" class="playlistView">
-        <div id="playlist">
-          <!-- playlistEntries go here -->
+      <!-- switch between "views" -->
+      <div class="viewControl boxResponsive bordered">
+        <div class="viewControlList">
+          <!-- list is the default view -->
+          <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
+        </div>
+        <div class="viewControlSearch">
+          <button id="search"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="viewControlBrowse">
+          <button id="browser"><i class="fas fa-folder"></i></button>
+        </div>
+        <div class="viewControlConfig">
+          <button id="config"><i class="fas fa-cog"></i></button>
         </div>
       </div>
 
-      <!-- playlist entry template will be placed into id="playlist" -->
-      <div id="playlistEntry" class="songRow bordered" style="display: none">
-        <div class="songControl boxResponsive">
-          <div class="cell">
-            <button id="plPlay"><i class="fas fa-play"></i></button>
-          </div>
-          <div class="cell">
-            <button id="plRemove">
-              <i class="fas fa-minus-circle"></i>
-            </button>
-          </div>
+      <!-- play, pause etc. -->
+      <div class="playerControl boxResponsive bordered">
+        <div class="playerControlPlay">
+          <button id="play"><i class="fas fa-play"></i></button>
+          <button id="resume"><i class="fas fa-play"></i></button>
+          <button id="pause" style="display: none"><i class="fas fa-pause"></i></button>
         </div>
-        <div class="songCell">
-          <div id="songCellTitle" class="songTitle">Title</div>
-          <div id="songCellArtist" class="songArtist">Artist</div>
-          <div id="songCellAlbum" class="songAlbum">Album</div>
-          <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
-          <div id="songCellDuration" class="songDuration">2:31</div>
+        <div class="playerControlStop">
+          <button id="stop"><i class="fas fa-stop"></i></button>
+        </div>
+        <div class="playerControlPrevious">
+          <button id="previous"><i class="fas fa-step-backward"></i></button>
+        </div>
+        <div class="playerControlNext">
+          <button id="next"><i class="fas fa-step-forward"></i></button>
         </div>
       </div>
+    </div>
 
-      <!-- search View -->
-      <div id="searchView" class="searchView" style="display:none">
-        <div id="searchBox" class="boxRow bordered">
-          <!-- search input field -->
-          <input id="searchText" type="text" name="search">
-          <button id="submitSearch"><i class="fas fa-search"></i></button>
+    <!-- playlist View -->
+    <div id="playlistView" class="view">
+      <div id="playlist">
+        <!-- playlistEntries go here -->
+      </div>
+    </div>
+
+    <!-- playlist entry template will be placed into id="playlist" -->
+    <div id="playlistEntry" class="songRow bordered" style="display: none">
+      <div class="songControl boxResponsive">
+        <div class="cell">
+          <button id="plPlay"><i class="fas fa-play"></i></button>
         </div>
-
-        <div id="searchResult" class="listing">
-          <!-- search result -->
+        <div class="cell">
+          <button id="plRemove">
+            <i class="fas fa-minus-circle"></i>
+          </button>
         </div>
       </div>
+      <div class="songCell">
+        <div id="songCellTitle" class="songTitle">Title</div>
+        <div id="songCellArtist" class="songArtist">Artist</div>
+        <div id="songCellAlbum" class="songAlbum">Album</div>
+        <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
+        <div id="songCellDuration" class="songDuration">2:31</div>
+      </div>
+    </div>
 
-      <!-- search entry template -->
-      <div id="searchEntry" class="songRow bordered" style="display: none">
-        <div class="songControl boxResponsive">
-          <div class="cell">
-            <button id="srAdd"><i class="fas fa-plus"></i></button>
-          </div>
-        </div>
-        <div class="songCell">
-          <div id="songCellTitle" class="songTitle">Title</div>
-          <div id="songCellArtist" class="songArtist">Artist</div>
-          <div id="songCellAlbum" class="songAlbum">Album</div>
-          <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
-          <div id="songCellDuration" class="songDuration">2:31</div>
-        </div>
+
+
+    <!-- search View -->
+    <div id="searchView" class="view" style="display:none">
+      <div id="searchBox" class="boxRow bordered">
+        <!-- search input field -->
+        <input id="searchText" type="text" name="search">
+        <button id="submitSearch"><i class="fas fa-search"></i></button>
       </div>
 
-      <div id="folderView" class="folderView" style="display: none">
-        <div id="directoryList" class="listing">
-          <!-- directory listing -->
+      <div id="searchResult" class="listing">
+        <!-- search result -->
+      </div>
+    </div>
+
+    <!-- search entry template -->
+    <div id="searchEntry" class="songRow bordered" style="display: none">
+      <div class="songControl boxResponsive">
+        <div class="cell">
+          <button id="srAdd"><i class="fas fa-plus"></i></button>
         </div>
       </div>
+      <div class="songCell">
+        <div id="songCellTitle" class="songTitle">Title</div>
+        <div id="songCellArtist" class="songArtist">Artist</div>
+        <div id="songCellAlbum" class="songAlbum">Album</div>
+        <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
+        <div id="songCellDuration" class="songDuration">2:31</div>
+      </div>
+    </div>
 
-      <la id="configView" class="configView">
-        <!-- FIXME: this looks like sh*t -->
-        <form class="bordered">
-          <div class="configItem">
-            <label class="configLabel">Host</label>
-            <input id="host" size="16"
-              type="text" name="host" value="">
+    <div id="folderView" class="view" style="display: none">
+      <div id="directoryList" class="listing">
+        <!-- directory listing -->
+      </div>
+    </div>
+
+    <div id="configView" class="view"  style="display: none">
+      <form class="bordered">
+        <div class="configItem">
+          <label class="configLabel">Host</label>
+          <input id="host" size="16"
+            type="text" name="host" value="">
+        </div>
+
+        <div class="configItem">
+          <label class="configLabel">Port</label>
+          <input id="port" size="5" maxlength="5"
+            type="number" name="port" value="">
+        </div>
+
+        <div class="configItem">
+          <label class="configLabel">Password</label>
+          <input id="pass" size="8"
+            type="password" name="pass" value="">
+        </div>
+        <!-- FIXME: this is not config! it's status -->
+        <div class="boxResponsive">
+          <div class="cell configItem">
+            <label class="configLabel">Random</label>
+            <input id="random" type="checkbox">
+
+            <label class="configLabel">Consume</label>
+            <input id="consume" type="checkbox">
           </div>
 
-          <div class="configItem">
-            <label class="configLabel">Port</label>
-            <input id="port" size="5" maxlength="5"
-              type="number" name="port" value="">
+          <div class="cell configItem">
+            <label class="configLabel">Repeat</label>
+            <input id="repeat" type="checkbox">
+
+            <label class="configLabel">Single</label>
+            <input id="single" type="checkbox">
           </div>
-
-          <div class="configItem">
-            <label class="configLabel">Password</label>
-            <input id="pass" size="8"
-              type="password" name="pass" value="">
-          </div>
-          <!-- FIXME: this is not config! it's status -->
-          <div class="boxResponsive">
-            <div class="cell configItem">
-              <label class="configLabel">Random</label>
-              <input id="random" type="checkbox">
-
-              <label class="configLabel">Consume</label>
-              <input id="consume" type="checkbox">
-            </div>
-
-            <div class="cell configItem">
-              <label class="configLabel">Repeat</label>
-              <input id="repeat" type="checkbox">
-
-              <label class="configLabel">Single</label>
-              <input id="single" type="checkbox">
-            </div>
-
-          </div>
-        </form>
-      </iv>
-
-    </v>
-
+        </div>
+      </form>
+    </div>
 
     <!-- Template below -->
 
