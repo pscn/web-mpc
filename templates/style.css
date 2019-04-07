@@ -1,3 +1,5 @@
+/* FIXME: lookup useful @media queries */
+
 body {
   /* FIXME: better font selection */
   font-family: "Roboto", sans-serif;
@@ -52,7 +54,7 @@ input[type="password"] {
 .boxResponsive {
   /* switching between column (mobile) and row (desktop) */
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
 }
 
 @media (min-width: 768px) {
@@ -83,12 +85,27 @@ input[type="password"] {
   grid-template-columns: 4px auto 1fr auto 4px;
   grid-template-areas:
     ". error error error ."
-    ". viewControl activeSong timeDisplay ."
-    ". playerControl activeSong timeDisplay ."
+    ". viewControl viewControl timeDisplay ."
+    ". activeSong activeSong activeSong . "
+    ". playerControl playerControl playerControl ."
     ". playlistView playlistView playlistView ."
     ". searchView searchView searchView ."
     ". folderView folderView folderView ."
     ". configView configView configView .";
+}
+
+@media (min-width: 768px) {
+  .main {
+    grid-template-columns: 4px auto 1fr auto 4px;
+    grid-template-areas:
+      ". error error error ."
+      ". viewControl activeSong timeDisplay ."
+      ". playerControl activeSong timeDisplay ."
+      ". playlistView playlistView playlistView ."
+      ". searchView searchView searchView ."
+      ". folderView folderView folderView ."
+      ". configView configView configView .";
+  }
 }
 
 .error {
@@ -107,6 +124,11 @@ input[type="password"] {
 
 .timeDisplay {
   grid-area: timeDisplay;
+}
+@media (min-width: 768px) {
+  .timeDisplay {
+    flex-direction: row; /* FIXME: doesn't work :( */
+  }
 }
 
 .playerControl {
