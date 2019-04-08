@@ -57,7 +57,7 @@ input[type="password"] {
 .boxResponsive {
   /* switching between column (mobile) and row (desktop) */
   display: flex;
-  /* flex-direction: column; */
+  flex-direction: column;
   align-items: center;
 }
 
@@ -116,6 +116,11 @@ button:disabled {
   /* always row */
   display: flex;
   flex-direction: row;
+  padding: 2px;
+}
+
+.boxRow .fas {
+  vertical-align: top;
 }
 
 .cell {
@@ -318,6 +323,7 @@ button:disabled {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas: "songControl songCell";
+  padding: 2px;
 }
 
 .songCell {
