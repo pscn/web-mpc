@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="utf-8">
     <meta name="mobile-web-app-capable" content="yes">
@@ -13,15 +12,12 @@
       crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="theme-default.css">
-
-    <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Bowlby+One+SC">
     <title>Web MPC</title>
   </head>
 
   <body>
     <!-- pass parameters from main.go to hidden input fields -->
-    <div style="display:none">
+    <div class="hide">
       <input id="ws" type="text" value="{{.ws}}">
     </div>
 
@@ -31,174 +27,193 @@
     <!-- main grid -->
     <div class="main">
       <!-- mainError messages -->
-      <div id="mainError" class="mainError boxResponsive bordered"
-        style="display:none;"></div>
-    </div>
-
-    <div class="mainControl">
-      <div class="ctrlConnection boxResponsive bordered">
-        <button id="connect">
-          <i class="fas fa-power-off"></i>
-        </button>
-      </div>
-
-      <div id="elapsed" class="ctrlElapsed boxResponsive bordered">0:21</div>
-      <div id="duration" class="ctrlDuration boxResponsive bordered">2:12</div>
-      <div id="ctrlSong" class="boxColumn bordered ctrlSong">
-        <!-- currently active song -->
-        <div id="title" class="cell big bold">Title</div>
-        <div id="artist" class="cell big">Artist</div>
-        <div id="album" class="cell medium">Album</div>
-        <div id="albumArtist" class="cell medium">[AlbumArtist]</div>
-      </div>
-
-      <!-- switch between "views" -->
-      <div class="ctrlView boxResponsive bordered">
-        <div class="ctrlViewList">
-          <!-- list is the default view -->
-          <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
-        </div>
-        <div class="ctrlViewSearch">
-          <button id="search"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="ctrlViewBrowse">
-          <button id="browser"><i class="fas fa-folder"></i></button>
-        </div>
-        <div class="ctrlViewConfig">
-          <button id="config"><i class="fas fa-cog"></i></button>
-        </div>
-      </div>
-
-      <!-- play, pause etc. -->
-      <div class="ctrlPlayer boxResponsive bordered">
-        <div class="ctrlPlayerPlay">
-          <button id="play" title="Play"><i class="fas fa-play"></i></button>
-          <button id="resume" title="Resume"><i class="fas fa-play"></i></button>
-          <button id="pause" title="Pause" style="display: none"><i class="fas fa-pause"></i></button>
-        </div>
-        <div class="ctrlPlayerStop">
-          <button id="stop" title="Stop"><i class="fas fa-stop"></i></button>
-        </div>
-        <div class="ctrlPlayerPrevious">
-          <button id="previous" title="Previous"><i class="fas fa-step-backward"></i></button>
-        </div>
-        <div class="ctrlPlayerNext">
-          <button id="next" title="Next"><i class="fas fa-step-forward"></i></button>
-        </div>
-      </div>
-
-      <div class="ctrlMode boxResponsive bordered">
-        <div class="ctrlModeRandom" title="Disable random">
-          <button id="randomDisable">
-            <i class="fas fa-random"></i>
-          </button>
-        </div>
-        <div class="ctrlModeRandom" title="Enable random">
-          <button id="randomEnable">
-            <i class="fas fa-slash"></i>
+      <div id="mainError" class="mainError boxResponsive bordered hide"></div>
+      <div class="mainControl">
+        <div class="ctrlConnection boxResponsive bordered">
+          <button id="connect">
+            <i class="fas fa-power-off"></i>
           </button>
         </div>
 
-        <div class="ctrlModeRepeat">
-          <button id="repeatDisable" title="Disable repeat">
-            <i class="fas fa-redo"></i>
-          </button>
-        </div>
-        <div class="ctrlModeRepeat">
-          <button id="repeatEnable" title="Enable repeat">
-            <i class="fas fa-slash"></i>
-          </button>
-        </div>
-
-        <div class="ctrlModeSingle">
-          <button id="singleDisable" title="Disable single">
-            <i class="fas fa-redo"></i><span style="vertical-align:
-              super;font-size: 75%">1</span>
-          </button>
-        </div>
-        <div class="ctrlModeSingle">
-          <button id="singleEnable" title="Enable single">
-            <i class="fas fa-slash"></i>
-          </button>
+        <div id="elapsed" class="ctrlElapsed boxResponsive bordered">0:21</div>
+        <div id="duration" class="ctrlDuration boxResponsive bordered">2:12</div>
+        <div id="ctrlSong" class="boxColumn bordered ctrlSong">
+          <!-- currently active song -->
+          <div id="title" class="cell big bold">Title</div>
+          <div id="artist" class="cell big">Artist</div>
+          <div id="album" class="cell medium">Album</div>
+          <div id="albumArtist" class="cell medium">[AlbumArtist]</div>
         </div>
 
-        <div class="ctrlModeConsume">
-          <button id="consumeDisable" title="Disable consume">
-            <i class="fas fa-utensils"></i>
-          </button>
+        <!-- switch between "views" -->
+        <div class="ctrlView boxResponsive bordered">
+          <div class="ctrlViewList">
+            <!-- list is the default view -->
+            <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
+          </div>
+          <div class="ctrlViewSearch">
+            <button id="search"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="ctrlViewBrowse">
+            <button id="browser"><i class="fas fa-folder"></i></button>
+          </div>
+          <div class="ctrlViewConfig">
+            <button id="config"><i class="fas fa-cog"></i></button>
+          </div>
         </div>
-        <div class="ctrlModeConsume">
-          <button id="consumeEnable" title="Enable consume">
-            <i class="fas fa-slash"></i>
-          </button>
+
+        <!-- play, pause etc. -->
+        <div class="ctrlPlayer boxResponsive bordered">
+          <div class="ctrlPlayerPlay">
+            <button id="play" title="Play"><i class="fas fa-play"></i></button>
+            <button id="resume" title="Resume"><i class="fas fa-play"></i></button>
+            <button id="pause" title="Pause" class="hide"><i class="fas
+                fa-pause"></i></button>
+          </div>
+          <div class="ctrlPlayerStop">
+            <button id="stop" title="Stop"><i class="fas fa-stop"></i></button>
+          </div>
+          <div class="ctrlPlayerPrevious">
+            <button id="previous" title="Previous"><i class="fas
+                fa-step-backward"></i></button>
+          </div>
+          <div class="ctrlPlayerNext">
+            <button id="next" title="Next"><i class="fas fa-step-forward"></i></button>
+          </div>
+        </div>
+
+        <div class="ctrlMode boxResponsive bordered">
+          <div class="ctrlModeRandom" title="Disable random">
+            <button id="randomDisable">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+
+                <i class="fas fa-random fa-stack-1x"></i>
+              </span>
+            </button>
+          </div>
+          <div class="ctrlModeRandom" title="Enable random">
+            <button id="randomEnable">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-ban fa-stack-2x"></i>
+                <i class="fas fa-random fa-stack-1x"></i>
+              </span>
+            </button>
+          </div>
+
+          <div class="ctrlModeRepeat">
+            <button id="repeatDisable" title="Disable repeat">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-redo fa-stack-1x"></i>
+              </span>
+            </button>
+          </div>
+          <div class="ctrlModeRepeat">
+            <button id="repeatEnable" title="Enable repeat">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-ban fa-stack-2x"></i>
+                <i class="fas fa-redo fa-stack-1x"></i>
+              </span> </button>
+          </div>
+
+          <div class="ctrlModeSingle">
+            <button id="singleDisable" title="Disable single">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-redo fa-stack-1x"><span class="small">1</span>
+                </i>
+              </span>
+            </button>
+          </div>
+          <div class="ctrlModeSingle">
+            <button id="singleEnable" title="Enable single">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-ban fa-stack-2x"></i>
+                <i class="fas fa-redo fa-stack-1x"><span class="small">1</span></i>
+              </span>
+
+            </button>
+          </div>
+          <div class="ctrlModeConsume">
+            <button id="consumeDisable" title="Disable consume">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-utensils fa-stack-1x"></i>
+              </span>
+            </button>
+          </div>
+          <div class="ctrlModeConsume">
+            <button id="consumeEnable" title="Enable consume">
+              <span class="fa-stack fa-1x" style="vertical-align: top;">
+                <i class="fas fa-utensils fa-stack-1x"></i>
+                <i class="fas fa-ban fa-stack-2x"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div><!-- end of mainControl-->
+
+      <!-- playlist View -->
+      <div id="viewPlaylist" class="mainContent">
+        <div id="playlist">
+          <!-- playlistEntries go here -->
         </div>
       </div>
-    </div>
 
-    <!-- playlist View -->
-    <div id="viewPlaylist" class="mainContent">
-      <div id="playlist">
-        <!-- playlistEntries go here -->
-      </div>
-    </div>
-
-    <!-- playlist entry template will be placed into id="playlist" -->
-    <div id="playlistEntry" class="songRow bordered" style="display: none">
-      <div class="songControl boxResponsive">
-        <div class="cell">
-          <button id="plPlay"><i class="fas fa-play"></i></button>
+      <!-- playlist entry template will be placed into id="playlist" -->
+      <div id="playlistEntry" class="songRow bordered hide">
+        <div class="songControl boxResponsive">
+          <div class="cell">
+            <button id="plPlay"><i class="fas fa-play"></i></button>
+          </div>
+          <div class="cell">
+            <button id="plRemove">
+              <i class="fas fa-minus-circle"></i>
+            </button>
+          </div>
         </div>
-        <div class="cell">
-          <button id="plRemove">
-            <i class="fas fa-minus-circle"></i>
-          </button>
-        </div>
-      </div>
-      <div class="songCell">
-        <div id="songCellTitle" class="songTitle">Title</div>
-        <div id="songCellArtist" class="songArtist">Artist</div>
-        <div id="songCellAlbum" class="songAlbum">Album</div>
-        <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
-        <div id="songCellDuration" class="songDuration">2:31</div>
-      </div>
-    </div>
-
-    <!-- search View -->
-    <div id="viewSearch" class="mainContent" style="display:none">
-      <div id="searchBox" class="boxRow bordered">
-        <!-- search input field -->
-        <input id="searchText" type="text" name="search">
-        <button id="submitSearch"><i class="fas fa-search"></i></button>
-      </div>
-
-      <div id="searchResult" class="listing">
-        <!-- search result -->
-      </div>
-    </div>
-
-    <!-- search entry template -->
-    <div id="searchEntry" class="songRow bordered" style="display: none">
-      <div class="songControl boxResponsive">
-        <div class="cell">
-          <button id="srAdd"><i class="fas fa-plus"></i></button>
+        <div class="songCell">
+          <div id="songCellTitle" class="songTitle">Title</div>
+          <div id="songCellArtist" class="songArtist">Artist</div>
+          <div id="songCellAlbum" class="songAlbum">Album</div>
+          <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
+          <div id="songCellDuration" class="songDuration">2:31</div>
         </div>
       </div>
-      <div class="songCell">
-        <div id="songCellTitle" class="songTitle">Title</div>
-        <div id="songCellArtist" class="songArtist">Artist</div>
-        <div id="songCellAlbum" class="songAlbum">Album</div>
-        <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
-        <div id="songCellDuration" class="songDuration">2:31</div>
-      </div>
-    </div>
 
-    <div id="viewDirectory" class="mainContent" style="display: none">
-      <div id="directoryList" class="listing">
-        <!-- directory listing -->
-      </div>
-    </div>
+      <!-- search View -->
+      <div id="viewSearch" class="mainContent hide">
+        <div id="searchBox" class="boxRow bordered">
+          <!-- search input field -->
+          <input id="searchText" type="text" name="search">
+          <button id="submitSearch"><i class="fas fa-search"></i></button>
+        </div>
 
-    <div id="directoryListEntry" class="songRow bordered" style="display: none">
+        <div id="searchResult" class="listing">
+          <!-- search result -->
+        </div>
+      </div>
+
+      <!-- search entry template -->
+      <div id="searchEntry" class="songRow bordered hide">
+        <div class="songControl boxResponsive">
+          <div class="cell">
+            <button id="srAdd"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="songCell">
+          <div id="songCellTitle" class="songTitle">Title</div>
+          <div id="songCellArtist" class="songArtist">Artist</div>
+          <div id="songCellAlbum" class="songAlbum">Album</div>
+          <div id="songCellAlbumArtist" class="songAlbumArtist">[AlbumArtist]</div>
+          <div id="songCellDuration" class="songDuration">2:31</div>
+        </div>
+      </div>
+
+      <div id="viewDirectory" class="mainContent hide">
+        <div id="directoryList" class="listing">
+          <!-- directory listing -->
+        </div>
+      </div>
+
+      <div id="directoryListEntry" class="songRow bordered hide">
         <div class="listingControl">
           <div class="listingControlPrimary">
             <button id="dlBrowse"><i class="fas fa-folder"></i></button>
@@ -213,29 +228,30 @@
           </div>
         </div>
       </div>
-  
-    <div id="viewConfig" class="mainContent" style="display: none">
-      <form class="bordered">
-        <div class="configItem">
-          <label class="configLabel">Host</label>
-          <input id="host" size="16"
-            type="text" name="host" value="">
-        </div>
 
-        <div class="configItem">
-          <label class="configLabel">Port</label>
-          <input id="port" size="5" maxlength="5"
-            type="number" name="port" value="">
-        </div>
+      <div id="viewConfig" class="mainContent" style="display: none">
+        <form class="bordered">
+          <div class="configItem">
+            <label class="configLabel">Host</label>
+            <input id="host" size="16"
+              type="text" name="host" value="">
+          </div>
 
-        <div class="configItem">
-          <label class="configLabel">Password</label>
-          <input id="pass" size="8"
-            type="password" name="pass" value="">
-        </div>
-      </form>
-    </div>
+          <div class="configItem">
+            <label class="configLabel">Port</label>
+            <input id="port" size="5" maxlength="5"
+              type="number" name="port" value="">
+          </div>
 
+          <div class="configItem">
+            <label class="configLabel">Password</label>
+            <input id="pass" size="8"
+              type="password" name="pass" value="">
+          </div>
+        </form>
+      </div>
+
+    </div><!-- end of main-->
 
   </body>
 

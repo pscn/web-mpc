@@ -30,18 +30,18 @@ input[type="password"] {
 
 /* common styles */
 .big {
-  font-size: 25px;
+  font-size: 120%;
 }
 .bold {
   font-weight: bold;
 }
 
 .medium {
-  font-size: 20px;
+  font-size: 100%;
 }
 
 .small {
-  font-size: 16px;
+  font-size: 80%;
 }
 
 .bordered {
@@ -63,6 +63,11 @@ input[type="password"] {
   align-items: center;
 }
 
+.hide {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
 
 button {
   background: none;
@@ -73,7 +78,7 @@ button {
   -webkit-transition-duration: 0.6s;
   transition-duration: 0.6s;
   /* margin: 4px;*/
-  font-size: 20px;
+  font-size: 90%;
 }
 
 button:hover {
@@ -87,6 +92,11 @@ button:focus {
 button:disabled {
   opacity: 0.5;
   color: var(--c4);
+}
+.ctrlMode button {
+  /* the stacked icons add padding somehow */
+  padding: 0px;
+  font-size: 75%;
 }
 
 @media (min-width: 768px) {
@@ -135,7 +145,6 @@ button:disabled {
 .mainError {
   grid-area: mainError;
   background: #ff1f1f;
-  font-size: 24px;
 }
 
 .mainControl {
@@ -181,9 +190,13 @@ button:disabled {
 .ctrlElapsed {
   grid-area: ctrlElapsed;
   align-items: right;
+  font-size: 80%;
+  padding-right: 2px;
 }
 .ctrlDuration {
   grid-area: ctrlDuration;
+  font-size: 80%;
+  padding-right: 2px;
 }
 
 .ctrlPlayer {
@@ -282,19 +295,19 @@ button:disabled {
 /* ctrlSong */
 
 .title {
-  font-size: 22px;
+  font-size: 120%;
 }
 
 .artist {
-  font-size: 22px;
+  font-size: 100%;
 }
 
 .album {
-  font-size: 20px;
+  font-size: 80%;
 }
 
 .albumArtist {
-  font-size: 20px;
+  font-size: 80%;
 }
 
 /* a song in a list */
@@ -313,7 +326,7 @@ button:disabled {
     "songArtist songArtist"
     "songAlbum songAlbum"
     "songAlbumArtist songAlbumArtist";
-  font-size: 20px;
+  font-size: 90%;
   padding-top: 2px;
 }
 
@@ -387,7 +400,7 @@ button:disabled {
     "playlistAlbum playlistAlbum"
     "playlistAlbumArtist playlistAlbumArtist"
     "directoryName directoryName";
-  font-size: 20px;
+  font-size: 80%;
 }
 
 @media (min-width: 768px) {
@@ -419,7 +432,6 @@ button:disabled {
 .playlistDuration {
   grid-area: playlistDuration;
 }
-
 
 div.listingRow:nth-child(even),
 div.songRow:nth-child(even) {

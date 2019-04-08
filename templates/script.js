@@ -4,12 +4,12 @@ window.addEventListener("load", function(evt) {
     return document.getElementById(id);
   };
   // helpers to easily show/hide or enable/disable elements
-  // example: ["play"].map(eShow) // set style.display for "play" to ""
+  // example: ["play"].map(eShow)
   var eHide = function(id) {
-    e(id).style.display = "none";
+    e(id).classList.add("hide");
   };
   var eShow = function(id) {
-    e(id).style.display = "";
+    e(id).classList.remove("hide");
   };
   var eDisable = function(id) {
     e(id).disabled = "disabled";
@@ -72,12 +72,23 @@ window.addEventListener("load", function(evt) {
   // a few 'globals' to track the process and current state of the player
   var gDuration = 1.0;
   var gElapsed = 0.0;
-  var gState = "pause";
+  var gState = {
+    play: "pause",
+    consume: false,
+    repeat: false,
+    single: false,
+    random: false
+  };
   var readableSeconds = function(value) {
-    const min = parseInt(value / 60);
+    var min = parseInt(value / 60);
     var sec = parseInt(value % 60);
     if (sec < 10) {
       sec = "0" + sec;
+    }
+    if (min < 10) {
+      min = "&nbsp;&nbsp;" + min;
+    } else if (min < 100) {
+      min = "&nbsp;" + min;
     }
     return min + ":" + sec;
   };
@@ -86,7 +97,7 @@ window.addEventListener("load", function(evt) {
   var updateProgress = function() {
     e("elapsed").innerHTML = readableSeconds(gElapsed);
     e("duration").innerHTML = readableSeconds(gDuration);
-    if (gState == "play" && gElapsed < gDuration) {
+    if (gState["play"] == "play" && gElapsed < gDuration) {
       // increment the seconds if playing and not finished
       gElapsed += 1.0;
     }
@@ -96,7 +107,9 @@ window.addEventListener("load", function(evt) {
   var showError = function(msg) {
     // FIXME: looks ugly
     e("mainError").innerHTML =
-      e("mainError").innerHTML == "" ? msg : e("mainError").innerHTML + "<br />" + msg;
+      e("mainError").innerHTML == ""
+        ? msg
+        : e("mainError").innerHTML + "<br />" + msg;
     eShow("mainError");
   };
   var hideError = function() {
@@ -106,7 +119,13 @@ window.addEventListener("load", function(evt) {
 
   var updateStatus = function(data) {
     const { state, duration, elapsed, consume, repeat, random, single } = data;
-    gState = state;
+    gState = {
+      play: state,
+      consume: consume,
+      repeat: repeat,
+      single: single,
+      random: random
+    };
     console.log(`updateStatus(${state})`);
     switch (state) {
       case "pause":
@@ -122,10 +141,16 @@ window.addEventListener("load", function(evt) {
         break;
     }
     // update the config view
-    e("consumeEnable").style.display = consume ? "none" : "";
-    e("repeatEnable").style.display = repeat ? "none" : "";
-    e("randomEnable").style.display = random ? "none" : "";
-    e("singleEnable").style.display = single ? "none" : "";
+
+    ["consume", "repeat", "single", "random"].map(function(value) {
+      if (gState[value]) {
+        eShow(value + "Disable");
+        eHide(value + "Enable");
+      } else {
+        eHide(value + "Disable");
+        eShow(value + "Enable");
+      }
+    });
   };
   var updateActiveSong = function(data) {
     const { file, artist, title, album_artist, album } = data;
@@ -145,7 +170,7 @@ window.addEventListener("load", function(evt) {
   var newSongNode = function(id, entry) {
     const { file, artist, title, album, album_artist, duration } = entry;
     var node = e(id).cloneNode(true);
-    node.style.display = "";
+    node.classList.remove("hide");
     node.title = file;
     node.querySelector("#songCellArtist").innerHTML = artist;
     node.querySelector("#songCellTitle").innerHTML = title;
@@ -155,7 +180,7 @@ window.addEventListener("load", function(evt) {
       node.querySelector("#songCellAlbumArtist").innerHTML =
         "[" + album_artist + "]&nbsp;";
     } else {
-      node.querySelector("#songCellAlbumArtist").style.display = "none";
+      node.querySelector("#songCellAlbumArtist").classList.add("hide");
     }
     node.querySelector("#songCellArtist").innerHTML = artist;
     node.querySelector("#songCellDuration").innerHTML = readableSeconds(
@@ -211,7 +236,7 @@ window.addEventListener("load", function(evt) {
         node = e("directoryListEntry").cloneNode(true);
         node.id = "dlRowParent";
         node.title = data.parent;
-        node.style.display = "";
+        node.classList.remove("hide");
         node.querySelector("#dlName").innerHTML = data.parent;
         node.querySelector("#dlBrowse").onclick = btnCommand(
           "browse",
@@ -223,7 +248,7 @@ window.addEventListener("load", function(evt) {
           if (entry.type == "directory") {
             node = e("directoryListEntry").cloneNode(true);
             node.id = "dlRow" + i;
-            node.style.display = "";
+            node.classList.remove("hide");
             node.querySelector("#dlName").innerHTML = entry.directory;
 
             {
@@ -235,7 +260,7 @@ window.addEventListener("load", function(evt) {
           } else {
             node = e("searchEntry").cloneNode(true);
             node.id = "srRow" + i;
-            node.style.display = "";
+            node.classList.remove("hide");
             node.querySelector("#srArtist").innerHTML = entry.artist;
             node.querySelector("#srTitle").innerHTML = entry.title;
             node.querySelector("#srAlbum").innerHTML = entry.album;
@@ -243,7 +268,7 @@ window.addEventListener("load", function(evt) {
               node.querySelector("#srAlbumArtist").innerHTML =
                 "[" + entry.album_artist + "]&nbsp;";
             } else {
-              node.querySelector("#srAlbumArtist").style.display = "none";
+              node.querySelector("#srAlbumArtist").classList.add("hide");
             }
             node.querySelector("#srArtist").innerHTML = entry.artist;
             node.querySelector("#srDuration").innerHTML = readableSeconds(
@@ -337,12 +362,12 @@ window.addEventListener("load", function(evt) {
       for (var k in views) {
         switch (k) {
           case view: // show matching view
-            e(k).style.display = "";
+            eShow(k);
             e(views[k]).disabled = "disabled";
             break;
           default:
             // hidde others
-            e(k).style.display = "none";
+            eHide(k);
             e(views[k]).disabled = "";
             break;
         }
