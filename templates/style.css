@@ -46,12 +46,10 @@ input[type="password"] {
 
 .bordered {
   /* add a round border & set the background */
-  border: 2px solid black;
+  /* border: 2px solid black; */
   border-radius: 4px;
-  margin: 2px;
-  /* 
-  padding: 2px; 
-  */
+  margin: 1px;
+  padding-bottom: 4px;
 
   background: var(--c5);
 }
@@ -97,6 +95,9 @@ button:disabled {
   /* the stacked icons add padding somehow */
   padding: 0px;
   font-size: 75%;
+}
+.fas {
+  vertical-align: middle;
 }
 
 @media (min-width: 768px) {
@@ -185,17 +186,19 @@ button:disabled {
 
 .ctrlSong {
   grid-area: ctrlSong;
+  padding: 4px;
 }
 
 .ctrlElapsed {
   grid-area: ctrlElapsed;
-  align-items: right;
   font-size: 80%;
+  padding-top: 6px;
   padding-right: 2px;
 }
 .ctrlDuration {
   grid-area: ctrlDuration;
   font-size: 80%;
+  padding-top: 6px;
   padding-right: 2px;
 }
 
