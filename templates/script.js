@@ -39,36 +39,6 @@ window.addEventListener("load", function(evt) {
     };
   };
 
-  // https://www.w3schools.com/js/js_cookies.asp
-  // gets the value of the cookie cookieName
-  var getCookie = function(cookieName) {
-    var name = cookieName + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(";");
-    for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == " ") {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  };
-
-  var updateConfig = function() {
-    const mpdAddr = getCookie("mpd");
-    if (mpdAddr != "") {
-      const parts = mpdAddr.split(":");
-      // having fun with javascript, this does:
-      // e("host").value = parts[0]
-      // e("port").value = parts[1] etc
-      ["host", "port", "pass"].map((id, i) => (e(id).value = parts[i]));
-    }
-  };
-  updateConfig();
-
   // a few 'globals' to track the process and current state of the player
   var gDuration = 1.0;
   var gElapsed = 0.0;
@@ -140,8 +110,7 @@ window.addEventListener("load", function(evt) {
         gElapsed = 0.0;
         break;
     }
-    // update the config view
-
+    // update the mode ctrl
     ["consume", "repeat", "single", "random"].map(function(value) {
       if (gState[value]) {
         eShow(value + "Disable");
@@ -349,8 +318,7 @@ window.addEventListener("load", function(evt) {
     // view name: button ID
     viewPlaylist: "list",
     viewSearch: "search",
-    viewDirectory: "browser",
-    viewConfig: "config"
+    viewDirectory: "browser"
   };
   var show = function(view) {
     return function() {
@@ -389,20 +357,6 @@ window.addEventListener("load", function(evt) {
   e("submitSearch").onclick = function(evt) {
     return command("search", e("searchText").value);
   };
-
-  var updateConfig = function(evt) {
-    // update the cookie and reconnect to the websocket
-    // which will read the cookie and apply the changes
-    document.cookie =
-      "mpd=" + e("host").value + ":" + e("port").value + ":" + e("pass").value;
-    if (ws != null) {
-      ws.close();
-    }
-    setTimeout(openWebSocket, 1000);
-  };
-  e("host").onchange = updateConfig;
-  e("port").onchange = updateConfig;
-  e("pass").onchange = updateConfig;
 
   e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);

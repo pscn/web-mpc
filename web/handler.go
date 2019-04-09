@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/gobuffalo/packr"
@@ -45,20 +44,6 @@ func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handl
 		upgrader:  &upgrader,
 		verbosity: verbosity,
 		logger:    log.New(os.Stdout, fmt.Sprintf("web-mpc "), log.LstdFlags|log.Lshortfile),
-	}
-}
-
-func (h *Handler) EnsureCookie(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := r.Cookie("mpd")
-		if err != nil { // cookie not set
-			h.logger.Println("setting cookie")
-			http.SetCookie(w, &http.Cookie{
-				Name:  "mpd",
-				Value: fmt.Sprintf("%s:%d:%s", h.mpdHost, h.mpdPort, h.mpdPass),
-			})
-		}
-		next(w, r)
 	}
 }
 
@@ -155,24 +140,6 @@ func (h *Handler) Channel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 
-		mpdHost := h.mpdHost
-		mpdPort := h.mpdPort
-		mpdPass := h.mpdPass
-
-		cookie, err := r.Cookie("mpd")
-		if err != nil { // cookie not set
-			h.logger.Println("setting cookie")
-			http.SetCookie(w, &http.Cookie{
-				Name:  "mpd",
-				Value: fmt.Sprintf("%s:%d:%s", mpdHost, mpdPort, mpdPass),
-			})
-		} else {
-			parts := strings.Split(cookie.Value, ":")
-			mpdHost = parts[0]
-			mpdPort = conv.ToInt(parts[1])
-			mpdPass = parts[2]
-		}
-
 		defer func() { // FIXME: not very nice, but better then crashing eh?
 			if r := recover(); r != nil {
 				h.logger.Println("recovered", r)
@@ -190,7 +157,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		defer ws.Close()
 
 		// open connection to mpc
-		client, err := mpc.New(mpdHost, mpdPort, mpdPass, h.logger)
+		client, err := mpc.New(h.mpdHost, h.mpdPort, h.mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
 			// FIXME: either the host & port for MPD is wrong, or MPD is

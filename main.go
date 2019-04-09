@@ -25,13 +25,13 @@ func main() {
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {
-		mux.HandleFunc("/", h.EnsureCookie(h.StaticTemplateFile("text/html", "index.html")))
+		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
 		mux.HandleFunc("/script.js", h.StaticFile("text/javascript", "script.js"))
 		mux.HandleFunc("/theme-default.css", h.StaticFile("text/css", "theme-default.css"))
 		mux.HandleFunc("/theme-juri.css", h.StaticFile("text/css", "theme-juri.css"))
 		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
 	} else {
-		mux.HandleFunc("/", h.EnsureCookie(h.StaticTemplatePacked("text/html", "index.html", &box)))
+		mux.HandleFunc("/", h.StaticTemplatePacked("text/html", "index.html", &box))
 		mux.HandleFunc("/script.js", h.StaticPacked("text/javascript", "script.js", &box))
 		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css", "theme-default.css", &box))
 		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css", "theme-juri.css", &box))

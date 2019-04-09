@@ -224,13 +224,12 @@ button:disabled {
   grid-template-areas:
     "ctrlViewList"
     "ctrlViewSearch"
-    "ctrlViewBrowse"
-    "ctrlViewConfig";
+    "ctrlViewBrowse";
 }
 @media (min-width: 768px) {
   .ctrlView {
-    grid-template-columns: auto auto auto auto;
-    grid-template-areas: "ctrlViewList ctrlViewSearch ctrlViewBrowse ctrlViewConfig";
+    grid-template-columns: auto auto auto;
+    grid-template-areas: "ctrlViewList ctrlViewSearch ctrlViewBrowse";
   }
 }
 .ctrlViewList {
@@ -241,9 +240,6 @@ button:disabled {
 }
 .ctrlViewBrowse {
   grid-area: ctrlViewBrowse;
-}
-.ctrlViewConfig {
-  grid-area: ctrlViewConfig;
 }
 /* end of ctrlView grid */
 
@@ -365,11 +361,6 @@ button:disabled {
 
 .songDuration {
   grid-area: songDuration;
-}
-
-/* search form */
-.configItem {
-  padding: 4px;
 }
 
 /* unverififed */
