@@ -3,8 +3,9 @@ package mpc
 import (
 	"fmt"
 	"log"
+	"sort"
 
-	"github.com/fhs/gompd/mpd"
+	"github.com/pscn/gompd/mpd"
 	"github.com/pscn/web-mpc/conv"
 )
 
@@ -13,14 +14,15 @@ type MessageType string
 
 // MessageTypes
 const (
-	Error          MessageType = "error"
-	Info           MessageType = "info"
-	Status         MessageType = "status"
-	ActiveSong     MessageType = "activeSong"
-	ActivePlaylist MessageType = "activePlaylist"
-	SearchResult   MessageType = "searchResult"
-	DirectoryList  MessageType = "directoryList"
+	Error         MessageType = "error"
+	Info          MessageType = "info"
+	Update        MessageType = "update"
+	SearchResult  MessageType = "searchResult"
+	DirectoryList MessageType = "directoryList"
 )
+
+// MaxSearchResults to return when searching
+const MaxSearchResults = 50
 
 // Message from the clients EventLoop
 type Message struct {
@@ -34,19 +36,7 @@ func NewMessage(msgType MessageType, data interface{}) *Message {
 }
 
 func (msg *Message) String() string {
-	switch msg.Type {
-	case Error, Info:
-		return fmt.Sprintf("%s: %s", msg.Type, msg.Data.(string))
-	case Status:
-		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*StatusData))
-	case ActiveSong:
-		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SongData))
-	case ActivePlaylist:
-		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*PlaylistData))
-	case SearchResult:
-		return fmt.Sprintf("%s: %+v", msg.Type, msg.Data.(*SearchResultData))
-	}
-	return fmt.Sprintf("Unknown type: %s", msg.Type)
+	return fmt.Sprintf("%s: %+v", msg.Type, msg.Data)
 }
 
 // ErrorMsg creates a new Event including an error
@@ -76,11 +66,13 @@ type StatusData struct {
 	Random   bool    `json:"random"`
 	Single   bool    `json:"single"`
 	Repeat   bool    `json:"repeat"`
+	Song     int     `json:"song"`
+	NextSong int     `json:"nextsong"`
 }
 
 // StatusMsg creates a new Event including the status data mapped from mpd.Attrs
-func StatusMsg(attrs *mpd.Attrs) *Message {
-	return NewMessage(Status, &StatusData{
+func statusData(attrs *mpd.Attrs) *StatusData {
+	return &StatusData{
 		Duration: conv.ToFloat((*attrs)["duration"]),
 		Elapsed:  conv.ToFloat((*attrs)["elapsed"]),
 		Consume:  conv.ToBool((*attrs)["consume"]),
@@ -89,15 +81,9 @@ func StatusMsg(attrs *mpd.Attrs) *Message {
 		Repeat:   conv.ToBool((*attrs)["repeat"]),
 		Volume:   conv.ToInt((*attrs)["volume"]),
 		State:    (*attrs)["state"],
-	})
-}
-
-// Status payload of an event
-func (msg *Message) Status() *StatusData {
-	if msg.Type == Status { // FIXME: how to inform the develeoper?
-		return msg.Data.(*StatusData)
+		Song:     conv.ToInt((*attrs)["song"]),
+		NextSong: conv.ToInt((*attrs)["nextsong"]),
 	}
-	return nil
 }
 
 // SongData converted from *mpd.attrs
@@ -110,14 +96,24 @@ type SongData struct {
 	File        string `json:"file"`
 	Genre       string `json:"genre"`
 	Released    string `json:"released"`
+	Prio        int    `json:"prio"`
+	PrioUp      int    `json:"prioUp"`   // the required prio to move 1 up
+	PrioDown    int    `json:"prioDown"` // the required prio to move 1 down
+	IsActive    bool   `json:"isActive"`
+	IsNext      bool   `json:"isNext"`
+	Position    int    `json:"position"`
 }
 
 // ActiveSongMsg creates a new Event including the current song data mapped from mpd.Attrs
-func ActiveSongMsg(attrs *mpd.Attrs) *Message {
+func songData(attrs *mpd.Attrs) *SongData {
 	if (*attrs)["AlbumArtist"] == "" {
 		(*attrs)["AlbumArtist"] = (*attrs)["Artist"]
 	}
-	return NewMessage(ActiveSong, &SongData{
+	if (*attrs)["Prio"] == "" {
+		(*attrs)["Prio"] = "0"
+	}
+	// fmt.Printf("attrs: %+v\n", attrs)
+	return &SongData{
 		Artist:      (*attrs)["Artist"],
 		Album:       (*attrs)["Album"],
 		AlbumArtist: (*attrs)["AlbumArtist"],
@@ -126,78 +122,99 @@ func ActiveSongMsg(attrs *mpd.Attrs) *Message {
 		File:        (*attrs)["file"],
 		Genre:       (*attrs)["Genre"],
 		Released:    (*attrs)["Date"],
-	})
-}
-
-// CurrentSong payload of an event
-func (msg *Message) CurrentSong() *SongData {
-	if msg.Type == ActiveSong { // FIXME: how to inform the develeoper?
-		return msg.Data.(*SongData)
+		Prio:        conv.ToInt((*attrs)["Prio"]),
+		PrioUp:      -1,
+		PrioDown:    -1,
+		IsActive:    false,
+		IsNext:      false,
+		Position:    conv.ToInt((*attrs)["Pos"]),
 	}
-	return nil
 }
 
-// PlaylistData converted from *mpd.attrs
-type PlaylistData struct {
-	Playlist []SongData
+// sorting
+type QueueData []SongData
+
+func (q QueueData) Len() int      { return len(q) }
+func (q QueueData) Swap(i, j int) { q[i], q[j] = q[j], q[i] }
+func (q QueueData) Less(i, j int) bool {
+	// We
+	if q[i].IsActive {
+		return false
+	}
+	if q[j].IsActive {
+		return true
+	}
+	if q[i].IsNext {
+		return false
+	}
+	if q[j].IsNext {
+		return true
+	}
+	return q[i].Prio < q[j].Prio
 }
 
-// ActivePlaylistMsg creates a new Event including the current song data mapped from mpd.Attrs
-func ActivePlaylistMsg(attrArr *[]mpd.Attrs) *Message {
-	event := &PlaylistData{}
-	event.Playlist = make([]SongData, len(*attrArr))
-	for i, attrs := range *attrArr {
-		if attrs["AlbumArtist"] == "" {
-			attrs["AlbumArtist"] = attrs["Artist"]
+type UpdateData struct {
+	Status     StatusData `json:"status"`
+	ActiveSong SongData   `json:"activeSong"`
+	Queue      []SongData `json:"queue"`
+}
+
+// UpdateDataMsg creates a new Event including the current song data mapped from mpd.Attrs
+func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs) *Message {
+	event := &UpdateData{}
+	event.Status = *statusData(status)
+	event.ActiveSong = *songData(song)
+	event.Queue = make([]SongData, len(*queue))
+	for i, attrs := range *queue {
+		event.Queue[i] = *songData(&attrs)
+	}
+	if event.Status.Song != -1 {
+		event.Queue[event.Status.Song].IsActive = true
+	}
+	// FIXME: can Song and NextSong be the same?
+	if event.Status.NextSong != -1 {
+		event.Queue[event.Status.NextSong].IsNext = true
+	}
+	// order by song → nextsong → prio
+	sort.Sort(sort.Reverse(QueueData(event.Queue)))
+	previousPrio := -1
+	for i, s := range event.Queue {
+		if s.IsActive {
+			continue
 		}
-		event.Playlist[i] = SongData{
-			Artist:      attrs["Artist"],
-			Album:       attrs["Album"],
-			AlbumArtist: attrs["AlbumArtist"],
-			Title:       attrs["Title"],
-			Duration:    conv.ToInt(attrs["Time"]),
-			File:        attrs["file"],
-			Genre:       attrs["Genre"],
-			Released:    attrs["Date"],
+		if previousPrio != -1 && previousPrio+1 <= 255 {
+			event.Queue[i].PrioUp = previousPrio + 1
 		}
+		previousPrio = s.Prio
+		// fmt.Printf("%d %d %d → %+v\n", previousPrio, s.Prio, s.PrioUp, s.File)
 	}
-	return NewMessage(ActivePlaylist, event)
-}
-
-// CurrentPlaylist payload of an event
-func (msg *Message) CurrentPlaylist() *PlaylistData {
-	if msg.Type == ActivePlaylist { // FIXME: how to inform the develeoper?
-		return msg.Data.(*PlaylistData)
-	}
-	return nil
+	return NewMessage(Update, event)
 }
 
 // SearchResultData converted from *mpd.attrs
 type SearchResultData struct {
-	SearchResult []SongData
+	SearchResult []SongData `json:"searchResult"`
+	Truncated    bool       `json:"truncated"` // have we omited some results?
+	MaxResults   int        `json:"maxResults"`
 }
 
 // SearchResultMsg from mpd.Attrs
 func SearchResultMsg(attrArr *[]mpd.Attrs) *Message {
-	event := &SearchResultData{}
+	event := &SearchResultData{
+		Truncated:  false,
+		MaxResults: MaxSearchResults,
+	}
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
 	}
-	event.SearchResult = make([]SongData, len(*attrArr))
-	for i, attrs := range *attrArr {
-		if attrs["AlbumArtist"] == "" {
-			attrs["AlbumArtist"] = attrs["Artist"]
-		}
-		event.SearchResult[i] = SongData{
-			Artist:      attrs["Artist"],
-			Album:       attrs["Album"],
-			AlbumArtist: attrs["AlbumArtist"],
-			Title:       attrs["Title"],
-			Duration:    conv.ToInt(attrs["Time"]),
-			File:        attrs["file"],
-			Genre:       attrs["Genre"],
-			Released:    attrs["Date"],
-		}
+	iattrArr := *attrArr
+	if len(iattrArr) > 50 {
+		event.Truncated = true
+		iattrArr = iattrArr[:50]
+	}
+	event.SearchResult = make([]SongData, len(iattrArr))
+	for i, attrs := range iattrArr {
+		event.SearchResult[i] = *songData(&attrs)
 	}
 	return NewMessage(SearchResult, event)
 }
@@ -211,9 +228,8 @@ func (msg *Message) SearchResult() *SearchResultData {
 }
 
 type DirectoryListEntry struct {
-	Type      string `json:"type"`
-	Directory string `json:"directory"`
-
+	Type        string `json:"type"`
+	Directory   string `json:"directory"`
 	Artist      string `json:"artist"`
 	Album       string `json:"album"`
 	AlbumArtist string `json:"album_artist"`
