@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/gobuffalo/packr"
@@ -168,6 +169,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
+		client.Stats()
 		defer client.Close()
 
 		// channel for commands from the webclient
@@ -189,9 +191,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
-		h.writeMessage(ws, client.Status())
-		h.writeMessage(ws, client.ActiveSong())
-		h.writeMessage(ws, client.ActivePlaylist())
+		h.writeMessage(ws, client.Update())
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -200,10 +200,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 				h.logger.Println("event:", event)
 				switch event {
 				case "player", "playlist", "options":
-					h.writeMessage(ws, client.Status())
-					h.writeMessage(ws, client.ActiveSong())
-					h.writeMessage(ws, client.ActivePlaylist())
+					// send the playlist before the status, to have "nextsong" work correctly
+					h.writeMessage(ws, client.Update())
 				}
+
 			case cmd := <-wc:
 				if cmd == nil {
 					// wc closed → exit
@@ -217,39 +217,56 @@ func (h *Handler) Channel() http.HandlerFunc {
 					} else {
 						err = client.Play(-1)
 					}
+
 				case mpc.Resume:
 					err = client.Resume()
+
 				case mpc.Pause:
 					err = client.Pause()
+
 				case mpc.Stop:
 					err = client.Stop()
+
 				case mpc.Next:
 					err = client.Next()
+
 				case mpc.Previous:
 					err = client.Previous()
+
 				case mpc.Add:
 					err = client.Add(cmd.Data)
+
 				case mpc.Remove:
 					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
 
-				case mpc.Consume, mpc.Repeat, mpc.Single, mpc.Random:
+				case mpc.Prio:
+					args := strings.Split(cmd.Data, ":")
+					err = client.Prio(conv.ToInt(args[0]), conv.ToInt(args[1]))
+					// prio does not yield an update
+					// h.writeMessage(ws, client.Update())
+
+				case mpc.ModeConsume, mpc.ModeRepeat, mpc.ModeSingle, mpc.ModeRandom:
 					target := true
 					if cmd.Data == "disable" {
 						target = false
 					}
 					switch cmd.Command {
-					case mpc.Consume:
+					case mpc.ModeConsume:
 						client.Consume(target)
-					case mpc.Repeat:
+
+					case mpc.ModeRepeat:
 						client.Repeat(target)
-					case mpc.Single:
+
+					case mpc.ModeSingle:
 						client.Single(target)
-					case mpc.Random:
+
+					case mpc.ModeRandom:
 						client.Random(target)
 					}
 
-				case mpc.StatusRequest:
-					h.writeMessage(ws, client.Status())
+				case mpc.UpdateRequest:
+					h.writeMessage(ws, client.Update())
+
 				case mpc.Search:
 					h.writeMessage(ws, client.Search(cmd.Data))
 
