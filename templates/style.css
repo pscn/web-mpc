@@ -14,6 +14,7 @@ body {
 @media (min-width: 768px) {
   body {
     /*background: #efefef;*/
+    font-size: 28px;
   }
 }
 
@@ -47,7 +48,7 @@ input[type="password"] {
 
 .bordered {
   /* add a round border & set the background */
-  /* border: 2px solid black; */
+  border: 2px solid black;
   border-radius: 4px;
   margin: 1px;
   padding-bottom: 4px;
@@ -82,6 +83,7 @@ button {
 
 .prio {
   border: 1px solid black;
+  margin-right: 4px;
 }
 
 button:hover {
@@ -184,10 +186,11 @@ button:disabled {
 
 @media (min-width: 768px) {
   .mainControl {
-    grid-template-columns: auto auto auto auto 1fr auto auto;
+    grid-template-columns: auto auto auto 1fr auto auto;
     grid-template-areas:
-      "ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
-      "ctrlConnection ctrlView ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
+      "ctrlConnection ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
+      "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
+      "ctrlView ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
   }
 }
 
@@ -238,12 +241,6 @@ button:disabled {
     "ctrlViewBrowse";
 }
 
-@media (min-width: 768px) {
-  .ctrlView {
-    grid-template-columns: auto auto auto;
-    grid-template-areas: "ctrlViewList ctrlViewSearch ctrlViewBrowse";
-  }
-}
 
 .ctrlViewList {
   grid-area: ctrlViewList;
@@ -344,14 +341,22 @@ button:disabled {
 /* a song in a list */
 .songRow {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "songControl songCell";
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "songControl songCell songPrio";
   padding: 2px;
+}
+
+@media (min-width: 768px) {
+  .songRow {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "songControl songPrio songCell";
+    padding: 2px;
+  }
 }
 
 .activeSong,
 .nextSong {
-  background: var(--c1) !important;
+  /* background: var(--c1) !important; */
 }
 
 .songCell {
