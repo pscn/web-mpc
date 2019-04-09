@@ -38,7 +38,7 @@ func main() {
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css", "style.css", &box))
 	}
 	mux.HandleFunc("/ws", h.Channel())
-
+	log.Printf("Web MPC starting…")
 	log.Fatal(http.ListenAndServe(*addr, mux))
 }
 
