@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/fhs/gompd/mpd"
+	"github.com/pscn/gompd/mpd"
 )
 
 // Client with host, port & password & mpc reference
@@ -42,7 +42,7 @@ func (client *Client) reConnect() (err error) {
 		client.mpc, err = mpd.Dial("tcp", client.addr)
 	}
 	if err == nil {
-		client.logger.Printf("connected to %s", client.addr)
+		client.logger.Printf("connected to %s (%s)", client.addr, client.mpc.Version())
 		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
 			client.logger.Printf("listening to %s", client.addr)
@@ -61,6 +61,12 @@ func (client *Client) Close() (err error) {
 	}
 	client.Event = nil
 	return client.mpc.Close()
+}
+
+func (client *Client) Stats() error {
+	attr, err := client.mpc.Stats()
+	client.logger.Printf("Stats: %+v", attr)
+	return err
 }
 
 // Ping and try to re-connect if ping fails
@@ -113,35 +119,46 @@ func (client *Client) Previous() error {
 	return client.mpc.Previous()
 }
 
-// Status returns mpd.Attrs
-func (client *Client) Status() *Message {
+// Prio sets prio for song in the queue at pos to prio
+func (client *Client) Prio(prio int, pos int) error {
+	return client.mpc.Prio(prio, pos, -1)
+}
+
+func (client *Client) status() *mpd.Attrs {
 	// we get EOF here sometimes.  why?
 	client.Ping()
 	status, err := client.mpc.Status()
 	if err != nil {
 		client.logger.Panic(err) // FIXME: no panic
 	}
-	return StatusMsg(&status)
+	return &status
 }
 
-// ActiveSong returns the currently active song
-func (client *Client) ActiveSong() *Message {
+func (client *Client) activeSong() *mpd.Attrs {
 	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
 		client.logger.Println("ActiveSong:", err)
 	}
-	return ActiveSongMsg(&attrs)
+	return &attrs
 }
 
-// ActivePlaylist returns the currently active playlist / queue
-func (client *Client) ActivePlaylist() *Message {
+func (client *Client) queue() *[]mpd.Attrs {
 	client.Ping()
 	attrs, err := client.mpc.PlaylistInfo(-1, -1)
 	if err != nil {
 		client.logger.Println("ActivePlaylist:", err)
 	}
-	return ActivePlaylistMsg(&attrs)
+	return &attrs
+}
+
+// Update prepares an update message for the client containing:
+// status, activeSong and queue
+func (client *Client) Update() *Message {
+	status := client.status()
+	activeSong := client.activeSong()
+	queue := client.queue()
+	return UpdateDataMsg(status, activeSong, queue)
 }
 
 // RemovePlaylistEntry nr
@@ -166,14 +183,19 @@ func (client *Client) Single(target bool) error {
 	return client.mpc.Single(target)
 }
 
+func escapeString(str string) string {
+	return strings.Replace(str, "%", "\\%", -1)
+}
+
 // Search for search string tokenized by space and searched in any
+// FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
 func (client *Client) Search(search string) *Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
 			if strings.HasPrefix(token, "t:") {
 				searchTokens = append(searchTokens, "title")
-				searchTokens = append(searchTokens, token[2:])
+				searchTokens = append(searchTokens, escapeString(token[2:]))
 			} else if strings.HasPrefix(token, "a:") {
 				searchTokens = append(searchTokens, "artist")
 				searchTokens = append(searchTokens, token[2:])
