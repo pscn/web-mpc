@@ -18,12 +18,13 @@ const (
 	Add           CommandType = "add"
 	Remove        CommandType = "remove"
 	Search        CommandType = "search"
-	StatusRequest CommandType = "statusRequest"
+	UpdateRequest CommandType = "updateRequest"
 	Browse        CommandType = "browse"
-	Random        CommandType = "random"
-	Repeat        CommandType = "repeat"
-	Single        CommandType = "single"
-	Consume       CommandType = "consume"
+	ModeRandom    CommandType = "random"
+	ModeRepeat    CommandType = "repeat"
+	ModeSingle    CommandType = "single"
+	ModeConsume   CommandType = "consume"
+	Prio          CommandType = "prio"
 )
 
 // Command from the web
