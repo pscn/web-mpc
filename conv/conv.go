@@ -17,7 +17,7 @@ func ToFloat(str string) float32 {
 func ToInt(str string) int {
 	val, err := strconv.ParseInt(str, 10, 64)
 	if err != nil { // FIXME: should we handle this?
-		return 0
+		return -1
 	}
 	return int(val)
 }
