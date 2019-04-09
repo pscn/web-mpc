@@ -32,6 +32,7 @@ input[type="password"] {
 .big {
   font-size: 120%;
 }
+
 .bold {
   font-weight: bold;
 }
@@ -79,23 +80,31 @@ button {
   font-size: 90%;
 }
 
+.prio {
+  border: 1px solid black;
+}
+
 button:hover {
   opacity: 0.5;
   background: var(--c3);
 }
+
 button:focus {
   opacity: 0.5;
   background: var(--c3);
 }
+
 button:disabled {
   opacity: 0.5;
   color: var(--c4);
 }
+
 .ctrlMode button {
   /* the stacked icons add padding somehow */
   padding: 0px;
   font-size: 75%;
 }
+
 .fas {
   vertical-align: middle;
 }
@@ -172,6 +181,7 @@ button:disabled {
     "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
     "ctrlPlayer ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
 }
+
 @media (min-width: 768px) {
   .mainControl {
     grid-template-columns: auto auto auto auto 1fr auto auto;
@@ -200,6 +210,7 @@ button:disabled {
   padding-top: 6px;
   padding-right: 2px;
 }
+
 .ctrlDuration {
   grid-area: ctrlDuration;
   font-size: 80%;
@@ -226,21 +237,26 @@ button:disabled {
     "ctrlViewSearch"
     "ctrlViewBrowse";
 }
+
 @media (min-width: 768px) {
   .ctrlView {
     grid-template-columns: auto auto auto;
     grid-template-areas: "ctrlViewList ctrlViewSearch ctrlViewBrowse";
   }
 }
+
 .ctrlViewList {
   grid-area: ctrlViewList;
 }
+
 .ctrlViewSearch {
   grid-area: ctrlViewSearch;
 }
+
 .ctrlViewBrowse {
   grid-area: ctrlViewBrowse;
 }
+
 /* end of ctrlView grid */
 
 /* ctrlPlayer grid */
@@ -254,18 +270,23 @@ button:disabled {
     "ctrlPlayerPrevious ctrlPlayerNext";
     */
 }
+
 .ctrlPlayerPlay {
   grid-area: ctrlPlayerPlay;
 }
+
 .ctrlPlayerStop {
   grid-area: ctrlPlayerStop;
 }
+
 .ctrlPlayerPrevious {
   grid-area: ctrlPlayerPrevious;
 }
+
 .ctrlPlayerNext {
   grid-area: ctrlPlayerNext;
 }
+
 /* end of ctrlPlayer grid */
 
 /* ctrlMode grid */
@@ -279,21 +300,27 @@ button:disabled {
     "ctrlModeSingle ctrlModeRandom";
     */
 }
+
 .ctrlModeConsume {
   grid-area: ctrlModeConsume;
 }
+
 .ctrlModeRepeat {
   grid-area: ctrlModeRepeat;
 }
+
 .ctrlModeSingle {
   grid-area: ctrlModeSingle;
 }
+
 .ctrlModeRandom {
   grid-area: ctrlModeRandom;
 }
+
 .toggleOn {
   text-decoration: underline;
 }
+
 /* end of ctrlMode grid */
 
 /* ctrlSong */
@@ -320,6 +347,11 @@ button:disabled {
   grid-template-columns: auto 1fr;
   grid-template-areas: "songControl songCell";
   padding: 2px;
+}
+
+.activeSong,
+.nextSong {
+  background: var(--c1) !important;
 }
 
 .songCell {
@@ -452,4 +484,5 @@ div.listingRow:nth-child(odd) button:disabled,
 div.songRow:nth-child(odd) button:disabled {
   color: var(--c5);
 }
+
 /* eof */
