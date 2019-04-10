@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+      shrink-to-fit=no">
+    <style>
+/* Default icon style */
+.icon {
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  display:block;
+  fill:yellow;
+  stroke:red;
+  stroke-width: 10%;
+  stroke-linejoin: round;
+}
+
+button {
+  padding: 4px;
+  margin: 0px;
+  background: #efefef;
+  box-sizing: unset;
+  border: 2px solid black;
+  border-radius: 4px;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+}
+      </style>
+  </head>
+  <body>
+    <!-- Hidden icon data -->
+    <svg aria-hidden="true" focusable="false" style="display:none">
+      <symbol id="icon-circle" viewBox="0 0 20 20">
+        <circle id="pCircle" cx="10" cy="10" r="8"></circle>
+      </symbol>
+      <symbol id="icon-play" viewBox="0 0 20 20">
+        <path id="pPlay" d="M 3,3 V 17 L 17,10 Z"></path>
+      </symbol>
+      <symbol id="icon-pause" viewBox="0 0 20 20">
+        <rect id="pPause0" width="4" height="14" x="4" y="3"></rect>
+        <rect id="pPause1" width="4" height="14" x="12" y="3"></rect>
+      </symbol>
+      <symbol id="icon-next" viewBox="0 0 20 20">
+        <path d="M 2,3 V 17 L 9,10 Z"></path>
+        <path d="M 11,3 V 17 L 18,10 Z"></path>
+      </symbol>
+      <symbol id="icon-prev" viewBox="0 0 20 20">
+        <path d="M 18,3 V 17 L 11,10 Z"></path>
+        <path d="M 9,3 V 17 L 2,10 Z"></path>
+      </symbol>
+      <symbol id="icon-stop" viewBox="0 0 20 20">
+        <rect id="pStop" width="8" height="8" x="6" y="6"></rect>
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 20 20">
+        <path d="M 13,7 3,17"></path>
+        <circle cx="13" cy="7" r="5.5"></circle>
+      </symbol>
+      <symbol id="icon-list" viewBox="0 0 20 20">
+        <path d="M 2,3 H 4 V 3 3"></path>
+        <path d="M 6,3 H 18 V 3"></path>
+        <path d="M 2,7.5 H 4 V 7.5 7.5"></path>
+        <path d="M 6,7.5 H 18 V 7.5"></path>
+        <path d="M 2,12 H 4 V 12 12"></path>
+        <path d="M 6,12 H 18 V 12"></path>
+        <path d="M 2,16.5 H 4 V 16.5 16.5"></path>
+        <path d="M 6,16.5 H 18 V 16.5"></path>
+      </symbol>
+
+      <symbol id="icon-folder" viewBox="0 0 20 20">
+        <path d="m 2,2 h 5 l 3,2.5 h 8 V 18 H 2 Z"></path>
+      </symbol>
+
+      <symbol id="icon-power" viewBox="0 0 20 20">
+        <g transform="translate(0,-2)">
+          <path sodipodi:type="arc" sodipodi:cx="-15.432505"
+            sodipodi:cy="2.7033515" sodipodi:rx="6" sodipodi:ry="6"
+            sodipodi:start="1" sodipodi:end="0"
+            d="M -12.190691,7.7521774 A 6,6 0 0 1 -19.522337,7.0934847 6,6 0 0 1
+            -20.698,-0.17320173 6,6 0 0 1 -13.948081,-3.110123 6,6 0 0 1
+            -9.4325047,2.7033515" sodipodi:open="true"
+            transform="rotate(-119.5)"></path>
+          <rect width=".75" height="5.5" x="9.5" y="5"></rect>
+        </g>
+      </symbol>
+
+      <symbol id="icon-ban" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8"></circle>
+        <path d="M 6,10 H 14"></path>
+      </symbol>
+    </svg>
+
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-circle"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-play"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-pause"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-next"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-prev"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-stop"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-search"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-list"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-folder"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-power"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-ban"></use>
+      </svg>
+    </button>
+  </body>
+</html>

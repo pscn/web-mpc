@@ -46,6 +46,21 @@ input[type="password"] {
   font-size: 80%;
 }
 
+.icon {
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  display: block;
+  fill: var(--c4);
+  stroke: black;
+  stroke-width: 10%;
+  stroke-linejoin: round;
+}
+button:disabled .icon {
+  fill: none;
+}
+
 .bordered {
   /* add a round border & set the background */
   border: 2px solid black;
@@ -70,15 +85,16 @@ input[type="password"] {
 }
 
 button {
-  background: none;
+  padding: 4px;
+  margin: 4px;
   box-sizing: unset;
-  border: 0;
+  border: 2px solid black;
   border-radius: 4px;
-  outline: none;
-  -webkit-transition-duration: 0.6s;
-  transition-duration: 0.6s;
-  /* margin: 4px;*/
-  font-size: 90%;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  font-size: 28px;
+  background: none;
 }
 
 .prio {
@@ -240,7 +256,6 @@ button:disabled {
     "ctrlViewSearch"
     "ctrlViewBrowse";
 }
-
 
 .ctrlViewList {
   grid-area: ctrlViewList;

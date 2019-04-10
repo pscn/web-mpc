@@ -22,6 +22,63 @@
       <input id="ws" type="text" value="{{.ws}}">
     </div>
 
+    <!-- SVG icons -->
+
+    <svg aria-hidden="true" focusable="false" style="display:none">
+      <symbol id="icon-circle" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8"></circle>
+      </symbol>
+      <symbol id="icon-play" viewBox="0 0 20 20">
+        <path d="M 3,3 V 17 L 17,10 Z"></path>
+      </symbol>
+      <symbol id="icon-pause" viewBox="0 0 20 20">
+        <rect width="4" height="14" x="4" y="3"></rect>
+        <rect width="4" height="14" x="12" y="3"></rect>
+      </symbol>
+      <symbol id="icon-next" viewBox="0 0 20 20">
+        <path d="M 2,3 V 17 L 9,10 Z"></path>
+        <path d="M 11,3 V 17 L 18,10 Z"></path>
+      </symbol>
+      <symbol id="icon-prev" viewBox="0 0 20 20">
+        <path d="M 18,3 V 17 L 11,10 Z"></path>
+        <path d="M 9,3 V 17 L 2,10 Z"></path>
+      </symbol>
+      <symbol id="icon-stop" viewBox="0 0 20 20">
+        <rect width="8" height="8" x="6" y="6"></rect>
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 20 20">
+        <path d="M 13,7 3,17"></path>
+        <circle cx="13" cy="7" r="5.5"></circle>
+      </symbol>
+      <symbol id="icon-list" viewBox="0 0 20 20">
+        <path d="M 1,3 H 4 V 3 3"></path>
+        <path d="M 6,3 H 18 V 3"></path>
+        <path d="M 1,9 H 4 V 9 9"></path>
+        <path d="M 6,9 H 18 V 9"></path>
+        <path d="M 1,15 H 4 V 15 15"></path>
+        <path d="M 6,15 H 18 V 15"></path>
+      </symbol>
+      <symbol id="icon-folder" viewBox="0 0 20 20">
+        <path d="m 2,2 h 5 l 3,2.5 h 8 V 18 H 2 Z"></path>
+      </symbol>
+      <symbol id="icon-power" viewBox="0 0 20 20">
+        <g transform="translate(0,-2)">
+          <path sodipodi:type="arc" sodipodi:cx="-15.432505"
+            sodipodi:cy="2.7033515" sodipodi:rx="6" sodipodi:ry="6"
+            sodipodi:start="1" sodipodi:end="0"
+            d="M -12.190691,7.7521774 A 6,6 0 0 1 -19.522337,7.0934847 6,6 0 0 1
+            -20.698,-0.17320173 6,6 0 0 1 -13.948081,-3.110123 6,6 0 0 1
+            -9.4325047,2.7033515" sodipodi:open="true"
+            transform="rotate(-119.5)"></path>
+          <rect width=".75" height="5.5" x="9.5" y="5"></rect>
+        </g>
+      </symbol>
+      <symbol id="icon-ban" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8"></circle>
+        <path d="M 6,10 H 14"></path>
+      </symbol>
+    </svg>
+
     <!-- load our javascript -->
     <script src="script.js"></script>
 
@@ -30,9 +87,11 @@
       <!-- mainError messages -->
       <div id="mainError" class="mainError bordered hide"></div>
       <div class="mainControl">
-        <div class="ctrlConnection bordered">
+        <div class="ctrlConnection">
           <button id="connect">
-            <i class="fas fa-power-off"></i>
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use xlink:href="#icon-power"></use>
+            </svg>
           </button>
         </div>
 
@@ -47,36 +106,72 @@
         </div>
 
         <!-- switch between "views" -->
-        <div class="ctrlView boxResponsive bordered">
+        <div class="ctrlView boxResponsive">
           <div class="ctrlViewList">
             <!-- list is the default view -->
-            <button id="list" disabled="disabled"><i class="fas fa-list"></i></button>
+            <button id="list" disabled="disabled">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-list"></use>
+              </svg>
+            </button>
           </div>
           <div class="ctrlViewSearch">
-            <button id="search"><i class="fas fa-search"></i></button>
+            <button id="search">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-search"></use>
+              </svg>
+            </button>
           </div>
           <div class="ctrlViewBrowse">
-            <button id="browser"><i class="fas fa-folder"></i></button>
+            <button id="browser">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-folder"></use>
+              </svg>
+            </button>
           </div>
         </div>
 
         <!-- play, pause etc. -->
-        <div class="ctrlPlayer boxResponsive bordered">
+        <div class="ctrlPlayer boxResponsive">
           <div class="ctrlPlayerPlay">
-            <button id="play" title="Play"><i class="fas fa-play"></i></button>
-            <button id="resume" title="Resume"><i class="fas fa-play"></i></button>
-            <button id="pause" title="Pause" class="hide"><i class="fas
-                fa-pause"></i></button>
+            <button id="play" title="Play">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-play"></use>
+              </svg>
+            </button>
+
+            <button id="resume" title="Resume">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-play"></use>
+              </svg>
+            </button>
+
+            <button id="pause" title="Pause" class="hide">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-pause"></use>
+              </svg>
+            </button>
           </div>
           <div class="ctrlPlayerStop">
-            <button id="stop" title="Stop"><i class="fas fa-stop"></i></button>
+            <button id="stop" title="Stop">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-stop"></use>
+              </svg>
+            </button>
           </div>
           <div class="ctrlPlayerPrevious">
-            <button id="previous" title="Previous"><i class="fas
-                fa-step-backward"></i></button>
+            <button id="previous" title="Previous">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-prev"></use>
+              </svg>
+            </button>
           </div>
           <div class="ctrlPlayerNext">
-            <button id="next" title="Next"><i class="fas fa-step-forward"></i></button>
+            <button id="next" title="Next">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-next"></use>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -159,11 +254,17 @@
       <div id="playlistEntry" class="songRow bordered hide">
         <div class="songControl boxResponsive">
           <div class="cell">
-            <button id="plPlay"><i class="fas fa-play"></i></button>
+            <button id="plPlay">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-play"></use>
+              </svg>
+            </button>
           </div>
           <div class="cell">
             <button id="plRemove">
-              <i class="fas fa-minus-circle"></i>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-ban"></use>
+              </svg>
             </button>
           </div>
         </div>
