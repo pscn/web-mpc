@@ -85,15 +85,15 @@ button:disabled .icon {
 }
 
 button {
-  padding: 4px;
-  margin: 4px;
+  padding: 3px;
+  margin: 3px;
   box-sizing: unset;
   border: 2px solid black;
   border-radius: 4px;
   width: 1em;
   height: 1em;
   text-align: center;
-  font-size: 28px;
+  font-size: 25px;
   background: none;
 }
 
@@ -206,7 +206,7 @@ button:disabled {
     grid-template-areas:
       "ctrlConnection ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
       "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlSong"
-      "ctrlView ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
+      "ctrlPlayer ctrlPlayer ctrlMode . ctrlElapsed ctrlDuration";
   }
 }
 
