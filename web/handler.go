@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/packr"
 	"github.com/pscn/web-mpc/conv"
 
 	"github.com/gorilla/websocket"
@@ -49,16 +48,10 @@ func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handl
 }
 
 // StaticPacked serves content with contenType
-func (h *Handler) StaticPacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
-	tmplStr, err := (*box).FindString(fileName)
-	if err != nil {
-		h.logger.Println("box error:", err)
-		return nil
-	}
-
+func (h *Handler) StaticPacked(contentType string, content string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", contentType)
-		w.Write([]byte(tmplStr))
+		w.Write([]byte(content))
 	}
 }
 
@@ -75,13 +68,8 @@ func (h *Handler) StaticFile(contentType string, fileName string) http.HandlerFu
 }
 
 // StaticTemplatePacked serves content with contenType
-func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
-	tmplStr, err := (*box).FindString(fileName)
-	if err != nil {
-		h.logger.Println("box error:", err)
-		return nil
-	}
-	tmpl := template.Must(template.New("").Parse(tmplStr))
+func (h *Handler) StaticTemplatePacked(contentType string, content string) http.HandlerFunc {
+	tmpl := template.Must(template.New("").Parse(content))
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := map[string]interface{}{
