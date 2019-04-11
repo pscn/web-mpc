@@ -5,7 +5,7 @@ import (
 	"log"
 	"sort"
 
-	"github.com/pscn/gompd/mpd"
+	"github.com/fhs/gompd/mpd"
 	"github.com/pscn/web-mpc/conv"
 )
 
