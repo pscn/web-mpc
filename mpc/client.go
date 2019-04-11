@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/pscn/gompd/mpd"
+	"github.com/fhs/gompd/mpd"
 )
 
 // Client with host, port & password & mpc reference
@@ -121,7 +121,7 @@ func (client *Client) Previous() error {
 
 // Prio sets prio for song in the queue at pos to prio
 func (client *Client) Prio(prio int, pos int) error {
-	return client.mpc.Prio(prio, pos, -1)
+	return client.mpc.SetPriority(prio, pos, -1)
 }
 
 func (client *Client) status() *mpd.Attrs {
@@ -183,10 +183,6 @@ func (client *Client) Single(target bool) error {
 	return client.mpc.Single(target)
 }
 
-func escapeString(str string) string {
-	return strings.Replace(str, "%", "\\%", -1)
-}
-
 // Search for search string tokenized by space and searched in any
 // FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
 func (client *Client) Search(search string) *Message {
@@ -195,7 +191,7 @@ func (client *Client) Search(search string) *Message {
 		if token != "" {
 			if strings.HasPrefix(token, "t:") {
 				searchTokens = append(searchTokens, "title")
-				searchTokens = append(searchTokens, escapeString(token[2:]))
+				searchTokens = append(searchTokens, token[2:])
 			} else if strings.HasPrefix(token, "a:") {
 				searchTokens = append(searchTokens, "artist")
 				searchTokens = append(searchTokens, token[2:])
