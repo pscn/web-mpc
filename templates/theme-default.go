@@ -21,9 +21,9 @@ func init() {
   }
 }
 
-func ThemeDefaultContent() []byte    { return fileThemeDefault.Content() }
-func ThemeDefaultName() string       { return fileThemeDefault.Name() }
-func ThemeDefaultComment() string    { return fileThemeDefault.Comment() }
-func ThemeDefaultModTime() time.Time { return fileThemeDefault.ModTime() }
+func ThemeDefaultContent() *[]byte    { return fileThemeDefault.Content() }
+func ThemeDefaultName() *string       { return fileThemeDefault.Name() }
+func ThemeDefaultComment() *string    { return fileThemeDefault.Comment() }
+func ThemeDefaultModTime() *time.Time { return fileThemeDefault.ModTime() }
 
 // eof

@@ -21,9 +21,9 @@ func init() {
   }
 }
 
-func JavaScriptContent() []byte    { return fileJavaScript.Content() }
-func JavaScriptName() string       { return fileJavaScript.Name() }
-func JavaScriptComment() string    { return fileJavaScript.Comment() }
-func JavaScriptModTime() time.Time { return fileJavaScript.ModTime() }
+func JavaScriptContent() *[]byte    { return fileJavaScript.Content() }
+func JavaScriptName() *string       { return fileJavaScript.Name() }
+func JavaScriptComment() *string    { return fileJavaScript.Comment() }
+func JavaScriptModTime() *time.Time { return fileJavaScript.ModTime() }
 
 // eof

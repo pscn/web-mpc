@@ -21,9 +21,9 @@ func init() {
   }
 }
 
-func CSSContent() []byte    { return fileCSS.Content() }
-func CSSName() string       { return fileCSS.Name() }
-func CSSComment() string    { return fileCSS.Comment() }
-func CSSModTime() time.Time { return fileCSS.ModTime() }
+func CSSContent() *[]byte    { return fileCSS.Content() }
+func CSSName() *string       { return fileCSS.Name() }
+func CSSComment() *string    { return fileCSS.Comment() }
+func CSSModTime() *time.Time { return fileCSS.ModTime() }
 
 // eof

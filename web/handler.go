@@ -48,10 +48,10 @@ func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handl
 }
 
 // StaticPacked serves content with contenType
-func (h *Handler) StaticPacked(contentType string, content string) http.HandlerFunc {
+func (h *Handler) StaticPacked(contentType string, content *[]byte) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", contentType)
-		w.Write([]byte(content))
+		w.Write(*content)
 	}
 }
 
@@ -68,8 +68,8 @@ func (h *Handler) StaticFile(contentType string, fileName string) http.HandlerFu
 }
 
 // StaticTemplatePacked serves content with contenType
-func (h *Handler) StaticTemplatePacked(contentType string, content string) http.HandlerFunc {
-	tmpl := template.Must(template.New("").Parse(content))
+func (h *Handler) StaticTemplatePacked(contentType string, content *[]byte) http.HandlerFunc {
+	tmpl := template.Must(template.New("").Parse(string(*content)))
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := map[string]interface{}{

@@ -21,9 +21,9 @@ func init() {
   }
 }
 
-func IndexContent() []byte    { return fileIndex.Content() }
-func IndexName() string       { return fileIndex.Name() }
-func IndexComment() string    { return fileIndex.Comment() }
-func IndexModTime() time.Time { return fileIndex.ModTime() }
+func IndexContent() *[]byte    { return fileIndex.Content() }
+func IndexName() *string       { return fileIndex.Name() }
+func IndexComment() *string    { return fileIndex.Comment() }
+func IndexModTime() *time.Time { return fileIndex.ModTime() }
 
 // eof

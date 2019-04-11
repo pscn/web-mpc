@@ -21,9 +21,9 @@ func init() {
   }
 }
 
-func ThemeJuriContent() []byte    { return fileThemeJuri.Content() }
-func ThemeJuriName() string       { return fileThemeJuri.Name() }
-func ThemeJuriComment() string    { return fileThemeJuri.Comment() }
-func ThemeJuriModTime() time.Time { return fileThemeJuri.ModTime() }
+func ThemeJuriContent() *[]byte    { return fileThemeJuri.Content() }
+func ThemeJuriName() *string       { return fileThemeJuri.Name() }
+func ThemeJuriComment() *string    { return fileThemeJuri.Comment() }
+func ThemeJuriModTime() *time.Time { return fileThemeJuri.ModTime() }
 
 // eof
