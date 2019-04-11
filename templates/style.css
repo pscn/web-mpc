@@ -54,7 +54,7 @@ input[type="password"] {
   display: block;
   fill: var(--c4);
   stroke: black;
-  stroke-width: 10%;
+  stroke-width: 8%;
   stroke-linejoin: round;
 }
 button:disabled .icon {
@@ -117,15 +117,6 @@ button:disabled {
   color: var(--c4);
 }
 
-.ctrlMode button {
-  /* the stacked icons add padding somehow */
-  padding: 0px;
-  font-size: 75%;
-}
-
-.fas {
-  vertical-align: middle;
-}
 
 @media (min-width: 768px) {
   .boxResponsive {

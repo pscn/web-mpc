@@ -15,7 +15,7 @@
   display:block;
   fill:yellow;
   stroke:red;
-  stroke-width: 10%;
+  stroke-width: 7%;
   stroke-linejoin: round;
 }
 
@@ -92,9 +92,65 @@ button {
         <circle cx="10" cy="10" r="8"></circle>
         <path d="M 6,10 H 14"></path>
       </symbol>
+      <symbol id="icon-trash" viewBox="0 0 20 20">
+        <path d="M 4.5,6 H 15 L 13.5,18 H 6 Z"></path>
+        <path d="M 8,10.5 8.5,18"></path>
+        <path d="M 11.5,10.5 11,18"></path>
+      </symbol>
+
+      <symbol id="icon-consume" viewBox="0 0 20 20">
+        <path sodipodi:type="arc" sodipodi:cx="3.6706762"
+          sodipodi:cy="13.635768" sodipodi:rx="6" sodipodi:ry="6"
+          sodipodi:start="1" sodipodi:end="0" d="M 6.9124901,18.684594 A 6,6 0 0
+          1 -0.41915633,18.025901 6,6 0 0 1 -1.5948191,10.759215 6,6 0 0 1
+          5.1551,7.8222934 6,6 0 0 1 9.6706762,13.635768 l -6,0 z"
+          transform="rotate(-30)"></path>
+        <path d="m 10.5,6.5 h -1"></path>
+      </symbol>
+      <symbol id="icon-consume-disabled" viewBox="0 0 20 20">
+        <path sodipodi:type="arc" sodipodi:cx="3.6706762"
+          sodipodi:cy="13.635768" sodipodi:rx="6" sodipodi:ry="6"
+          sodipodi:start="1" sodipodi:end="0" d="M 6.9124901,18.684594 A 6,6 0 0
+          1 -0.41915633,18.025901 6,6 0 0 1 -1.5948191,10.759215 6,6 0 0 1
+          5.1551,7.8222934 6,6 0 0 1 9.6706762,13.635768 l -6,0 z"
+          transform="rotate(-30)"></path>
+        <path d="m 10.5,6.5 h -1"></path>
+        <path d="m 1.5,1.5 17,17"></path>
+      </symbol>
+
+      <symbol id="icon-repeat" viewBox="0 0 20 20">
+        <circle cx="6" cy="10" r="4"></circle>
+        <circle cx="13.5" cy="10" r="3.5"></circle>
+      </symbol>
+
+      <symbol id="icon-repeat-disabled" viewBox="0 0 20 20">
+        <circle cx="6" cy="10" r="4"></circle>
+        <circle cx="13.5" cy="10" r="3.5"></circle>
+        <path d="m 1.5,1.5 17,17"></path>
+      </symbol>
+
+      <symbol id="icon-single" viewBox="0 0 20 20">
+        <circle cx="7" cy="12" r="4"></circle>
+        <path d="m 11,6 4,-3.5 v 12"></path>
+      </symbol>
+      <symbol id="icon-single-disabled" viewBox="0 0 20 20">
+        <circle cx="7" cy="12" r="4"></circle>
+        <path d="m 11,6 4,-3.5 v 12"></path>
+        <path d="m 1.5,1.5 17,17"></path>
+      </symbol>
+
+      <symbol id="icon-random" viewBox="0 0 20 20">
+        <path d="m 2,5 h 6 l 4,10 h 6"></path>
+        <path d="M 2,15 H 8 L 12,5 h 6"></path>
+      </symbol>
+      <symbol id="icon-random-disabled" viewBox="0 0 20 20">
+        <path d="m 2,5 h 6 l 4,10 h 6"></path>
+        <path d="M 2,15 H 8 L 12,5 h 6"></path>
+        <path d="m 1.5,1.5 17,17"></path>
+      </symbol>
     </svg>
 
-    <button style="font-size: 40px;">
+    <button style="font-size: 40px;" id="a">
       <svg class="icon" aria-hidden="true" focusable="false">
         <use xlink:href="#icon-circle"></use>
       </svg>
@@ -147,6 +203,51 @@ button {
     <button style="font-size: 40px;">
       <svg class="icon" aria-hidden="true" focusable="false">
         <use xlink:href="#icon-ban"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-trash"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-consume"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-consume-disabled"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-repeat"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-repeat-disabled"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-single"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-single-disabled"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-random"></use>
+      </svg>
+    </button>
+    <button style="font-size: 40px;">
+      <svg class="icon" aria-hidden="true" focusable="false">
+        <use xlink:href="#icon-random-disabled"></use>
       </svg>
     </button>
   </body>
