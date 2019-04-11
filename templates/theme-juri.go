@@ -2,12 +2,12 @@
 package templates
 
 import (
-	"time"
+  "time"
 
-	"github.com/pscn/file2go/decode"
+  "github.com/pscn/file2go/decode"
 )
 
-const contentThemeJuri = `H4sIGAxlr1wA/2RHaGxiV1V0YW5WeWFTNWpjM009AFpXNWpiMlJsWkNCaWVTQm1hV3hsTW1kdgA0ykEKgzAQBdC9p/iQnRBTo5IQT2MmUxSUERPIovTupdRuHy9cIgWvBjAtSM6NE56XHFhLOXMwptba1SHTKrLnjuQw+xZNHXRZ+WB9ceooZ7SmAbSmPkDFhVzk+Qc2QJHlnuwNQ4ByiZKfbhgDlH8s0f/H9B3Oj87OzfsTAAD//66raUahAAAA`
+const contentThemeJuri = `H4sIGGFor1wA/2RHaGxiV1V0YW5WeWFTNWpjM009AFpXNWpiMlJsWkNCaWVTQm1hV3hsTW1kdgA0ykEKgzAQBdC9p/iQnRBTo5IQT2MmUxSUERPIovTupdRuHy9cIgWvBjAtSM6NE56XHFhLOXMwptba1SHTKrLnjuQw+xZNHXRZ+WB9ceooZ7SmAbSmPkDFhVzk+Qc2QJHlnuwNQ4ByiZKfbhgDlH8s0f/H9B3Oj87OzfsTAAD//66raUahAAAA`
 
 var fileThemeJuri *decode.File
 

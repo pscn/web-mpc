@@ -11,7 +11,7 @@ import (
 
 //go:generate file2go -alias Index templates/index.html
 //go:generate file2go -alias CSS templates/style.css
-//go:generate file2go -alias JS templates/script.js
+//go:generate file2go -alias JavaScript templates/javascript.js
 //go:generate file2go -alias ThemeDefault templates/theme-default.css
 //go:generate file2go -alias ThemeJuri templates/theme-juri.css
 
@@ -31,16 +31,17 @@ func main() {
 	// read templates and add listener
 	if *devel {
 		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
-		mux.HandleFunc("/script.js", h.StaticFile("text/javascript", "script.js"))
+		mux.HandleFunc("/javascript.js", h.StaticFile("text/javascript", "javascript.js"))
 		mux.HandleFunc("/theme-default.css", h.StaticFile("text/css", "theme-default.css"))
 		mux.HandleFunc("/theme-juri.css", h.StaticFile("text/css", "theme-juri.css"))
 		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
 	} else {
 		mux.HandleFunc("/", h.StaticTemplatePacked("text/html", templates.IndexContent()))
-		mux.HandleFunc("/script.js", h.StaticPacked("text/javascript", templates.JSContent()))
-		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css", templates.ThemeDefault.Content()))
-		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css", templates.ThemeJuri.Content()))
+		mux.HandleFunc("/javascript.js", h.StaticPacked("text/javascript", templates.JavaScriptContent()))
+		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css", templates.ThemeDefaultContent()))
+		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css", templates.ThemeJuriContent()))
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css", templates.CSSContent()))
+
 	}
 	mux.HandleFunc("/ws", h.Channel())
 	log.Printf("Web MPC starting…")
