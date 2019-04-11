@@ -185,6 +185,8 @@ window.addEventListener("load", function(evt) {
         showError(data);
         break;
       case "update":
+        updateStatus(data.status);
+
         e("playlist").innerHTML = ""; // delete old playlist
         gPlaylistFiles.length = 0;
         // used to figure out if we need to show prio buttons or not:
@@ -197,6 +199,9 @@ window.addEventListener("load", function(evt) {
         const activeFile = data.activeSong.file;
         data.queue.map(function(entry, i) {
           const { file, prio, position, isActive, isNext } = entry;
+          if (isActive) {
+            return; // don't show the active song in the list
+          }
           gPlaylistFiles.push(file);
           var node = newSongNode("playlistEntry", entry, i);
           const btnPlay = node.querySelector("#plPlay");
@@ -217,34 +222,45 @@ window.addEventListener("load", function(evt) {
           const btnPrio1 = node.querySelector("#plPrio1");
           const btnPrio2 = node.querySelector("#plPrio2");
           const btnPrio3 = node.querySelector("#plPrio3");
-          // see explanation above
-          if (
-            (state != "stop" || activeFile != "") &&
-            (isActive || queueSize <= 2)
-          ) {
-            btnPrio1.disabled = "disabled";
-            btnPrio2.disabled = "disabled";
-            btnPrio3.disabled = "disabled";
+          if (!gState["random"]) {
+            btnPrio1.classList.add("hide");
+            btnPrio2.classList.add("hide");
+            btnPrio3.classList.add("hide");
           } else {
-            switch (prio) {
-              case 0:
-                btnPrio3.disabled = "disabled";
-                break;
-              case 127:
-                btnPrio2.disabled = "disabled";
-                break;
-              case 255:
-                btnPrio1.disabled = "disabled";
-                break;
+            // see explanation above
+            if (
+              (state != "stop" || activeFile != "") &&
+              (isActive || queueSize <= 2)
+            ) {
+              btnPrio1.disabled = "disabled";
+              btnPrio2.disabled = "disabled";
+              btnPrio3.disabled = "disabled";
+            } else {
+              switch (prio) {
+                case 0:
+                  btnPrio3.disabled = "disabled";
+                  break;
+                case 127:
+                  btnPrio2.disabled = "disabled";
+                  break;
+                case 255:
+                  btnPrio1.disabled = "disabled";
+                  break;
+              }
+              btnPrio1.onclick = btnCommand(
+                "prio",
+                "255:" + position.toString()
+              );
+              btnPrio2.onclick = btnCommand(
+                "prio",
+                "127:" + position.toString()
+              );
+              btnPrio3.onclick = btnCommand("prio", "0:" + position.toString());
             }
-            btnPrio1.onclick = btnCommand("prio", "255:" + position.toString());
-            btnPrio2.onclick = btnCommand("prio", "127:" + position.toString());
-            btnPrio3.onclick = btnCommand("prio", "0:" + position.toString());
           }
           e("playlist").append(node);
         });
 
-        updateStatus(data.status);
         updateActiveSong(data.activeSong);
         break;
       case "searchResult":
