@@ -1,6 +1,7 @@
 :root {
   /* copied from https://www.w3schools.com/lib/w3-theme-red.css */
-  --c1: #AAAAAA;
+  --background:: #AAAAAA;
+  --foreground: #000000;
   --c2: #5E5E5E;
   --c3: #F2F2F2;
   --c4: #6B6B6B;

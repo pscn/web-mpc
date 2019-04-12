@@ -252,17 +252,10 @@ window.addEventListener("load", function(evt) {
     e("title").innerHTML = title;
     //e("title").innerHTML = title;
     if (artist != album_artist) {
-      // only show album artist if it's different
-      show("albumArtist");
-      e("albumArtist").innerHTML = "[" + album_artist + "]&nbsp;";
-      addcls("ctrlSong", "ctrlSongWithAlbumArtist");
-      rmcls("ctrlSong", "ctrlSongWithoutAlbumArtist");
+      e("album").innerHTML = album + "&nbsp;[" + album_artist + "]";
     } else {
-      hide("albumArtist");
-      rmcls("ctrlSong", "ctrlSongWithAlbumArtist");
-      addcls("ctrlSong", "ctrlSongWithoutAlbumArtist");
+      e("album").innerHTML = album;
     }
-    e("album").innerHTML = album;
   };
 
   var newSongNode = function(id, entry, nr) {
@@ -276,10 +269,11 @@ window.addEventListener("load", function(evt) {
     node.querySelector("#songCellAlbum").innerHTML = album;
     if (artist != album_artist) {
       // only show album artist if it's different
-      node.querySelector("#songCellAlbumArtist").innerHTML =
-        "[" + album_artist + "]&nbsp;";
-    } else {
-      node.querySelector("#songCellAlbumArtist").classList.add("hide");
+      node.querySelector("#songCellAlbum").innerHTML =
+        node.querySelector("#songCellAlbum").innerHTML +
+        "&nbsp;[" +
+        album_artist +
+        "]";
     }
     node.querySelector("#songCellArtist").innerHTML = artist;
     node.querySelector("#songCellDuration").innerHTML = readableSeconds(
@@ -435,14 +429,12 @@ window.addEventListener("load", function(evt) {
             node.classList.remove("hide");
             node.querySelector("#srArtist").innerHTML = entry.artist;
             node.querySelector("#srTitle").innerHTML = entry.title;
-            node.querySelector("#srAlbum").innerHTML = entry.album;
             if (entry.artist != entry.album_artist) {
-              node.querySelector("#srAlbumArtist").innerHTML =
-                "[" + entry.album_artist + "]&nbsp;";
+              node.querySelector("#srAlbum").innerHTML =
+                entry.album + "&nbsp;[" + entry.album_artist + "]";
             } else {
-              node.querySelector("#srAlbumArtist").classList.add("hide");
+              node.querySelector("#srAlbum").innerHTML = entry.album;
             }
-            node.querySelector("#srArtist").innerHTML = entry.artist;
             node.querySelector("#srDuration").innerHTML = readableSeconds(
               entry.duration
             );

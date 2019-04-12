@@ -321,14 +321,6 @@ button:disabled {
 .ctrlSong {
   display: grid;
   grid-template-columns: 1fr 1fr;
-}
-.ctrlSongWithAlbumArtist {
-  grid-template-areas:
-    "activeSongTitle activeSongTitle"
-    "activeSongArtist activeSongArtist"
-    "activeSongAlbum activeSongAlbumArtist";
-}
-.ctrlSongWithoutAlbumArtist {
   grid-template-areas:
     "activeSongTitle activeSongTitle"
     "activeSongArtist activeSongArtist"
@@ -347,11 +339,6 @@ button:disabled {
 
 .activeSongAlbum {
   grid-area: activeSongAlbum;
-  font-size: 80%;
-}
-
-.activeSongAlbumArtist {
-  grid-area: activeSongAlbumArtist;
   font-size: 80%;
 }
 
@@ -385,14 +372,6 @@ button:disabled {
   display: grid;
   grid-template-columns: 1fr auto;
   padding-top: 2px;
-}
-.songCellWithAlbumArtist {
-  grid-template-areas:
-    "songCellTitle songCellDuration"
-    "songCellArtist songCellArtist"
-    "songCellAlbum songCellAlbumArtist";
-}
-.songCellWithoutAlbumArtist {
   grid-template-areas:
     "songCellTitle songCellDuration"
     "songCellArtist songCellArtist"
@@ -403,8 +382,8 @@ button:disabled {
 @media (min-width: 768px) {
   /* desktop */
   .songCell {
-    grid-template-columns: 3fr 2fr 3fr 1fr auto;
-    grid-template-areas: "songCellTitle songCellArtist songCellAlbum songCellAlbumArtist songCellDuration";
+    grid-template-columns: 3fr 2fr 3fr auto;
+    grid-template-areas: "songCellTitle songCellArtist songCellAlbum songCellDuration";
   }
 }
 
@@ -419,10 +398,6 @@ button:disabled {
 
 .songCellAlbum {
   grid-area: songCellAlbum;
-}
-
-.songCellAlbumArtist {
-  grid-area: songCellAlbumArtist;
 }
 
 .songCellDuration {
@@ -465,7 +440,6 @@ button:disabled {
     "playlistTitle playlistDuration"
     "playlistArtist playlistArtist"
     "playlistAlbum playlistAlbum"
-    "playlistAlbumArtist playlistAlbumArtist"
     "directoryName directoryName";
   font-size: 80%;
 }
@@ -475,7 +449,7 @@ button:disabled {
   .listingEntry {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
     grid-template-areas:
-      "playlistTitle playlistArtist playlistAlbum playlistAlbumArtist playlistDuration"
+      "playlistTitle playlistArtist playlistAlbum playlistAlbum playlistDuration"
       "directoryName directoryName directoryName directoryName directoryName";
   }
 }
@@ -490,10 +464,6 @@ button:disabled {
 
 .playlistAlbum {
   grid-area: playlistAlbum;
-}
-
-.playlistAlbumArtist {
-  grid-area: playlistAlbumArtist;
 }
 
 .playlistDuration {
