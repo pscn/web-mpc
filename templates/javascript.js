@@ -38,7 +38,8 @@ const views = {
 };
 var showView = function(view) {
   return function() {
-    for (var k in views) { // disable/enable view buttons & show/hide view
+    for (var k in views) {
+      // disable/enable view buttons & show/hide view
       switch (k) {
         case view: // show matching view
           show(k);
@@ -51,7 +52,9 @@ var showView = function(view) {
           break;
       }
     }
-    switch (view) { // special actions based on the select view
+    switch (
+      view // special actions based on the select view
+    ) {
       case "viewDirectory":
         command("browse", ""); // send a command
         break;
@@ -380,6 +383,9 @@ window.addEventListener("load", function(evt) {
         // console.log({ gFiles: gPlaylistFiles });
         if (data.truncated) {
           showError("search result limited to " + data.maxResults);
+        }
+        if (data.searchResult.length == 0) {
+          showError("nothing found");
         }
         data.searchResult.map(function(entry) {
           const { file } = entry;
