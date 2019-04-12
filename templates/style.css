@@ -190,17 +190,13 @@ button:disabled {
   display: grid;
   grid-template-columns: auto auto 1fr auto auto auto;
   grid-template-areas:
-    "ctrlConnection ctrlSong ctrlSong ctrlSong ctrlSong ctrlMode"
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlMode"
     "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlMode"
     "ctrlPlayer ctrlPlayer . ctrlElapsed ctrlDuration ctrlDuration";
 }
 
 .ctrlView {
   grid-area: ctrlView;
-}
-
-.ctrlConnection {
-  grid-area: ctrlConnection;
 }
 
 .ctrlSong {
@@ -235,9 +231,14 @@ button:disabled {
   display: grid;
   grid-template-columns: auto;
   grid-template-areas:
+    "ctrlConnection"
     "ctrlViewList"
     "ctrlViewSearch"
     "ctrlViewBrowse";
+}
+
+.ctrlConnection {
+  grid-area: ctrlConnection;
 }
 
 .ctrlViewList {
@@ -377,7 +378,6 @@ button:disabled {
     "songCellArtist songCellArtist"
     "songCellAlbum songCellAlbum";
 }
-
 
 @media (min-width: 768px) {
   /* desktop */
