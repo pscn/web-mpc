@@ -1,28 +1,76 @@
-window.addEventListener("load", function (evt) {
-  // short for document.getElementById
-  var e = function (id) {
-    return document.getElementById(id);
-  };
-  // helpers to easily show/hide or enable/disable elements
-  // example: ["play"].map(eShow)
-  var eHide = function (id) {
-    e(id).classList.add("hide");
-  };
-  var eShow = function (id) {
-    e(id).classList.remove("hide");
-  };
-  var eDisable = function (id) {
-    e(id).disabled = "disabled";
-  };
-  var eEnable = function (id) {
-    e(id).disabled = "";
-  };
+// short for document.getElementById(id)
+var e = function(id) {
+  return document.getElementById(id);
+};
+// short for document.getElementById(id).classList.add(class)
+var addcls = function(id, cls) {
+  console.log("addcls(" + id + "," + cls + ")");
+  e(id).classList.add(cls);
+};
+// short for document.getElementById(id).classList.rm(class)
+var rmcls = function(id, cls) {
+  console.log("rmcls(" + id + "," + cls + ")");
+  e(id).classList.remove(cls);
+};
+var hide = function(id) {
+  console.log("hide(" + id + ")");
+  addcls(id, "hide");
+};
+var show = function(id) {
+  console.log("show(" + id + ")");
+  rmcls(id, "hide");
+};
+var disable = function(id) {
+  e(id).disabled = "disabled";
+};
+var enable = function(id) {
+  e(id).disabled = "";
+};
 
+/*
+ * switch betwwen different views
+ */
+const views = {
+  // view name: button ID
+  viewPlaylist: "list",
+  viewSearch: "search",
+  viewDirectory: "browser"
+};
+var showView = function(view) {
+  return function() {
+    for (var k in views) { // disable/enable view buttons & show/hide view
+      switch (k) {
+        case view: // show matching view
+          show(k);
+          e(views[k]).disabled = "disabled";
+          break;
+        default:
+          // hidde others
+          hide(k);
+          e(views[k]).disabled = "";
+          break;
+      }
+    }
+    switch (view) { // special actions based on the select view
+      case "viewDirectory":
+        command("browse", ""); // send a command
+        break;
+      case "viewSearch":
+        if (view == "viewSearch") {
+          e("searchText").select();
+          e("searchText").focus();
+        }
+        break;
+    }
+  };
+};
+
+window.addEventListener("load", function(evt) {
   var ws_addr = e("ws").value; // read from hidden input field
   var ws;
 
   // send a command on the websocket
-  var command = function (cmd, data) {
+  var command = function(cmd, data) {
     if (!ws) {
       return false;
     }
@@ -34,8 +82,8 @@ window.addEventListener("load", function (evt) {
 
   // wrapper to use command as an onclick
   // example: e("play").onclick = btnCommand("play", 1)
-  var btnCommand = function (cmd, data) {
-    return function () {
+  var btnCommand = function(cmd, data) {
+    return function() {
       return command(cmd, data);
     };
   };
@@ -54,7 +102,7 @@ window.addEventListener("load", function (evt) {
   };
   var gErrors = [];
   var gPlaylistFiles = [];
-  var readableSeconds = function (value) {
+  var readableSeconds = function(value) {
     var min = parseInt(value / 60);
     var sec = parseInt(value % 60);
     if (sec < 10) {
@@ -69,7 +117,7 @@ window.addEventListener("load", function (evt) {
   };
   // this functions runs forever and gets called every second to update the
   // elapsed and duration information of the active song
-  var updateProgress = function () {
+  var updateProgress = function() {
     e("elapsed").innerHTML = readableSeconds(gElapsed);
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState["play"] == "play" && gElapsed < gDuration) {
@@ -84,36 +132,36 @@ window.addEventListener("load", function (evt) {
     setTimeout(updateProgress, 1000);
   };
 
-  var showError = function (msg) {
+  var showError = function(msg) {
     if (msg != "") {
       gErrors.push(msg);
     }
     // FIXME: looks ugly
     var sep = "";
     var str = "";
-    gErrors.map(function (value) {
+    gErrors.map(function(value) {
       str += sep + value;
       sep = "<br />";
     });
     e("mainError").innerHTML = str;
-    eShow("mainError");
+    show("mainError");
 
-    setTimeout(function () {
+    setTimeout(function() {
       if (gErrors.length > 0) {
         gErrors.shift();
         showError("");
       }
-      if (gErrors.length==0) {
+      if (gErrors.length == 0) {
         hideError();
       }
     }, 5000);
   };
-  var hideError = function () {
+  var hideError = function() {
     e("mainError").innerHTML = "";
-    eHide("mainError");
+    hide("mainError");
   };
 
-  var updateStatus = function (data) {
+  var updateStatus = function(data) {
     // FIXME: use nextsong (or nextsongid) to highlight the next song
     const {
       state,
@@ -150,53 +198,48 @@ window.addEventListener("load", function (evt) {
         break;
     }
     // update the mode ctrl
-    ["consume", "repeat", "single", "random"].map(function (value) {
+    ["consume", "repeat", "single", "random"].map(function(value) {
       if (gState[value]) {
-        eShow(value + "Disable");
-        eHide(value + "Enable");
+        show(value + "Disable");
+        hide(value + "Enable");
       } else {
-        eHide(value + "Disable");
-        eShow(value + "Enable");
+        hide(value + "Disable");
+        show(value + "Enable");
       }
     });
   };
-  var addEvent = function (el, type, fn) {
-    if (el.addEventListener)
-      el.addEventListener(type, fn, false);
-    else
-      el.attachEvent('on' + type, fn);
+  var addEvent = function(el, type, fn) {
+    if (el.addEventListener) el.addEventListener(type, fn, false);
+    else el.attachEvent("on" + type, fn);
   };
-  var fitText = function (el, minfs, maxfs) {
+  var fitText = function(el, minfs, maxfs) {
     //https://github.com/adactio/FitText.js/blob/master/fittext.js
-    var fit = function (el) {
-      var resizer = function () {
-        console.log("Length=" + el.innerHTML.length)
-        console.log("el.clientWidth=" + el.clientWidth);
-        console.log("el.clientWidth/10=" + (el.clientWidth / 10));
-        console.log("el.clientWidth/10=" + (el.clientWidth / el.innerHTML.length));
-        console.log("el.clientHeight=" + el.clientHeight);
-        console.log("el.clientHeight/10=" + (el.clientHeight / 10));
-        el.style.fontSize = Math.max(Math.min(el.clientWidth / el.innerHTML.length * 2,
-          parseFloat(maxfs)), parseFloat(minfs)) + 'px';
+    var fit = function(el) {
+      var resizer = function() {
+        el.style.fontSize =
+          Math.max(
+            Math.min(
+              (el.clientWidth / el.innerHTML.length) * 2,
+              parseFloat(maxfs)
+            ),
+            parseFloat(minfs)
+          ) + "px";
       };
       // Call once to set.
       resizer();
       // FIXME: add the resize to the element once
-      addEvent(window, 'resize', resizer);
-      addEvent(window, 'orientationchange', resizer);
+      addEvent(window, "resize", resizer);
+      addEvent(window, "orientationchange", resizer);
     };
 
-    if (el.length)
-      for (var i = 0; i < el.length; i++)
-        fit(el[i]);
-    else
-      fit(el);
+    if (el.length) for (var i = 0; i < el.length; i++) fit(el[i]);
+    else fit(el);
 
     // return set of elements
     return el;
-  }
+  };
 
-  var updateActiveSong = function (data) {
+  var updateActiveSong = function(data) {
     const { file, artist, title, album_artist, album } = data;
     e("ctrlSong").title = file;
     e("artist").innerHTML = artist;
@@ -204,10 +247,10 @@ window.addEventListener("load", function (evt) {
     //e("title").innerHTML = title;
     if (artist != album_artist) {
       // only show album artist if it's different
-      eShow("albumArtist");
+      show("albumArtist");
       e("albumArtist").innerHTML = "[" + album_artist + "]&nbsp;";
     } else {
-      eHide("albumArtist");
+      hide("albumArtist");
     }
     e("album").innerHTML = album;
     // FIXME: do this once and trigger after setting the values
@@ -217,8 +260,7 @@ window.addEventListener("load", function (evt) {
     fitText(e("albumArtist"), 16, 38);
   };
 
-
-  var newSongNode = function (id, entry, nr) {
+  var newSongNode = function(id, entry, nr) {
     const { file, artist, title, album, album_artist, duration } = entry;
     var node = e(id).cloneNode(true);
     node.classList.remove("hide");
@@ -245,7 +287,7 @@ window.addEventListener("load", function (evt) {
     return node;
   };
 
-  var processResponse = function (obj) {
+  var processResponse = function(obj) {
     const { type, data } = obj;
     console.log({ type, data });
 
@@ -266,7 +308,7 @@ window.addEventListener("load", function (evt) {
         const queueSize = data.queue.length;
         const state = data.status.state;
         const activeFile = data.activeSong.file;
-        data.queue.map(function (entry, i) {
+        data.queue.map(function(entry, i) {
           const { file, prio, position, isActive, isNext } = entry;
           if (isActive) {
             return; // don't show the active song in the list
@@ -329,8 +371,7 @@ window.addEventListener("load", function (evt) {
           }
           e("playlist").append(node);
         });
-        window.dispatchEvent(new Event('resize')); // trigger resize events on the song stuff
-
+        window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 
         updateActiveSong(data.activeSong);
         break;
@@ -340,7 +381,7 @@ window.addEventListener("load", function (evt) {
         if (data.truncated) {
           showError("search result limited to " + data.maxResults);
         }
-        data.searchResult.map(function (entry) {
+        data.searchResult.map(function(entry) {
           const { file } = entry;
           const node = newSongNode("searchEntry", entry);
           const btn = node.querySelector("#srAdd");
@@ -349,15 +390,14 @@ window.addEventListener("load", function (evt) {
             // FIXME: should we add a button to remove it from the playlist?
             btn.disabled = "disabled";
           }
-          btn.onclick = function () {
+          btn.onclick = function() {
             btn.disabled = "disabled";
             return command("add", file);
           };
           e("searchResult").append(node);
         });
 
-        window.dispatchEvent(new Event('resize')); // trigger resize events on the song stuff
-
+        window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 
         break;
       case "directoryList":
@@ -372,7 +412,7 @@ window.addEventListener("load", function (evt) {
           data.parent
         );
         e("directoryList").append(node);
-        data.directoryList.map(function (entry, i) {
+        data.directoryList.map(function(entry, i) {
           var node;
           if (entry.type == "directory") {
             node = e("directoryListEntry").cloneNode(true);
@@ -382,7 +422,7 @@ window.addEventListener("load", function (evt) {
 
             {
               const name = entry.directory;
-              node.querySelector("#dlBrowse").onclick = function (evt) {
+              node.querySelector("#dlBrowse").onclick = function(evt) {
                 return command("browse", name);
               };
             }
@@ -406,7 +446,7 @@ window.addEventListener("load", function (evt) {
             {
               const file = entry.file;
               const node = node.querySelector("#srAdd");
-              node.onclick = function (evt) {
+              node.onclick = function(evt) {
                 node.disabled = "disabled";
                 return command("add", file);
               };
@@ -417,51 +457,54 @@ window.addEventListener("load", function (evt) {
         break;
     }
   };
-  var openWebSocket = function () {
+  var openWebSocket = function() {
     ws = new WebSocket(ws_addr);
-    ws.onopen = function (evt) {
+    ws.onopen = function(evt) {
       console.log("OPEN");
       hideError();
       e("connect").disabled = "disabled";
     };
-    ws.onclose = function (evt) {
+    ws.onclose = function(evt) {
       console.log("CLOSE");
       ws = null;
       showError("no connection");
       e("connect").disabled = "";
     };
-    ws.onmessage = function (evt) {
+    ws.onmessage = function(evt) {
       processResponse(JSON.parse(evt.data));
     };
-    ws.onerror = function (evt) {
+    ws.onerror = function(evt) {
       showError(evt.data);
     };
   };
   openWebSocket();
 
-  window.onfocus = function (event) {
+  window.onfocus = function(event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress setTimeout functions
     command("updateRequest", "");
   };
   updateProgress();
 
-  var stop = function () {
-    ["play"].map(eShow);
-    ["pause", "resume"].map(eHide);
-    ["stop", "next", "previous"].map(eDisable);
+  var stop = function() {
+    console.log("stop");
+    ["play"].map(show);
+    ["pause", "resume"].map(hide);
+    ["stop", "next", "previous"].map(disable);
   };
-  var play = function () {
-    ["pause"].map(eShow);
-    ["resume", "play"].map(eHide);
-    ["stop", "next", "previous"].map(eEnable);
+  var play = function() {
+    console.log("play");
+    ["pause"].map(show);
+    ["resume", "play"].map(hide);
+    ["stop", "next", "previous"].map(enable);
   };
-  var pause = function () {
-    ["resume"].map(eShow);
-    ["pause", "play"].map(eHide);
-    ["stop", "next", "previous"].map(eEnable);
+  var pause = function() {
+    console.log("pause");
+    ["resume"].map(show);
+    ["pause", "play"].map(hide);
+    ["stop", "next", "previous"].map(enable);
   };
-  var togglePlayPause = function (state) {
+  var togglePlayPause = function(state) {
     // console.log(`togglePlayPause(${state})`);
     switch (state) {
       case "play":
@@ -473,45 +516,11 @@ window.addEventListener("load", function (evt) {
     }
   };
 
-  /*
-   * switch betwwen different views
-   */
-  var views = {
-    // view name: button ID
-    viewPlaylist: "list",
-    viewSearch: "search",
-    viewDirectory: "browser"
-  };
-  var show = function (view) {
-    return function () {
-      switch (view) {
-        case "viewDirectory":
-          command("browse", "");
-          break;
-      }
-      for (var k in views) {
-        switch (k) {
-          case view: // show matching view
-            eShow(k);
-            e(views[k]).disabled = "disabled";
-            if (view == "viewSearch") {
-              e("searchText").focus();
-            }
-            break;
-          default:
-            // hidde others
-            eHide(k);
-            e(views[k]).disabled = "";
-            break;
-        }
-      }
-    };
-  };
   // add onclick to every button
   for (var k in views) {
-    e(views[k]).onclick = show(k);
+    e(views[k]).onclick = showView(k);
   }
-  ["random", "consume", "repeat", "single"].map(function (value) {
+  ["random", "consume", "repeat", "single"].map(function(value) {
     e(value + "Enable").onclick = btnCommand(value, "enable");
     e(value + "Disable").onclick = btnCommand(value, "disable");
   });
@@ -519,18 +528,18 @@ window.addEventListener("load", function (evt) {
   /*
    * onclick function assignments
    */
-  e("submitSearch").onclick = function (evt) {
+  e("submitSearch").onclick = function(evt) {
     return command("search", e("searchText").value);
   };
 
-  e("searchText").onchange = function (evt) {
+  e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);
   };
   e("connect").onclick = openWebSocket;
 
   // add onclick function for all controls
-  ["play", "resume", "pause", "stop", "next", "previous"].map(function (value) {
-    e(value).onclick = function (evt) {
+  ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
+    e(value).onclick = function(evt) {
       console.log(`Control: ${value}`);
       return command(value, "");
     };
