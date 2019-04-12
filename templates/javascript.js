@@ -52,6 +52,7 @@ window.addEventListener("load", function(evt) {
     song: 0,
     nextsong: 0
   };
+  var gErrors = [];
   var gPlaylistFiles = [];
   var readableSeconds = function(value) {
     var min = parseInt(value / 60);
@@ -73,18 +74,35 @@ window.addEventListener("load", function(evt) {
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState["play"] == "play" && gElapsed < gDuration) {
       // increment the seconds if playing and not finished
-      gElapsed += 1.0;
+      gElapsed += 1;
+    }
+    if (parseInt(gElapsed) % 2 == 0) {
+      e("pause").classList.add("blink");
+    } else {
+      e("pause").classList.remove("blink");
     }
     setTimeout(updateProgress, 1000);
   };
 
   var showError = function(msg) {
+    if (msg != "") {
+      gErrors.push(msg);
+    }
     // FIXME: looks ugly
-    e("mainError").innerHTML =
-      e("mainError").innerHTML == ""
-        ? msg
-        : e("mainError").innerHTML + "<br />" + msg;
+    var sep = "";
+    var str = "";
+    gErrors.map(function(value) {
+      str += sep + value;
+      sep = "<br />";
+    });
+    e("mainError").innerHTML = str;
     eShow("mainError");
+    setTimeout(function() {
+      if (gErrors.length > 0) {
+        gErrors.shift();
+        showError("");
+      }
+    }, 5000);
   };
   var hideError = function() {
     e("mainError").innerHTML = "";
