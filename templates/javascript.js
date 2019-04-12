@@ -86,14 +86,13 @@ var resize = function(el, minFS, maxFS) {
   el.style.fontSize = parseInt(parseInt(fs) / 4) * 4 + "px";
 };
 var resizer = function() {
-  ["48", "44", "40", "36", "32", "28"].map(function(maxFS) {
-    var el = document.getElementsByClassName("resize" + maxFS);
-    var i;
-    for (i = 0; i < el.length; i++) {
-      resize(el[i], 18, maxFS);
-    }
-  });
+  var el = document.getElementsByClassName("resize");
+  var i;
+  for (i = 0; i < el.length; i++) {
+    resize(el[i], 18, 32);
+  }
 };
+
 var triggerResize = function() {
   window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 };
