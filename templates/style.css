@@ -4,7 +4,7 @@ body {
   /* FIXME: better font selection */
   font-family: "Roboto", sans-serif;
   /*font-family: 'Bowlby One SC';*/
-  font-size: 18px;
+  font-size: 28px;
   margin: 4px;
   padding: 0px;
   color: var(--foreground);
@@ -27,6 +27,7 @@ input[type="password"] {
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  font-size: 1em;
 }
 
 /* common styles */
@@ -98,7 +99,7 @@ button {
   width: 1em;
   height: 1em;
   text-align: center;
-  font-size: 25px;
+  font-size: 0.9em;
   background: none;
 }
 
