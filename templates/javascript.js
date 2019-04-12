@@ -1,20 +1,20 @@
-window.addEventListener("load", function(evt) {
+window.addEventListener("load", function (evt) {
   // short for document.getElementById
-  var e = function(id) {
+  var e = function (id) {
     return document.getElementById(id);
   };
   // helpers to easily show/hide or enable/disable elements
   // example: ["play"].map(eShow)
-  var eHide = function(id) {
+  var eHide = function (id) {
     e(id).classList.add("hide");
   };
-  var eShow = function(id) {
+  var eShow = function (id) {
     e(id).classList.remove("hide");
   };
-  var eDisable = function(id) {
+  var eDisable = function (id) {
     e(id).disabled = "disabled";
   };
-  var eEnable = function(id) {
+  var eEnable = function (id) {
     e(id).disabled = "";
   };
 
@@ -22,7 +22,7 @@ window.addEventListener("load", function(evt) {
   var ws;
 
   // send a command on the websocket
-  var command = function(cmd, data) {
+  var command = function (cmd, data) {
     if (!ws) {
       return false;
     }
@@ -34,8 +34,8 @@ window.addEventListener("load", function(evt) {
 
   // wrapper to use command as an onclick
   // example: e("play").onclick = btnCommand("play", 1)
-  var btnCommand = function(cmd, data) {
-    return function() {
+  var btnCommand = function (cmd, data) {
+    return function () {
       return command(cmd, data);
     };
   };
@@ -54,7 +54,7 @@ window.addEventListener("load", function(evt) {
   };
   var gErrors = [];
   var gPlaylistFiles = [];
-  var readableSeconds = function(value) {
+  var readableSeconds = function (value) {
     var min = parseInt(value / 60);
     var sec = parseInt(value % 60);
     if (sec < 10) {
@@ -69,7 +69,7 @@ window.addEventListener("load", function(evt) {
   };
   // this functions runs forever and gets called every second to update the
   // elapsed and duration information of the active song
-  var updateProgress = function() {
+  var updateProgress = function () {
     e("elapsed").innerHTML = readableSeconds(gElapsed);
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState["play"] == "play" && gElapsed < gDuration) {
@@ -84,32 +84,36 @@ window.addEventListener("load", function(evt) {
     setTimeout(updateProgress, 1000);
   };
 
-  var showError = function(msg) {
+  var showError = function (msg) {
     if (msg != "") {
       gErrors.push(msg);
     }
     // FIXME: looks ugly
     var sep = "";
     var str = "";
-    gErrors.map(function(value) {
+    gErrors.map(function (value) {
       str += sep + value;
       sep = "<br />";
     });
     e("mainError").innerHTML = str;
     eShow("mainError");
-    setTimeout(function() {
+
+    setTimeout(function () {
       if (gErrors.length > 0) {
         gErrors.shift();
         showError("");
       }
+      if (gErrors.length==0) {
+        hideError();
+      }
     }, 5000);
   };
-  var hideError = function() {
+  var hideError = function () {
     e("mainError").innerHTML = "";
     eHide("mainError");
   };
 
-  var updateStatus = function(data) {
+  var updateStatus = function (data) {
     // FIXME: use nextsong (or nextsongid) to highlight the next song
     const {
       state,
@@ -146,7 +150,7 @@ window.addEventListener("load", function(evt) {
         break;
     }
     // update the mode ctrl
-    ["consume", "repeat", "single", "random"].map(function(value) {
+    ["consume", "repeat", "single", "random"].map(function (value) {
       if (gState[value]) {
         eShow(value + "Disable");
         eHide(value + "Enable");
@@ -156,11 +160,48 @@ window.addEventListener("load", function(evt) {
       }
     });
   };
-  var updateActiveSong = function(data) {
+  var addEvent = function (el, type, fn) {
+    if (el.addEventListener)
+      el.addEventListener(type, fn, false);
+    else
+      el.attachEvent('on' + type, fn);
+  };
+  var fitText = function (el, minfs, maxfs) {
+    //https://github.com/adactio/FitText.js/blob/master/fittext.js
+    var fit = function (el) {
+      var resizer = function () {
+        console.log("Length=" + el.innerHTML.length)
+        console.log("el.clientWidth=" + el.clientWidth);
+        console.log("el.clientWidth/10=" + (el.clientWidth / 10));
+        console.log("el.clientWidth/10=" + (el.clientWidth / el.innerHTML.length));
+        console.log("el.clientHeight=" + el.clientHeight);
+        console.log("el.clientHeight/10=" + (el.clientHeight / 10));
+        el.style.fontSize = Math.max(Math.min(el.clientWidth / el.innerHTML.length * 2,
+          parseFloat(maxfs)), parseFloat(minfs)) + 'px';
+      };
+      // Call once to set.
+      resizer();
+      // FIXME: add the resize to the element once
+      addEvent(window, 'resize', resizer);
+      addEvent(window, 'orientationchange', resizer);
+    };
+
+    if (el.length)
+      for (var i = 0; i < el.length; i++)
+        fit(el[i]);
+    else
+      fit(el);
+
+    // return set of elements
+    return el;
+  }
+
+  var updateActiveSong = function (data) {
     const { file, artist, title, album_artist, album } = data;
     e("ctrlSong").title = file;
     e("artist").innerHTML = artist;
     e("title").innerHTML = title;
+    //e("title").innerHTML = title;
     if (artist != album_artist) {
       // only show album artist if it's different
       eShow("albumArtist");
@@ -169,9 +210,15 @@ window.addEventListener("load", function(evt) {
       eHide("albumArtist");
     }
     e("album").innerHTML = album;
+    // FIXME: do this once and trigger after setting the values
+    fitText(e("title"), 16, 48);
+    fitText(e("artist"), 16, 38);
+    fitText(e("album"), 16, 38);
+    fitText(e("albumArtist"), 16, 38);
   };
 
-  var newSongNode = function(id, entry, nr) {
+
+  var newSongNode = function (id, entry, nr) {
     const { file, artist, title, album, album_artist, duration } = entry;
     var node = e(id).cloneNode(true);
     node.classList.remove("hide");
@@ -191,10 +238,14 @@ window.addEventListener("load", function(evt) {
     node.querySelector("#songCellDuration").innerHTML = readableSeconds(
       duration
     );
+    fitText(node.querySelector("#songCellArtist"), 16, 28);
+    fitText(node.querySelector("#songCellTitle"), 16, 28);
+    fitText(node.querySelector("#songCellAlbum"), 16, 28);
+    fitText(node.querySelector("#songCellAlbumArtist"), 16, 28);
     return node;
   };
 
-  var processResponse = function(obj) {
+  var processResponse = function (obj) {
     const { type, data } = obj;
     console.log({ type, data });
 
@@ -215,7 +266,7 @@ window.addEventListener("load", function(evt) {
         const queueSize = data.queue.length;
         const state = data.status.state;
         const activeFile = data.activeSong.file;
-        data.queue.map(function(entry, i) {
+        data.queue.map(function (entry, i) {
           const { file, prio, position, isActive, isNext } = entry;
           if (isActive) {
             return; // don't show the active song in the list
@@ -278,6 +329,8 @@ window.addEventListener("load", function(evt) {
           }
           e("playlist").append(node);
         });
+        window.dispatchEvent(new Event('resize')); // trigger resize events on the song stuff
+
 
         updateActiveSong(data.activeSong);
         break;
@@ -287,7 +340,7 @@ window.addEventListener("load", function(evt) {
         if (data.truncated) {
           showError("search result limited to " + data.maxResults);
         }
-        data.searchResult.map(function(entry) {
+        data.searchResult.map(function (entry) {
           const { file } = entry;
           const node = newSongNode("searchEntry", entry);
           const btn = node.querySelector("#srAdd");
@@ -296,12 +349,16 @@ window.addEventListener("load", function(evt) {
             // FIXME: should we add a button to remove it from the playlist?
             btn.disabled = "disabled";
           }
-          btn.onclick = function() {
+          btn.onclick = function () {
             btn.disabled = "disabled";
             return command("add", file);
           };
           e("searchResult").append(node);
         });
+
+        window.dispatchEvent(new Event('resize')); // trigger resize events on the song stuff
+
+
         break;
       case "directoryList":
         e("directoryList").innerHTML = "";
@@ -315,7 +372,7 @@ window.addEventListener("load", function(evt) {
           data.parent
         );
         e("directoryList").append(node);
-        data.directoryList.map(function(entry, i) {
+        data.directoryList.map(function (entry, i) {
           var node;
           if (entry.type == "directory") {
             node = e("directoryListEntry").cloneNode(true);
@@ -325,7 +382,7 @@ window.addEventListener("load", function(evt) {
 
             {
               const name = entry.directory;
-              node.querySelector("#dlBrowse").onclick = function(evt) {
+              node.querySelector("#dlBrowse").onclick = function (evt) {
                 return command("browse", name);
               };
             }
@@ -349,7 +406,7 @@ window.addEventListener("load", function(evt) {
             {
               const file = entry.file;
               const node = node.querySelector("#srAdd");
-              node.onclick = function(evt) {
+              node.onclick = function (evt) {
                 node.disabled = "disabled";
                 return command("add", file);
               };
@@ -360,51 +417,51 @@ window.addEventListener("load", function(evt) {
         break;
     }
   };
-  var openWebSocket = function() {
+  var openWebSocket = function () {
     ws = new WebSocket(ws_addr);
-    ws.onopen = function(evt) {
+    ws.onopen = function (evt) {
       console.log("OPEN");
       hideError();
       e("connect").disabled = "disabled";
     };
-    ws.onclose = function(evt) {
+    ws.onclose = function (evt) {
       console.log("CLOSE");
       ws = null;
       showError("no connection");
       e("connect").disabled = "";
     };
-    ws.onmessage = function(evt) {
+    ws.onmessage = function (evt) {
       processResponse(JSON.parse(evt.data));
     };
-    ws.onerror = function(evt) {
+    ws.onerror = function (evt) {
       showError(evt.data);
     };
   };
   openWebSocket();
 
-  window.onfocus = function(event) {
+  window.onfocus = function (event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress setTimeout functions
     command("updateRequest", "");
   };
   updateProgress();
 
-  var stop = function() {
+  var stop = function () {
     ["play"].map(eShow);
     ["pause", "resume"].map(eHide);
     ["stop", "next", "previous"].map(eDisable);
   };
-  var play = function() {
+  var play = function () {
     ["pause"].map(eShow);
     ["resume", "play"].map(eHide);
     ["stop", "next", "previous"].map(eEnable);
   };
-  var pause = function() {
+  var pause = function () {
     ["resume"].map(eShow);
     ["pause", "play"].map(eHide);
     ["stop", "next", "previous"].map(eEnable);
   };
-  var togglePlayPause = function(state) {
+  var togglePlayPause = function (state) {
     // console.log(`togglePlayPause(${state})`);
     switch (state) {
       case "play":
@@ -425,8 +482,8 @@ window.addEventListener("load", function(evt) {
     viewSearch: "search",
     viewDirectory: "browser"
   };
-  var show = function(view) {
-    return function() {
+  var show = function (view) {
+    return function () {
       switch (view) {
         case "viewDirectory":
           command("browse", "");
@@ -437,6 +494,9 @@ window.addEventListener("load", function(evt) {
           case view: // show matching view
             eShow(k);
             e(views[k]).disabled = "disabled";
+            if (view == "viewSearch") {
+              e("searchText").focus();
+            }
             break;
           default:
             // hidde others
@@ -451,7 +511,7 @@ window.addEventListener("load", function(evt) {
   for (var k in views) {
     e(views[k]).onclick = show(k);
   }
-  ["random", "consume", "repeat", "single"].map(function(value) {
+  ["random", "consume", "repeat", "single"].map(function (value) {
     e(value + "Enable").onclick = btnCommand(value, "enable");
     e(value + "Disable").onclick = btnCommand(value, "disable");
   });
@@ -459,18 +519,18 @@ window.addEventListener("load", function(evt) {
   /*
    * onclick function assignments
    */
-  e("submitSearch").onclick = function(evt) {
+  e("submitSearch").onclick = function (evt) {
     return command("search", e("searchText").value);
   };
 
-  e("searchText").onchange = function(evt) {
+  e("searchText").onchange = function (evt) {
     return command("search", e("searchText").value);
   };
   e("connect").onclick = openWebSocket;
 
   // add onclick function for all controls
-  ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
-    e(value).onclick = function(evt) {
+  ["play", "resume", "pause", "stop", "next", "previous"].map(function (value) {
+    e(value).onclick = function (evt) {
       console.log(`Control: ${value}`);
       return command(value, "");
     };

@@ -7,8 +7,8 @@ body {
   font-size: 16px;
   margin: 4px;
   padding: 0px;
-  color: black;
-  background: var(--c3);
+  color: var(--foreground);
+  background: var(--background);
 }
 
 @media (min-width: 768px) {
@@ -22,7 +22,7 @@ input[type="text"],
 input[type="number"],
 input[type="password"] {
   width: 100%;
-  border: 1px solid black;
+  border: 1px solid var(--foreground);
   border-radius: 4px;
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -53,20 +53,22 @@ input[type="password"] {
   overflow: hidden;
   display: block;
   fill: var(--c4);
-  stroke: black;
+  stroke: var(--foreground);
   stroke-width: 8%;
   stroke-linejoin: round;
 }
+
 .blink {
   background: var(--c2);
 }
+
 button:disabled .icon {
   fill: none;
 }
 
 .bordered {
   /* add a round border & set the background */
-  border: 2px solid black;
+  border: 2px solid var(--foreground);
   border-radius: 4px;
   margin: 1px;
   padding-bottom: 4px;
@@ -91,7 +93,7 @@ button {
   padding: 3px;
   margin: 3px;
   box-sizing: unset;
-  border: 2px solid black;
+  border: 2px solid var(--foreground);
   border-radius: 4px;
   width: 1em;
   height: 1em;
@@ -101,18 +103,18 @@ button {
 }
 
 .prio {
-  border: 1px solid black;
+  border: 1px solid var(--foreground);
   margin-right: 4px;
 }
 
 button:hover {
   opacity: 0.5;
-  background: var(--c3);
+  background: var(--background);
 }
 
 button:focus {
   opacity: 0.5;
-  background: var(--c3);
+  background: var(--background);
 }
 
 button:disabled {
@@ -328,38 +330,54 @@ button:disabled {
 
 /* end of ctrlMode grid */
 
-/* ctrlSong */
+/* ctrlSong gri */
+.ctrlSong {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "activeSongTitle activeSongTitle"
+    "activeSongArtist activeSongArtist"
+    "activeSongAlbum activeSongAlbumArtist";
+}
 
-.title {
+.activeSongTitle {
+  grid-area: activeSongTitle;
   font-size: 120%;
 }
 
-.artist {
+.activeSongArtist {
+  grid-area: activeSongArtist;
   font-size: 100%;
 }
 
-.album {
+.activeSongAlbum {
+  grid-area: activeSongAlbum;
   font-size: 80%;
 }
 
-.albumArtist {
+.activeSongAlbumArtist {
+  grid-area: activeSongAlbumArtist;
   font-size: 80%;
 }
 
 /* a song in a list */
 .songRow {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: "songControl songCell songPrio";
-  padding: 2px;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "songControl songPrio songCell";
+  margin-bottom: 4px;
 }
 
 @media (min-width: 768px) {
   .songRow {
     grid-template-columns: auto auto 1fr;
     grid-template-areas: "songControl songPrio songCell";
-    padding: 2px;
+    margin-bottom: 4px;
   }
+}
+
+.songRow button {
+  border: 0px;
 }
 
 .activeSong,
@@ -381,6 +399,7 @@ button:disabled {
 }
 
 @media (min-width: 768px) {
+
   /* desktop */
   .songCell {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
@@ -390,6 +409,7 @@ button:disabled {
 
 .songTitle {
   grid-area: songTitle;
+  font-size: 24px;
 }
 
 .songArtist {
@@ -449,6 +469,7 @@ button:disabled {
 }
 
 @media (min-width: 768px) {
+
   /* desktop */
   .listingEntry {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
