@@ -9,11 +9,7 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-//go:generate file2go -verbose -prefix Index templates/index.html
-//go:generate file2go -verbose -prefix CSS templates/style.css
-//go:generate file2go -verbose -prefix JavaScript templates/javascript.js
-//go:generate file2go -verbose -prefix ThemeDefault templates/theme-default.css
-//go:generate file2go -verbose -prefix ThemeJuri templates/theme-juri.css
+//go:generate file2go -output templates/files.go templates/index.html templates/javascript.js templates/style.css templates/theme-default.css templates/theme-juri.css
 
 var addr = flag.String("addr", ":8666", "http service address")
 var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
@@ -36,11 +32,16 @@ func main() {
 		mux.HandleFunc("/theme-juri.css", h.StaticFile("text/css", "theme-juri.css"))
 		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
 	} else {
-		mux.HandleFunc("/", h.StaticTemplatePacked("text/html", templates.IndexContent()))
-		mux.HandleFunc("/javascript.js", h.StaticPacked("text/javascript", templates.JavaScriptContent()))
-		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css", templates.ThemeDefaultContent()))
-		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css", templates.ThemeJuriContent()))
-		mux.HandleFunc("/style.css", h.StaticPacked("text/css", templates.CSSContent()))
+		mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
+			templates.ContentMust("templates/index.html")))
+		mux.HandleFunc("/javascript.js", h.StaticPacked("text/javascript",
+			templates.ContentMust("templates/javascript.js")))
+		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css",
+			templates.ContentMust("templates/theme-default.css")))
+		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css",
+			templates.ContentMust("templates/theme-juri.css")))
+		mux.HandleFunc("/style.css", h.StaticPacked("text/css",
+			templates.ContentMust("templates/style.css")))
 
 	}
 	mux.HandleFunc("/ws", h.Channel())
