@@ -81,7 +81,7 @@ var addEvent = function(el, type, fn) {
 
 // Resize voodoo
 var resize = function(el, minFS, maxFS) {
-  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1, maxFS);
+  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.2, maxFS);
   fs = Math.max(fs, minFS);
   el.style.fontSize = (parseInt(fs) / 2) * 2 + "px";
 };
