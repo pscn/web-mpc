@@ -183,6 +183,12 @@ func (client *Client) Single(target bool) error {
 	return client.mpc.Single(target)
 }
 
+func escapeSearchToken(token string) string {
+	// FIXME: workaround for broken gompd search (%) => fix it upstream when you
+	// have an idead how to fix it :)
+	return strings.Replace(token, "%", "%%%%", -1)
+}
+
 // Search for search string tokenized by space and searched in any
 // FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
 func (client *Client) Search(search string) *Message {
@@ -191,16 +197,16 @@ func (client *Client) Search(search string) *Message {
 		if token != "" {
 			if strings.HasPrefix(token, "t:") {
 				searchTokens = append(searchTokens, "title")
-				searchTokens = append(searchTokens, token[2:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
 			} else if strings.HasPrefix(token, "a:") {
 				searchTokens = append(searchTokens, "artist")
-				searchTokens = append(searchTokens, token[2:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
 			} else if strings.HasPrefix(token, "al:") {
 				searchTokens = append(searchTokens, "album")
-				searchTokens = append(searchTokens, token[3:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[3:]))
 			} else {
 				searchTokens = append(searchTokens, "any")
-				searchTokens = append(searchTokens, token)
+				searchTokens = append(searchTokens, escapeSearchToken(token))
 			}
 		}
 	}
