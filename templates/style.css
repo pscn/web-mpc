@@ -57,6 +57,9 @@ input[type="password"] {
   stroke-width: 8%;
   stroke-linejoin: round;
 }
+.blink {
+  background: var(--c2);
+}
 button:disabled .icon {
   fill: none;
 }
@@ -116,7 +119,6 @@ button:disabled {
   opacity: 0.5;
   color: var(--c4);
 }
-
 
 @media (min-width: 768px) {
   .boxResponsive {
