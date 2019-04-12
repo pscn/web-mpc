@@ -44,7 +44,7 @@ input[type="password"] {
 }
 
 .small {
-  font-size: 80%;
+  font-size: 0.75em;
 }
 
 .icon {
@@ -189,11 +189,11 @@ button:disabled {
 /* mainControl grid */
 .mainControl {
   display: grid;
-  grid-template-columns: auto auto 1fr auto auto auto;
+  grid-template-columns: auto auto 1fr auto auto;
   grid-template-areas:
-    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlMode"
-    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong ctrlMode"
-    "ctrlPlayer ctrlPlayer . ctrlElapsed ctrlDuration ctrlDuration";
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlPlayer ctrlPlayer . ctrlMode ctrlMode";
 }
 
 .ctrlView {
@@ -207,14 +207,11 @@ button:disabled {
 
 .ctrlElapsed {
   grid-area: ctrlElapsed;
-  padding-top: 6px;
-  padding-right: 2px;
 }
 
 .ctrlDuration {
   grid-area: ctrlDuration;
-  padding-top: 6px;
-  padding-right: 2px;
+  text-align: left;
 }
 
 .ctrlPlayer {
@@ -232,14 +229,10 @@ button:disabled {
   display: grid;
   grid-template-columns: auto;
   grid-template-areas:
-    "ctrlConnection"
     "ctrlViewList"
     "ctrlViewSearch"
     "ctrlViewBrowse";
-}
-
-.ctrlConnection {
-  grid-area: ctrlConnection;
+  height: 4em;
 }
 
 .ctrlViewList {
@@ -289,12 +282,9 @@ button:disabled {
 /* ctrlMode grid */
 .ctrlMode {
   display: grid;
-  grid-template-columns: auto;
+  grid-template-columns: auto auto auto auto;
   grid-template-areas:
-    "ctrlModeConsume"
-    "ctrlModeRepeat"
-    "ctrlModeSingle"
-    "ctrlModeRandom";
+    "ctrlModeConsume ctrlModeRepeat ctrlModeSingle ctrlModeRandom";
 }
 
 .ctrlModeConsume {
@@ -322,11 +312,12 @@ button:disabled {
 /* ctrlSong gri */
 .ctrlSong {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr 1fr auto;
   grid-template-areas:
-    "activeSongTitle activeSongTitle"
-    "activeSongArtist activeSongArtist"
-    "activeSongAlbum activeSongAlbum";
+    "activeSongTitle activeSongTitle activeSongTitle activeSongTitle"
+    "activeSongArtist activeSongArtist activeSongArtist activeSongArtist"
+    "activeSongAlbum activeSongAlbum activeSongAlbum activeSongAlbum"
+    "ctrlElapsed . . ctrlDuration";
 }
 
 .activeSongTitle {

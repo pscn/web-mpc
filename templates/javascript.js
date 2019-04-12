@@ -81,16 +81,16 @@ var addEvent = function(el, type, fn) {
 
 // Resize voodoo
 var resize = function(el, minFS, maxFS) {
-  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.75, maxFS);
+  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1, maxFS);
   fs = Math.max(fs, minFS);
-  el.style.fontSize = (parseInt(fs) / 4) * 4 + "px";
+  el.style.fontSize = (parseInt(fs) / 2) * 2 + "px";
 };
 var resizer = function() {
   ["48", "44", "40", "36", "32", "28"].map(function(maxFS) {
     var el = document.getElementsByClassName("resize" + maxFS);
     var i;
     for (i = 0; i < el.length; i++) {
-      resize(el[i], 22, maxFS);
+      resize(el[i], 18, maxFS);
     }
   });
 };
@@ -144,11 +144,13 @@ window.addEventListener("load", function(evt) {
     if (sec < 10) {
       sec = "0" + sec;
     }
+    /*
     if (min < 10) {
       min = "&nbsp;&nbsp;" + min;
     } else if (min < 100) {
       min = "&nbsp;" + min;
     }
+    */
     return min + ":" + sec;
   };
   // this functions runs forever and gets called every second to update the
@@ -457,13 +459,11 @@ window.addEventListener("load", function(evt) {
     ws.onopen = function(evt) {
       debug("OPEN");
       hideError();
-      e("connect").disabled = "disabled";
     };
     ws.onclose = function(evt) {
       debug("CLOSE");
       ws = null;
       showError("no connection");
-      e("connect").disabled = "";
     };
     ws.onmessage = function(evt) {
       processResponse(JSON.parse(evt.data));
@@ -530,7 +530,6 @@ window.addEventListener("load", function(evt) {
   e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);
   };
-  e("connect").onclick = openWebSocket;
 
   // add onclick function for all controls
   ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
