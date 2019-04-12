@@ -123,20 +123,18 @@ func songData(attrs *mpd.Attrs) *SongData {
 		Genre:       (*attrs)["Genre"],
 		Released:    (*attrs)["Date"],
 		Prio:        conv.ToInt((*attrs)["Prio"]),
-		PrioUp:      -1,
-		PrioDown:    -1,
 		IsActive:    false,
 		IsNext:      false,
 		Position:    conv.ToInt((*attrs)["Pos"]),
 	}
 }
 
-// sorting
-type QueueData []SongData
+// queueData helps in sorting []SongData FIXME: is there a better way to do this?
+type queueData []SongData
 
-func (q QueueData) Len() int      { return len(q) }
-func (q QueueData) Swap(i, j int) { q[i], q[j] = q[j], q[i] }
-func (q QueueData) Less(i, j int) bool {
+func (q queueData) Len() int      { return len(q) }
+func (q queueData) Swap(i, j int) { q[i], q[j] = q[j], q[i] }
+func (q queueData) Less(i, j int) bool {
 	// We
 	if q[i].IsActive {
 		return false
@@ -150,9 +148,13 @@ func (q QueueData) Less(i, j int) bool {
 	if q[j].IsNext {
 		return true
 	}
+	if q[i].Prio == q[j].Prio {
+		return q[i].Position < q[j].Position
+	}
 	return q[i].Prio < q[j].Prio
 }
 
+// UpdateData contains everything (status, active song, queue) the client needs
 type UpdateData struct {
 	Status     StatusData `json:"status"`
 	ActiveSong SongData   `json:"activeSong"`
@@ -176,18 +178,7 @@ func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs) *Mess
 		event.Queue[event.Status.NextSong].IsNext = true
 	}
 	// order by song → nextsong → prio
-	sort.Sort(sort.Reverse(QueueData(event.Queue)))
-	previousPrio := -1
-	for i, s := range event.Queue {
-		if s.IsActive {
-			continue
-		}
-		if previousPrio != -1 && previousPrio+1 <= 255 {
-			event.Queue[i].PrioUp = previousPrio + 1
-		}
-		previousPrio = s.Prio
-		// fmt.Printf("%d %d %d → %+v\n", previousPrio, s.Prio, s.PrioUp, s.File)
-	}
+	sort.Sort(sort.Reverse(queueData(event.Queue)))
 	return NewMessage(Update, event)
 }
 
@@ -227,6 +218,7 @@ func (msg *Message) SearchResult() *SearchResultData {
 	return nil
 }
 
+// DirectoryListEntry an entry for a directory list
 type DirectoryListEntry struct {
 	Type        string `json:"type"`
 	Directory   string `json:"directory"`
@@ -239,6 +231,9 @@ type DirectoryListEntry struct {
 	Genre       string `json:"genre"`
 	Released    string `json:"released"`
 }
+
+// DirectoryListData helper to remember the parent of the current directory
+// to give the UI something to link back to
 type DirectoryListData struct {
 	Parent        string               `json:"parent"`
 	DirectoryList []DirectoryListEntry `json:"directoryList"`
