@@ -83,7 +83,7 @@ var addEvent = function(el, type, fn) {
 var resize = function(el, minFS, maxFS) {
   var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.2, maxFS);
   fs = Math.max(fs, minFS);
-  el.style.fontSize = (parseInt(fs) / 2) * 2 + "px";
+  el.style.fontSize = parseInt(parseInt(fs) / 4) * 4 + "px";
 };
 var resizer = function() {
   ["48", "44", "40", "36", "32", "28"].map(function(maxFS) {

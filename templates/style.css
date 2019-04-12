@@ -48,12 +48,11 @@ input[type="password"] {
 }
 
 .icon {
-  fill: currentColor;
+  fill: none;
   width: 1em;
   height: 1em;
   overflow: hidden;
   display: block;
-  fill: var(--c4);
   stroke: var(--foreground);
   stroke-width: 8%;
   stroke-linejoin: round;
@@ -61,10 +60,6 @@ input[type="password"] {
 
 .blink {
   background: var(--c2);
-}
-
-button:disabled .icon {
-  fill: none;
 }
 
 .bordered {
@@ -121,6 +116,7 @@ button:focus {
 button:disabled {
   opacity: 0.5;
   color: var(--c4);
+  background: var(--c2);
 }
 
 @media (min-width: 768px) {
@@ -381,27 +377,30 @@ button:disabled {
 @media (min-width: 768px) {
   /* desktop */
   .songCell {
-    grid-template-columns: 3fr 2fr 3fr auto;
-    grid-template-areas: "songCellTitle songCellArtist songCellAlbum songCellDuration";
+    grid-template-columns: 1fr 1fr 1fr auto ;
+    grid-template-areas: "songCellTitle  songCellArtist songCellAlbum songCellDuration";
   }
 }
 
 .songCellTitle {
   grid-area: songCellTitle;
-  font-size: 24px;
+  align-self: center;
 }
 
 .songCellArtist {
   grid-area: songCellArtist;
+  align-self: center;
 }
 
 .songCellAlbum {
   grid-area: songCellAlbum;
+  align-self: center;
 }
 
 .songCellDuration {
   grid-area: songCellDuration;
   text-align: right;
+  align-self: center;
 }
 
 /* unverififed */
