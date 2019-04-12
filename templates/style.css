@@ -207,11 +207,15 @@ button:disabled {
 
 .ctrlElapsed {
   grid-area: ctrlElapsed;
+  font-size: 0.5em;
+  align-self: end;
 }
 
 .ctrlDuration {
   grid-area: ctrlDuration;
   text-align: left;
+  font-size: 0.5em;
+  align-self: end;
 }
 
 .ctrlPlayer {
@@ -316,23 +320,26 @@ button:disabled {
   grid-template-areas:
     "activeSongTitle activeSongTitle activeSongTitle activeSongTitle"
     "activeSongArtist activeSongArtist activeSongArtist activeSongArtist"
-    "activeSongAlbum activeSongAlbum activeSongAlbum activeSongAlbum"
-    "ctrlElapsed . . ctrlDuration";
+    ". activeSongAlbum activeSongAlbum ."
+    "ctrlElapsed activeSongAlbum activeSongAlbum ctrlDuration";
 }
 
 .activeSongTitle {
   grid-area: activeSongTitle;
-  font-size: 120%;
+  text-align: center;
+  align-self: start;
 }
 
 .activeSongArtist {
   grid-area: activeSongArtist;
-  font-size: 100%;
+  text-align: center;
+  align-self: center;
 }
 
 .activeSongAlbum {
   grid-area: activeSongAlbum;
-  font-size: 80%;
+  text-align: center;
+  align-self: end;
 }
 
 /* a song in a list */
