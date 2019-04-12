@@ -95,7 +95,7 @@ button {
   height: 1em;
   text-align: center;
   font-size: 0.9em;
-  background: none;
+  background: var(--c5);
 }
 
 .prio {
@@ -283,8 +283,7 @@ button:disabled {
 .ctrlMode {
   display: grid;
   grid-template-columns: auto auto auto auto;
-  grid-template-areas:
-    "ctrlModeConsume ctrlModeRepeat ctrlModeSingle ctrlModeRandom";
+  grid-template-areas: "ctrlModeConsume ctrlModeRepeat ctrlModeSingle ctrlModeRandom";
 }
 
 .ctrlModeConsume {
@@ -356,6 +355,10 @@ button:disabled {
 
 .songRow button {
   border: 0px;
+  background: none;
+}
+.songRow .songPrio button:disabled {
+  border: 1px solid var(--foreground);
 }
 
 .activeSong,
@@ -377,7 +380,7 @@ button:disabled {
 @media (min-width: 768px) {
   /* desktop */
   .songCell {
-    grid-template-columns: 1fr 1fr 1fr auto ;
+    grid-template-columns: 1fr 1fr 1fr auto;
     grid-template-areas: "songCellTitle  songCellArtist songCellAlbum songCellDuration";
   }
 }
@@ -400,7 +403,8 @@ button:disabled {
 .songCellDuration {
   grid-area: songCellDuration;
   text-align: right;
-  align-self: center;
+  align-self: start;
+  padding-right: 2px;
 }
 
 /* unverififed */
