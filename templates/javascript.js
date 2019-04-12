@@ -68,7 +68,32 @@ var showView = function(view) {
   };
 };
 
+var addEvent = function(el, type, fn) {
+  if (el.addEventListener) {
+    el.addEventListener(type, fn, false);
+  } else {
+    el.attachEvent("on" + type, fn);
+  }
+};
+var resize = function(el, minFS, maxFS) {
+  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 2, maxFS);
+  fs = Math.max(fs, minFS);
+  el.style.fontSize = fs + "px";
+};
+var resizer = function() {
+  ["48", "44", "40", "36", "32", "28"].map(function(maxFS) {
+    var el = document.getElementsByClassName("resize" + maxFS);
+    var i;
+    for (i = 0; i < el.length; i++) {
+      resize(el[i], 16, maxFS);
+    }
+  });
+};
+
 window.addEventListener("load", function(evt) {
+  addEvent(window, "resize", resizer);
+  addEvent(window, "orientationchange", resizer);
+
   var ws_addr = e("ws").value; // read from hidden input field
   var ws;
 
@@ -211,36 +236,6 @@ window.addEventListener("load", function(evt) {
       }
     });
   };
-  var addEvent = function(el, type, fn) {
-    if (el.addEventListener) el.addEventListener(type, fn, false);
-    else el.attachEvent("on" + type, fn);
-  };
-  var fitText = function(el, minfs, maxfs) {
-    //https://github.com/adactio/FitText.js/blob/master/fittext.js
-    var fit = function(el) {
-      var resizer = function() {
-        el.style.fontSize =
-          Math.max(
-            Math.min(
-              (el.clientWidth / el.innerHTML.length) * 2,
-              parseFloat(maxfs)
-            ),
-            parseFloat(minfs)
-          ) + "px";
-      };
-      // Call once to set.
-      resizer();
-      // FIXME: add the resize to the element once
-      addEvent(window, "resize", resizer);
-      addEvent(window, "orientationchange", resizer);
-    };
-
-    if (el.length) for (var i = 0; i < el.length; i++) fit(el[i]);
-    else fit(el);
-
-    // return set of elements
-    return el;
-  };
 
   var updateActiveSong = function(data) {
     const { file, artist, title, album_artist, album } = data;
@@ -256,11 +251,6 @@ window.addEventListener("load", function(evt) {
       hide("albumArtist");
     }
     e("album").innerHTML = album;
-    // FIXME: do this once and trigger after setting the values
-    fitText(e("title"), 16, 48);
-    fitText(e("artist"), 16, 38);
-    fitText(e("album"), 16, 38);
-    fitText(e("albumArtist"), 16, 38);
   };
 
   var newSongNode = function(id, entry, nr) {
@@ -283,10 +273,6 @@ window.addEventListener("load", function(evt) {
     node.querySelector("#songCellDuration").innerHTML = readableSeconds(
       duration
     );
-    fitText(node.querySelector("#songCellArtist"), 16, 28);
-    fitText(node.querySelector("#songCellTitle"), 16, 28);
-    fitText(node.querySelector("#songCellAlbum"), 16, 28);
-    fitText(node.querySelector("#songCellAlbumArtist"), 16, 28);
     return node;
   };
 
