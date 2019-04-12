@@ -379,9 +379,9 @@ window.addEventListener("load", function(evt) {
         if (data.searchResult.length == 0) {
           showError("nothing found");
         }
-        data.searchResult.map(function(entry) {
+        data.searchResult.map(function(entry, i) {
           const { file } = entry;
-          const node = newSongNode("searchEntry", entry);
+          const node = newSongNode("searchEntry", entry, i);
           const btn = node.querySelector("#srAdd");
           // disable button for files already in the playlist
           if (gPlaylistFiles.includes(file)) {
