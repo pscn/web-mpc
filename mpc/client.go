@@ -63,6 +63,7 @@ func (client *Client) Close() (err error) {
 	return client.mpc.Close()
 }
 
+// Stats for the MPD database
 func (client *Client) Stats() error {
 	attr, err := client.mpc.Stats()
 	client.logger.Printf("Stats: %+v", attr)
@@ -167,18 +168,22 @@ func (client *Client) RemovePlaylistEntry(nr int) error {
 	return client.mpc.Delete(nr, -1)
 }
 
-func (client *Client) Consume(target bool) error {
-	return client.mpc.Consume(target)
+// Consume mode to enable
+func (client *Client) Consume(enable bool) error {
+	return client.mpc.Consume(enable)
 }
 
-func (client *Client) Repeat(target bool) error {
-	return client.mpc.Repeat(target)
+// Repeat mode to enable
+func (client *Client) Repeat(enable bool) error {
+	return client.mpc.Repeat(enable)
 }
 
+// Random mode to enable
 func (client *Client) Random(target bool) error {
 	return client.mpc.Random(target)
 }
 
+// Single mode to enable
 func (client *Client) Single(target bool) error {
 	return client.mpc.Single(target)
 }
@@ -224,9 +229,10 @@ func (client *Client) Search(search string) *Message {
 
 // Add file to playlist
 func (client *Client) Add(file string) error {
-	return client.mpc.Add(file)
+	return client.mpc.Add(strings.Replace(file, "%", "%%", -1))
 }
 
+// ListDirectory lists the contents of directory
 func (client *Client) ListDirectory(directory string) *Message {
 	attrs, err := client.mpc.ListInfo(directory)
 	if err != nil {
