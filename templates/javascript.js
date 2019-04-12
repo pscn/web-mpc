@@ -1,23 +1,26 @@
+var debug = function(msg) {
+  if (false) console.log(msg);
+};
 // short for document.getElementById(id)
 var e = function(id) {
   return document.getElementById(id);
 };
 // short for document.getElementById(id).classList.add(class)
 var addcls = function(id, cls) {
-  console.log("addcls(" + id + "," + cls + ")");
+  debug("addcls(" + id + "," + cls + ")");
   e(id).classList.add(cls);
 };
 // short for document.getElementById(id).classList.rm(class)
 var rmcls = function(id, cls) {
-  console.log("rmcls(" + id + "," + cls + ")");
+  debug("rmcls(" + id + "," + cls + ")");
   e(id).classList.remove(cls);
 };
 var hide = function(id) {
-  console.log("hide(" + id + ")");
+  debug("hide(" + id + ")");
   addcls(id, "hide");
 };
 var show = function(id) {
-  console.log("show(" + id + ")");
+  debug("show(" + id + ")");
   rmcls(id, "hide");
 };
 var disable = function(id) {
@@ -75,8 +78,10 @@ var addEvent = function(el, type, fn) {
     el.attachEvent("on" + type, fn);
   }
 };
+
+// Resize voodoo
 var resize = function(el, minFS, maxFS) {
-  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 2, maxFS);
+  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.5, maxFS);
   fs = Math.max(fs, minFS);
   el.style.fontSize = fs + "px";
 };
@@ -85,9 +90,12 @@ var resizer = function() {
     var el = document.getElementsByClassName("resize" + maxFS);
     var i;
     for (i = 0; i < el.length; i++) {
-      resize(el[i], 16, maxFS);
+      resize(el[i], 18, maxFS);
     }
   });
+};
+var triggerResize = function() {
+  window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 };
 
 window.addEventListener("load", function(evt) {
@@ -102,8 +110,8 @@ window.addEventListener("load", function(evt) {
     if (!ws) {
       return false;
     }
-    // console.log('SEND: ' + JSON.stringify(myJson))
-    console.log({ cmd, data });
+    // debug('SEND: ' + JSON.stringify(myJson))
+    debug({ cmd, data });
     ws.send(JSON.stringify({ command: cmd, data: data }));
     return true;
   };
@@ -211,7 +219,7 @@ window.addEventListener("load", function(evt) {
       song: song,
       nextsong: nextsong
     };
-    // console.log(`updateStatus(${state})`);
+    // debug(`updateStatus(${state})`);
     switch (state) {
       case "pause":
       case "play":
@@ -247,8 +255,12 @@ window.addEventListener("load", function(evt) {
       // only show album artist if it's different
       show("albumArtist");
       e("albumArtist").innerHTML = "[" + album_artist + "]&nbsp;";
+      addcls("ctrlSong", "ctrlSongWithAlbumArtist");
+      rmcls("ctrlSong", "ctrlSongWithoutAlbumArtist");
     } else {
       hide("albumArtist");
+      rmcls("ctrlSong", "ctrlSongWithAlbumArtist");
+      addcls("ctrlSong", "ctrlSongWithoutAlbumArtist");
     }
     e("album").innerHTML = album;
   };
@@ -278,7 +290,7 @@ window.addEventListener("load", function(evt) {
 
   var processResponse = function(obj) {
     const { type, data } = obj;
-    console.log({ type, data });
+    debug({ type, data });
 
     switch (type) {
       case ("error", "info"):
@@ -360,13 +372,13 @@ window.addEventListener("load", function(evt) {
           }
           e("playlist").append(node);
         });
-        window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 
         updateActiveSong(data.activeSong);
+        triggerResize();
         break;
       case "searchResult":
         e("searchResult").innerHTML = ""; // delete old search result
-        // console.log({ gFiles: gPlaylistFiles });
+        // debug({ gFiles: gPlaylistFiles });
         if (data.truncated) {
           showError("search result limited to " + data.maxResults);
         }
@@ -388,8 +400,7 @@ window.addEventListener("load", function(evt) {
           };
           e("searchResult").append(node);
         });
-
-        window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
+        triggerResize();
 
         break;
       case "directoryList":
@@ -452,12 +463,12 @@ window.addEventListener("load", function(evt) {
   var openWebSocket = function() {
     ws = new WebSocket(ws_addr);
     ws.onopen = function(evt) {
-      console.log("OPEN");
+      debug("OPEN");
       hideError();
       e("connect").disabled = "disabled";
     };
     ws.onclose = function(evt) {
-      console.log("CLOSE");
+      debug("CLOSE");
       ws = null;
       showError("no connection");
       e("connect").disabled = "";
@@ -479,25 +490,25 @@ window.addEventListener("load", function(evt) {
   updateProgress();
 
   var stop = function() {
-    console.log("stop");
+    debug("stop");
     ["play"].map(show);
     ["pause", "resume"].map(hide);
     ["stop", "next", "previous"].map(disable);
   };
   var play = function() {
-    console.log("play");
+    debug("play");
     ["pause"].map(show);
     ["resume", "play"].map(hide);
     ["stop", "next", "previous"].map(enable);
   };
   var pause = function() {
-    console.log("pause");
+    debug("pause");
     ["resume"].map(show);
     ["pause", "play"].map(hide);
     ["stop", "next", "previous"].map(enable);
   };
   var togglePlayPause = function(state) {
-    // console.log(`togglePlayPause(${state})`);
+    // debug(`togglePlayPause(${state})`);
     switch (state) {
       case "play":
         play();
@@ -532,13 +543,13 @@ window.addEventListener("load", function(evt) {
   // add onclick function for all controls
   ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
     e(value).onclick = function(evt) {
-      console.log(`Control: ${value}`);
+      debug(`Control: ${value}`);
       return command(value, "");
     };
   });
 
   // show the viewPlaylist
-  show("viewPlaylist")();
+  show("viewPlaylist");
 });
 
 // eof
