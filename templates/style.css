@@ -384,42 +384,50 @@ button:disabled {
   grid-area: songCell;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "songTitle songDuration"
-    "songArtist songArtist"
-    "songAlbum songAlbum"
-    "songAlbumArtist songAlbumArtist";
-  font-size: 90%;
   padding-top: 2px;
 }
+.songCellWithAlbumArtist {
+  grid-template-areas:
+    "songCellTitle songCellDuration"
+    "songCellArtist songCellArtist"
+    "songCellAlbum songCellAlbumArtist";
+}
+.songCellWithoutAlbumArtist {
+  grid-template-areas:
+    "songCellTitle songCellDuration"
+    "songCellArtist songCellArtist"
+    "songCellAlbum songCellAlbum";
+}
+
 
 @media (min-width: 768px) {
   /* desktop */
   .songCell {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
-    grid-template-areas: "songTitle songArtist songAlbum songAlbumArtist songDuration";
+    grid-template-areas: "songCellTitle songCellArtist songCellAlbum songCellAlbumArtist songCellDuration";
   }
 }
 
-.songTitle {
-  grid-area: songTitle;
+.songCellTitle {
+  grid-area: songCellTitle;
   font-size: 24px;
 }
 
-.songArtist {
-  grid-area: songArtist;
+.songCellArtist {
+  grid-area: songCellArtist;
 }
 
-.songAlbum {
-  grid-area: songAlbum;
+.songCellAlbum {
+  grid-area: songCellAlbum;
 }
 
-.songAlbumArtist {
-  grid-area: songAlbumArtist;
+.songCellAlbumArtist {
+  grid-area: songCellAlbumArtist;
 }
 
-.songDuration {
-  grid-area: songDuration;
+.songCellDuration {
+  grid-area: songCellDuration;
+  text-align: right;
 }
 
 /* unverififed */

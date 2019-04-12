@@ -81,7 +81,7 @@ var addEvent = function(el, type, fn) {
 
 // Resize voodoo
 var resize = function(el, minFS, maxFS) {
-  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.5, maxFS);
+  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.75, maxFS);
   fs = Math.max(fs, minFS);
   el.style.fontSize = fs + "px";
 };
@@ -90,7 +90,7 @@ var resizer = function() {
     var el = document.getElementsByClassName("resize" + maxFS);
     var i;
     for (i = 0; i < el.length; i++) {
-      resize(el[i], 18, maxFS);
+      resize(el[i], 22, maxFS);
     }
   });
 };
