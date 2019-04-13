@@ -118,7 +118,7 @@ var addEvent = function(el, type, fn) {
 // Resize voodoo
 var resize = function(el, minFS, maxFS) {
   var fs = maxFS;
-  const txt = el.innerHTML;
+  var txt = el.innerHTML;
   var maxWidth = el.clientWidth;
   while (fs >= minFS && getTextWidth(txt, fs) + fs > maxWidth) {
     fs -= 2;
@@ -138,13 +138,16 @@ var resize = function(el, minFS, maxFS) {
   }
   el.style.fontSize = fs + "px";
 };
-var resizer = function() {
+var resizer = function () {
+  return true;
+};
+/*function() {
   var el = document.getElementsByClassName("resize");
   var i;
   for (i = 0; i < el.length; i++) {
     resize(el[i], 12, 28);
   }
-};
+};*/
 
 var triggerResize = function() {
   window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
