@@ -185,13 +185,6 @@ window.addEventListener("load", function(evt) {
     if (sec < 10) {
       sec = "0" + sec;
     }
-    /*
-    if (min < 10) {
-      min = "&nbsp;&nbsp;" + min;
-    } else if (min < 100) {
-      min = "&nbsp;" + min;
-    }
-    */
     return min + ":" + sec;
   };
   // this functions runs forever and gets called every second to update the
@@ -201,8 +194,12 @@ window.addEventListener("load", function(evt) {
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState["play"] == "play" && gElapsed < gDuration) {
       // increment the seconds if playing and not finished
-      e("progress").style.width = (gElapsed / gDuration) * 100 + "%";
       gElapsed += 1;
+    }
+    if (gState["play"] == "stop") {
+      e("progress").style.width = "0%";
+    } else {
+      e("progress").style.width = (gElapsed / gDuration) * 100 + "%";
     }
     setTimeout(updateProgress, 1000);
   };
