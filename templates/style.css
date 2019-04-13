@@ -253,7 +253,7 @@ button:disabled {
 .ctrlPlayer {
   display: grid;
   grid-template-columns: auto auto auto auto auto;
-  grid-template-areas: "ctrlPlayerPlay ctrlPlayerStop ctrlPlayerPrevious ctrlPlayerNext ctrlPlayerRemove";
+  grid-template-areas: "ctrlPlayerPlay ctrlPlayerStop ctrlPlayerPrevious ctrlPlayerNext ctrlPlayerRemove ctrlPlayerClean";
   /*
   grid-template-areas:
     "ctrlPlayerPlay ctrlPlayerStop"
@@ -276,8 +276,13 @@ button:disabled {
 .ctrlPlayerNext {
   grid-area: ctrlPlayerNext;
 }
+
 .ctrlPlayerRemove {
   grid-area: ctrlPlayerRemove;
+}
+
+.ctrlPlayerClean {
+  grid-area: ctrlPlayerClean;
 }
 
 /* end of ctrlPlayer grid */

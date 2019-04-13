@@ -11,24 +11,26 @@ import (
 
 // Client with host, port & password & mpc reference
 type Client struct {
-	addr     string // host:port
-	host     string
-	port     int
-	password string
-	logger   *log.Logger
-	mpc      *mpd.Client
-	mpw      *mpd.Watcher
-	Event    *chan string
+	addr        string // host:port
+	host        string
+	port        int
+	password    string
+	logger      *log.Logger
+	mpc         *mpd.Client
+	mpw         *mpd.Watcher
+	Event       *chan string
+	queueLength int
 }
 
 // New with host, port, password and in & out channels
 func New(host string, port int, password string, logger *log.Logger) (*Client, error) {
 	mpc := &Client{
-		addr:     fmt.Sprintf("%s:%d", host, port),
-		host:     host,
-		port:     port,
-		password: password,
-		logger:   logger,
+		addr:        fmt.Sprintf("%s:%d", host, port),
+		host:        host,
+		port:        port,
+		password:    password,
+		logger:      logger,
+		queueLength: -1,
 	}
 	return mpc, mpc.reConnect()
 }
@@ -156,6 +158,7 @@ func (client *Client) queue() *[]mpd.Attrs {
 	if err != nil {
 		client.logger.Println("ActivePlaylist:", err)
 	}
+	client.queueLength = len(attrs)
 	return &attrs
 }
 
@@ -236,6 +239,11 @@ func (client *Client) Search(search string) *Message {
 // Add file to playlist
 func (client *Client) Add(file string) error {
 	return client.mpc.Add(strings.Replace(file, "%", "%%", -1))
+}
+
+// Clean the queue
+func (client *Client) Clean() error {
+	return client.mpc.Delete(0, client.queueLength)
 }
 
 // ListDirectory lists the contents of directory

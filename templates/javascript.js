@@ -563,7 +563,9 @@ window.addEventListener("load", function(evt) {
     return command("search", e("searchText").value);
   };
 
-  ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
+  ["play", "resume", "pause", "stop", "next", "previous", "clean"].map(function(
+    value
+  ) {
     e(value).onclick = btnCommand(value, "");
   });
 

@@ -228,6 +228,9 @@ func (h *Handler) Channel() http.HandlerFunc {
 				case mpc.Remove:
 					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
 
+				case mpc.Clean:
+					err = client.Clean()
+
 				case mpc.Prio:
 					args := strings.Split(cmd.Data, ":")
 					err = client.Prio(conv.ToInt(args[0]), conv.ToInt(args[1]))
