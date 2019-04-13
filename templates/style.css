@@ -3,9 +3,8 @@
 body {
   /* FIXME: better font selection */
 
-/*  font-family: "Roboto Mono", monospace;*/
-  font-family: 'Righteous', cursive;
-
+  /*  font-family: "Roboto Mono", monospace;*/
+  font-family: "Righteous", cursive;
 
   font-size: 28px;
   margin: 4px;
@@ -363,6 +362,36 @@ button:disabled {
 }
 .songRow .songPrio button:disabled {
   border: 1px solid var(--foreground);
+}
+
+/* a directory in a list */
+.directoryRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "directoryControl directoryCell";
+  margin-bottom: 4px;
+}
+
+@media (min-width: 768px) {
+  .directoryRow {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "directoryControl directoryCell";
+    margin-bottom: 4px;
+  }
+}
+
+.directoryRow button {
+  border: 0px;
+  background: none;
+}
+.directoryRow .songPrio button:disabled {
+  border: 1px solid var(--foreground);
+}
+.directoryControl {
+  grid-area: directoryControl;
+}
+.directoryCell {
+  grid-area: directoryCell;
 }
 
 .activeSong,

@@ -379,19 +379,21 @@
           </div>
         </div>
 
-        <div id="directoryListEntry" class="songRow bordered hide">
-          <div class="listingControl">
-            <div class="listingControlPrimary">
-              <button id="dlBrowse"><i class="fas fa-folder"></i></button>
+        <div id="directoryListEntry" class="directoryRow bordered hide">
+          <div class="directoryControl boxResponsive">
+            <div class="cell">
+              <button id="dlBrowse">
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use xlink:href="#icon-folder"></use>
+                </svg>
+              </button>
             </div>
-            <div class="listingControlSecondary">
-              <button id="dlAdd"><i class="fas fa-plus"></i></button>
+            <div class="cell">
+              <button id="dlAdd">+</button>
             </div>
           </div>
-          <div class="col">
-            <div class="listingEntry">
-              <span id="dlName" class="directoryName">Name</span>
-            </div>
+          <div class="directoryCell">
+            <div id="directoryName" class="directoryName resize">Name</div>
           </div>
         </div>
 
