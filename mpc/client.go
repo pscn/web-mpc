@@ -93,37 +93,31 @@ func (client *Client) Ping() (err error) {
 
 // Play start playing
 func (client *Client) Play(nr int) error {
-	client.Ping()
 	return client.mpc.Play(nr)
 }
 
 // Pause playing
 func (client *Client) Pause() error {
-	client.Ping()
 	return client.mpc.Pause(true)
 }
 
 // Resume playing
 func (client *Client) Resume() error {
-	client.Ping()
 	return client.mpc.Pause(false)
 }
 
 // Stop stops playing
 func (client *Client) Stop() error {
-	client.Ping()
 	return client.mpc.Stop()
 }
 
 // Next song in playlist
 func (client *Client) Next() error {
-	client.Ping()
 	return client.mpc.Next()
 }
 
 // Previous song in playlist
 func (client *Client) Previous() error {
-	client.Ping()
 	return client.mpc.Previous()
 }
 
@@ -133,8 +127,6 @@ func (client *Client) Prio(prio int, pos int) error {
 }
 
 func (client *Client) status() *mpd.Attrs {
-	// we get EOF here sometimes.  why?
-	client.Ping()
 	status, err := client.mpc.Status()
 	if err != nil {
 		client.logger.Panic(err) // FIXME: no panic
@@ -144,7 +136,6 @@ func (client *Client) status() *mpd.Attrs {
 }
 
 func (client *Client) activeSong() *mpd.Attrs {
-	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
 		client.logger.Println("ActiveSong:", err)
@@ -153,7 +144,6 @@ func (client *Client) activeSong() *mpd.Attrs {
 }
 
 func (client *Client) queue() *[]mpd.Attrs {
-	client.Ping()
 	attrs, err := client.mpc.PlaylistInfo(-1, -1)
 	if err != nil {
 		client.logger.Println("ActivePlaylist:", err)
@@ -173,7 +163,6 @@ func (client *Client) Update() *Message {
 
 // RemovePlaylistEntry nr
 func (client *Client) RemovePlaylistEntry(nr int) error {
-	client.Ping()
 	return client.mpc.Delete(nr, -1)
 }
 
