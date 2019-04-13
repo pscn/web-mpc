@@ -204,13 +204,16 @@ button:disabled {
 
 .ctrlElapsed {
   grid-area: ctrlElapsed;
+  width: 4em;
   font-size: 0.5em;
   align-self: end;
+  text-align: center;
 }
 
 .ctrlDuration {
   grid-area: ctrlDuration;
-  text-align: left;
+  width: 4em;
+  text-align: center;
   font-size: 0.5em;
   align-self: end;
 }
@@ -233,7 +236,7 @@ button:disabled {
     "ctrlViewList"
     "ctrlViewSearch"
     "ctrlViewBrowse";
-  height: 4em;
+  height: 3em;
 }
 
 .ctrlViewList {
@@ -312,14 +315,14 @@ button:disabled {
 /* ctrlSong gri */
 .ctrlSong {
   padding: 4px;
-  height: 4em;
+  height: 4.5em;
   display: grid;
-  grid-template-columns: auto 1fr 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-template-areas:
-    "activeSongTitle activeSongTitle activeSongTitle activeSongTitle"
-    "activeSongArtist activeSongArtist activeSongArtist activeSongArtist"
-    ". activeSongAlbum activeSongAlbum ."
-    "ctrlElapsed activeSongAlbum activeSongAlbum ctrlDuration";
+    "activeSongTitle activeSongTitle activeSongTitle"
+    "activeSongArtist activeSongArtist activeSongArtist"
+    "activeSongAlbum activeSongAlbum activeSongAlbum"
+    "ctrlElapsed activeSongProgress  ctrlDuration";
 }
 
 .activeSongTitle {
@@ -340,6 +343,16 @@ button:disabled {
   align-self: center;
 }
 
+.activeSongProgress {
+  grid-area: activeSongProgress;
+  border: 1px solid var(--foreground);
+  align-self: center;
+}
+.activeSongProgress div {
+  background: var(--background);
+  height: 0.4em;
+  border-right: 1px solid var(--foreground);
+}
 /* a song in a list */
 .songRow {
   display: grid;

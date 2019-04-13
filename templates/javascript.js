@@ -201,6 +201,7 @@ window.addEventListener("load", function(evt) {
     e("duration").innerHTML = readableSeconds(gDuration);
     if (gState["play"] == "play" && gElapsed < gDuration) {
       // increment the seconds if playing and not finished
+      e("progress").style.width = (gElapsed / gDuration) * 100 + "%";
       gElapsed += 1;
     }
     if (parseInt(gElapsed) % 2 == 0) {
