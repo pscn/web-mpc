@@ -155,7 +155,7 @@ window.addEventListener("load", function(evt) {
       return false;
     }
     // debug('SEND: ' + JSON.stringify(myJson))
-    debug({ cmd, data });
+    log({ cmd, data });
     ws.send(JSON.stringify({ command: cmd, data: data }));
     return true;
   };
@@ -330,7 +330,7 @@ window.addEventListener("load", function(evt) {
 
   var processResponse = function(obj) {
     const { type, data } = obj;
-    debug({ type, data });
+    log({ type, data });
 
     switch (type) {
       case ("error", "info"):
