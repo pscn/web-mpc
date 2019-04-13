@@ -147,7 +147,7 @@ var resizer = function() {
   var el = document.getElementsByClassName("resize");
   var i;
   for (i = 0; i < el.length; i++) {
-    resize(el[i], 12, 28);
+    resize(el[i], 12, 22);
   }
 };
 
