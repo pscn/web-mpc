@@ -20,6 +20,7 @@ type Client struct {
 	mpw         *mpd.Watcher
 	Event       *chan string
 	queueLength int
+	queuePage   int
 }
 
 // New with host, port, password and in & out channels
@@ -31,6 +32,7 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 		password:    password,
 		logger:      logger,
 		queueLength: -1,
+		queuePage:   1,
 	}
 	return mpc, mpc.reConnect()
 }
@@ -149,6 +151,14 @@ func (client *Client) queue() *[]mpd.Attrs {
 		client.logger.Println("ActivePlaylist:", err)
 	}
 	client.queueLength = len(attrs)
+	if client.queueLength < 50 {
+		client.queuePage = 1
+	} else {
+		if client.queuePage*50 > client.queueLength {
+			client.queuePage = client.queueLength / 50
+		}
+		attrs = attrs[(client.queuePage-1)*50 : (client.queuePage * 50)]
+	}
 	return &attrs
 }
 
