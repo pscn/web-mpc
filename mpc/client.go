@@ -132,6 +132,7 @@ func (client *Client) status() *mpd.Attrs {
 	if err != nil {
 		client.logger.Panic(err) // FIXME: no panic
 	}
+	client.logger.Printf("status: %+v", status)
 	return &status
 }
 
@@ -243,7 +244,11 @@ func (client *Client) ListDirectory(directory string) *Message {
 	if len(previousDirectory) > 1 {
 		previousDirectory = previousDirectory[:len(previousDirectory)-1]
 	}
-	return DirectoryListMsg(previousDirectory, &attrs)
+	hasPreviousDirectory := true
+	if directory == "" {
+		hasPreviousDirectory = false
+	}
+	return DirectoryListMsg(previousDirectory, hasPreviousDirectory, &attrs)
 }
 
 // eof

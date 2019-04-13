@@ -236,13 +236,15 @@ type DirectoryListEntry struct {
 // to give the UI something to link back to
 type DirectoryListData struct {
 	Parent        string               `json:"parent"`
+	HasParent     bool                 `json:"hasParent"`
 	DirectoryList []DirectoryListEntry `json:"directoryList"`
 }
 
 // DirectoryListMsg from mpd.Attrs
-func DirectoryListMsg(previousDirectory string, attrArr *[]mpd.Attrs) *Message {
+func DirectoryListMsg(previousDirectory string, hasPreviousDirectory bool, attrArr *[]mpd.Attrs) *Message {
 	event := &DirectoryListData{
-		Parent: previousDirectory,
+		Parent:    previousDirectory,
+		HasParent: hasPreviousDirectory,
 	}
 	if attrArr == nil {
 		return NewMessage(DirectoryList, event)

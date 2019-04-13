@@ -142,31 +142,28 @@ var triggerResize = function() {
   window.dispatchEvent(new Event("resize")); // trigger resize events on the song stuff
 };
 
+// send a command on the websocket
+var command = function(cmd, data) {
+  if (!ws) return false;
+  log({ cmd, data });
+  ws.send(JSON.stringify({ command: cmd, data: data }));
+  return true;
+};
+
+// wrapper to use command as an onclick
+// example: e("play").onclick = btnCommand("play", 1)
+var btnCommand = function(cmd, data) {
+  return function() {
+    return command(cmd, data);
+  };
+};
+
+var ws_addr, ws;
+
 window.addEventListener("load", function(evt) {
+  ws_addr = e("ws").value; // read from hidden input field
   addEvent(window, "resize", resizer);
   addEvent(window, "orientationchange", resizer);
-
-  var ws_addr = e("ws").value; // read from hidden input field
-  var ws;
-
-  // send a command on the websocket
-  var command = function(cmd, data) {
-    if (!ws) {
-      return false;
-    }
-    // debug('SEND: ' + JSON.stringify(myJson))
-    log({ cmd, data });
-    ws.send(JSON.stringify({ command: cmd, data: data }));
-    return true;
-  };
-
-  // wrapper to use command as an onclick
-  // example: e("play").onclick = btnCommand("play", 1)
-  var btnCommand = function(cmd, data) {
-    return function() {
-      return command(cmd, data);
-    };
-  };
 
   // a few 'globals' to track the process and current state of the player
   var gDuration = 1.0;
@@ -445,53 +442,43 @@ window.addEventListener("load", function(evt) {
         break;
       case "directoryList":
         e("directoryList").innerHTML = "";
-        node = e("directoryListEntry").cloneNode(true);
-        node.id = "dlRowParent";
-        node.title = data.parent;
-        node.classList.remove("hide");
-        node.querySelector("#dlName").innerHTML = data.parent;
-        node.querySelector("#dlBrowse").onclick = btnCommand(
-          "browse",
-          data.parent
-        );
-        e("directoryList").append(node);
+        if (data.hasParent) {
+          node = e("directoryListEntry").cloneNode(true);
+          node.id = "dlRowParent";
+          node.title = data.parent;
+          node.classList.remove("hide");
+          node.querySelector("#directoryName").innerHTML =
+            data.parent != "" ? data.parent : "..";
+          ["#directoryName", "#dlBrowse"].map(function(v) {
+            node.querySelector(v).onclick = btnCommand("browse", data.parent);
+          });
+          e("directoryList").append(node);
+        }
         data.directoryList.map(function(entry, i) {
           var node;
           if (entry.type == "directory") {
             node = e("directoryListEntry").cloneNode(true);
             node.id = "dlRow" + i;
             node.classList.remove("hide");
-            node.querySelector("#dlName").innerHTML = entry.directory;
-
-            {
-              const name = entry.directory;
-              node.querySelector("#dlBrowse").onclick = function(evt) {
-                return command("browse", name);
-              };
-            }
+            node.querySelector("#directoryName").innerHTML = entry.directory;
+            ["#directoryName", "#dlBrowse"].map(function(v) {
+              node.querySelector(v).onclick = btnCommand(
+                "browse",
+                entry.directory
+              );
+            });
           } else {
-            node = e("searchEntry").cloneNode(true);
-            node.id = "srRow" + i;
-            node.classList.remove("hide");
-            node.querySelector("#srArtist").innerHTML = entry.artist;
-            node.querySelector("#srTitle").innerHTML = entry.title;
-            if (entry.artist != entry.album_artist) {
-              node.querySelector("#srAlbum").innerHTML =
-                entry.album + " [" + entry.album_artist + "]";
-            } else {
-              node.querySelector("#srAlbum").innerHTML = entry.album;
+            node = newSongNode("searchEntry", entry, i);
+            const btn = node.querySelector("#srAdd");
+            // disable button for files already in the playlist
+            if (gPlaylistFiles.includes(entry.file)) {
+              // FIXME: should we add a button to remove it from the playlist?
+              btn.disabled = "disabled";
             }
-            node.querySelector("#srDuration").innerHTML = readableSeconds(
-              entry.duration
-            );
-            {
-              const file = entry.file;
-              const node = node.querySelector("#srAdd");
-              node.onclick = function(evt) {
-                node.disabled = "disabled";
-                return command("add", file);
-              };
-            }
+            btn.onclick = function() {
+              btn.disabled = "disabled";
+              return command("add", entry.file);
+            };
           }
           e("directoryList").append(node);
         });
