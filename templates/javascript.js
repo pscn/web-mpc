@@ -73,24 +73,26 @@ const views = {
 };
 var showView = function(view) {
   return function() {
+    log("handle:" + view);
     for (var k in views) {
       // disable/enable view buttons & show/hide view
       const el = e(k);
       switch (k) {
         case view: // show matching view
+          log("show:" + k);
           show(el);
-          disable(el);
+          disableId(views[k]);
           break;
         default:
           // hidde others
+          log("hidde:" + k);
           hide(el);
-          enable(el);
+          enableId(views[k]);
           break;
       }
     }
-    switch (
-      view // special actions based on the select view
-    ) {
+    // special actions based on the select view
+    switch (view) {
       case "viewDirectory":
         command("browse", ""); // send a command
         break;
@@ -450,29 +452,32 @@ var processResponse = function(obj) {
         e("directoryList").append(node);
       }
       data.directoryList.map(function(entry, i) {
+        const { type, directory, file } = entry;
         var node;
-        if (entry.type == "directory") {
+        if (type == "directory") {
           node = e("directoryListEntry").cloneNode(true);
           node.id = "dlRow" + i;
           rmcls(node, "hide");
-          node.querySelector("#directoryName").innerHTML = entry.directory;
+          node.querySelector("#directoryName").innerHTML = directory;
           ["#directoryName", "#dlBrowse"].map(function(v) {
-            node.querySelector(v).onclick = btnCommand(
-              "browse",
-              entry.directory
-            );
+            node.querySelector(v).onclick = btnCommand("browse", directory);
           });
+          const btn = node.querySelector("#dlAdd");
+          btn.onclick = function() {
+            disable(btn);
+            return command("add", directory);
+          };
         } else {
           node = newSongNode("searchEntry", entry, i);
           const btn = node.querySelector("#srAdd");
           // disable button for files already in the playlist
-          if (gPlaylistFiles.includes(entry.file)) {
+          if (gPlaylistFiles.includes(file)) {
             // FIXME: should we add a button to remove it from the playlist?
             disable(btn);
           }
           btn.onclick = function() {
             disable(btn);
-            return command("add", entry.file);
+            return command("add", file);
           };
         }
         e("directoryList").append(node);
