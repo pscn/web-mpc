@@ -487,22 +487,28 @@ var processResponse = function(obj) {
   }
 };
 
+var shouldRefresh = false;
 var openWebSocket = function() {
   ws = new WebSocket(ws_addr);
   ws.onopen = function(evt) {
     debug("OPEN");
     hideError();
+    if (shouldRefresh) {
+      location.reload(); // force refresh to get latest html etc
+    }
   };
   ws.onclose = function(evt) {
     debug("CLOSE");
     ws = null;
-    showError("no connection");
+    showError("no connection&hellip; reconnecting in 4 seconds&hellip;");
+    shouldRefresh = true;
+    setTimeout(openWebSocket, 4000);
   };
   ws.onmessage = function(evt) {
     processResponse(JSON.parse(evt.data));
   };
   ws.onerror = function(evt) {
-    showError(evt.data);
+    log({ evt });
   };
 };
 
