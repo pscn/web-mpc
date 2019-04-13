@@ -147,7 +147,7 @@ var resizer = function() {
   var el = document.getElementsByClassName("resize");
   var i;
   for (i = 0; i < el.length; i++) {
-    resize(el[i], 12, 22);
+    resize(el[i], 12, 18);
   }
 };
 
@@ -195,6 +195,8 @@ var readableSeconds = function(value) {
   }
   return min + ":" + sec;
 };
+var gPage = 1;
+var gLastPage = 1;
 
 // this functions runs forever and gets called every second to update the
 // elapsed and duration information of the active song
@@ -409,6 +411,50 @@ var processResponse = function(obj) {
         }
         e("playlist").append(node);
       });
+      gPage = data.page;
+      gLastPage = data.lastPage;
+      previousPage = gPage - 1;
+      nextPage = gPage + 1;
+      if (gLastPage == 1) {
+        disableId("firstPage");
+        disableId("previousPage");
+        disableId("nextPage");
+        disableId("lastPage");
+      } else {
+        if (gPage == 1) {
+          disableId("firstPage");
+        } else {
+          enableId("firstPage");
+          e("firstPage").onclick = btnCommand("updateRequest", "1");
+        }
+        if (previousPage <= 1) {
+          disableId("previousPage");
+        } else {
+          enableId("previousPage");
+          e("previousPage").onclick = btnCommand(
+            "updateRequest",
+            previousPage.toString()
+          );
+        }
+        if (nextPage >= gLastPage) {
+          disableId("nextPage");
+        } else {
+          enableId("nextPage");
+          e("nextPage").onclick = btnCommand(
+            "updateRequest",
+            nextPage.toString()
+          );
+        }
+        if (gPage == gLastPage) {
+          disableId("lastPage");
+        } else {
+          enableId("lastPage");
+          e("lastPage").onclick = btnCommand(
+            "updateRequest",
+            gLastPage.toString()
+          );
+        }
+      }
 
       updateActiveSong(data.activeSong);
       triggerResize();
@@ -583,7 +629,7 @@ window.addEventListener("load", function(evt) {
   window.onfocus = function(event) {
     // request a fresh status as some browsers (e. g. Chrome) suspend our
     // progress setTimeout functions
-    command("updateRequest", "");
+    command("updateRequest", gPage.toString());
   };
 
   // show the viewPlaylist

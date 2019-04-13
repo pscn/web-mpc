@@ -165,10 +165,13 @@ type UpdateData struct {
 	Status     StatusData `json:"status"`
 	ActiveSong SongData   `json:"activeSong"`
 	Queue      []SongData `json:"queue"`
+	Page       int        `json:"page"`
+	LastPage   int        `json:"lastPage"`
 }
 
 // UpdateDataMsg creates a new Event including the current song data mapped from mpd.Attrs
-func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs) *Message {
+func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
+	queuePage int, songsPerPage int) *Message {
 	event := &UpdateData{}
 	event.Status = *statusData(status)
 	event.ActiveSong = *songData(song)
@@ -185,6 +188,26 @@ func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs) *Mess
 	}
 	// order by song → nextsong → prio
 	sort.Sort(sort.Reverse(queueData(event.Queue)))
+	queueLength := len(event.Queue)
+	fmt.Printf("page: %d\n", queuePage)
+	if queueLength < songsPerPage {
+		event.Page = 1
+		event.LastPage = 1
+	} else {
+		event.LastPage = queueLength / songsPerPage
+		event.Page = queuePage
+		if songsPerPage*queuePage > queueLength {
+			event.Page = event.LastPage
+		}
+		start := (event.Page - 1) * songsPerPage
+		end := start + songsPerPage
+		if end > queueLength {
+			end = queueLength
+		}
+		fmt.Printf("page: %d\n", queuePage)
+		fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
+		event.Queue = event.Queue[start:end]
+	}
 	return NewMessage(Update, event)
 }
 

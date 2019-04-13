@@ -151,24 +151,16 @@ func (client *Client) queue() *[]mpd.Attrs {
 		client.logger.Println("ActivePlaylist:", err)
 	}
 	client.queueLength = len(attrs)
-	if client.queueLength < 50 {
-		client.queuePage = 1
-	} else {
-		if client.queuePage*50 > client.queueLength {
-			client.queuePage = client.queueLength / 50
-		}
-		attrs = attrs[(client.queuePage-1)*50 : (client.queuePage * 50)]
-	}
 	return &attrs
 }
 
 // Update prepares an update message for the client containing:
 // status, activeSong and queue
-func (client *Client) Update() *Message {
+func (client *Client) Update(page int) *Message {
 	status := client.status()
 	activeSong := client.activeSong()
 	queue := client.queue()
-	return UpdateDataMsg(status, activeSong, queue)
+	return UpdateDataMsg(status, activeSong, queue, page, 10)
 }
 
 // RemovePlaylistEntry nr

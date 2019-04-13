@@ -179,8 +179,9 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
+		currentPage := 1
 		h.writeMessage(ws, client.Version())
-		h.writeMessage(ws, client.Update())
+		h.writeMessage(ws, client.Update(currentPage))
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -190,7 +191,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 				switch event {
 				case "player", "playlist", "options":
 					// send the playlist before the status, to have "nextsong" work correctly
-					h.writeMessage(ws, client.Update())
+					h.writeMessage(ws, client.Update(currentPage))
 				}
 
 			case cmd := <-wc:
@@ -257,7 +258,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 					}
 
 				case mpc.UpdateRequest:
-					h.writeMessage(ws, client.Update())
+					currentPage = conv.ToInt(cmd.Data)
+					h.writeMessage(ws, client.Update(currentPage))
 
 				case mpc.Search:
 					h.writeMessage(ws, client.Search(cmd.Data))

@@ -410,10 +410,9 @@ button:disabled {
 .directoryCell {
   grid-area: directoryCell;
 }
-
-.activeSong,
-.nextSong {
-  /* background: var(--c1) !important; */
+.playlistPagination button {
+  width: unset;
+  height: unset;
 }
 
 .songCell {

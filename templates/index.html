@@ -265,7 +265,6 @@
               </svg>
             </button>
           </div>
-          <!-- FIXME: add "ban" button to remove the current song -->
         </div>
 
         <div class="ctrlMode boxResponsive">
@@ -296,7 +295,7 @@
             </div>
 
             <div class="ctrlModeSingle" title="Toggle single mode">
-              <button id="singleDisable">
+              <button id="singleDisable" class="hide">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use xlink:href="#icon-single"></use>
                 </svg>
@@ -309,7 +308,7 @@
             </div>
 
             <div class="ctrlModeConsume" title="Toggle consume mode">
-              <button id="consumeDisable">
+              <button id="consumeDisable" class="hide">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use xlink:href="#icon-consume"></use>
                 </svg>
@@ -325,6 +324,12 @@
 
         <!-- playlist View -->
         <div id="viewPlaylist" class="mainContent">
+          <div id="playlistPagination" class="playlistPagination">
+            <button id="firstPage">First</button>
+            <button id="previousPage">Previous</button>
+            <button id="nextPage">Next</button>
+            <button id="lastPage">Last</button>
+          </div>
           <div id="playlist">
             <!-- playlistEntries go here -->
           </div>
