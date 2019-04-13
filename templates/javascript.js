@@ -84,7 +84,7 @@ var showView = function(view) {
         default:
           // hidde others
           hide(el);
-          enabled(el);
+          enable(el);
           break;
       }
     }
