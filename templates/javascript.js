@@ -510,7 +510,7 @@ window.addEventListener("load", function(evt) {
     command("updateRequest", "");
   };
   updateProgress();
-
+  // FIXME: play / pause / stop doesn't work as expected (does not enable buttons all the time)
   var stop = function() {
     debug("stop");
     ["play", "remove"].map(show);
