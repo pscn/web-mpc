@@ -204,11 +204,6 @@ window.addEventListener("load", function(evt) {
       e("progress").style.width = (gElapsed / gDuration) * 100 + "%";
       gElapsed += 1;
     }
-    if (parseInt(gElapsed) % 2 == 0) {
-      e("pause").classList.add("blink");
-    } else {
-      e("pause").classList.remove("blink");
-    }
     setTimeout(updateProgress, 1000);
   };
 

@@ -60,10 +60,6 @@ input[type="password"] {
   stroke-linejoin: round;
 }
 
-.blink {
-  background: var(--c2);
-}
-
 .bordered {
   /* add a round border & set the background */
   border: 2px solid var(--foreground);
