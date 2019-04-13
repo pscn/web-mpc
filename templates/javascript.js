@@ -282,7 +282,7 @@ window.addEventListener("load", function(evt) {
   };
 
   var updateActiveSong = function(data) {
-    const { file, artist, title, album_artist, album } = data;
+    const { file, artist, title, album_artist, album, position } = data;
     e("ctrlSong").title = file;
     e("artist").innerHTML = artist;
     e("title").innerHTML = title;
@@ -291,6 +291,12 @@ window.addEventListener("load", function(evt) {
       e("album").innerHTML = album + " [" + album_artist + "]";
     } else {
       e("album").innerHTML = album;
+    }
+    if (position == -1) {
+      disable("remove");
+    } else {
+      enable("remove");
+      e("remove").onclick = btnCommand("remove", position.toString());
     }
   };
 
@@ -508,20 +514,20 @@ window.addEventListener("load", function(evt) {
   var stop = function() {
     debug("stop");
     ["play", "remove"].map(show);
-    ["pause", "resume", "previous"].map(hide);
-    ["stop", "previous"].map(disable);
+    ["pause", "resume", "stop", "next", "previous"].map(hide);
+    ["play", "remove"].map(enable);
   };
   var play = function() {
     debug("play");
-    ["pause"].map(show);
+    ["pause", "stop", "next", "previous"].map(show);
     ["resume", "play", "remove"].map(hide);
-    ["stop", "next", "previous"].map(enable);
+    ["pause", "stop", "next", "previous"].map(enable);
   };
   var pause = function() {
     debug("pause");
-    ["resume"].map(show);
+    ["resume", "stop", "next", "previous"].map(show);
     ["pause", "play", "remove"].map(hide);
-    ["stop", "next", "previous"].map(enable);
+    ["resume", "stop", "next", "previous"].map(enable);
   };
   var togglePlayPause = function(state) {
     // debug(`togglePlayPause(${state})`);
@@ -557,10 +563,7 @@ window.addEventListener("load", function(evt) {
 
   // add onclick function for all controls
   ["play", "resume", "pause", "stop", "next", "previous"].map(function(value) {
-    e(value).onclick = function(evt) {
-      debug(`Control: ${value}`);
-      return command(value, "");
-    };
+    e(value).onclick = btnCommand(value, "");
   });
 
   // show the viewPlaylist
