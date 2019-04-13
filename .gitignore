@@ -1,6 +1,3 @@
+web-mpc*
+*.swp
 debug
-main-packr.go
-packrd/packed-packr.go
-web-mpc
-web-mpc.code-workspace
-web-mpc.exe

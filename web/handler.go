@@ -6,13 +6,14 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
-	"github.com/gobuffalo/packr"
-	"github.com/pscn/web-mpc/helpers"
+	"github.com/pscn/web-mpc/conv"
 
 	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/mpc"
@@ -20,35 +21,37 @@ import (
 
 // Handler a websocket, a logger and two channels come into a bar
 type Handler struct {
+	mpdHost   string
+	mpdPort   int
+	mpdPass   string
 	upgrader  *websocket.Upgrader
 	verbosity int
 	logger    *log.Logger
 }
 
 // New handler
-func New(verbosity int, checkOrigin bool) *Handler {
+func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handler {
 	upgrader := websocket.Upgrader{}
 	if !checkOrigin {
 		// disable origin check to test from static html, css & js
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	}
+	host, port, _ := net.SplitHostPort(mpdHost) // FIXME: handle err
 	return &Handler{
+		mpdHost:   host,
+		mpdPort:   conv.ToInt(port),
+		mpdPass:   mpdPass,
 		upgrader:  &upgrader,
 		verbosity: verbosity,
+		logger:    log.New(os.Stdout, fmt.Sprintf("web-mpc "), log.LstdFlags|log.Lshortfile),
 	}
 }
 
 // StaticPacked serves content with contenType
-func (h *Handler) StaticPacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
-	tmplStr, err := (*box).FindString(fileName)
-	if err != nil {
-		h.logger.Println("box error:", err)
-		return nil
-	}
-
+func (h *Handler) StaticPacked(contentType string, content *[]byte) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", contentType)
-		w.Write([]byte(tmplStr))
+		w.Write(*content)
 	}
 }
 
@@ -65,16 +68,13 @@ func (h *Handler) StaticFile(contentType string, fileName string) http.HandlerFu
 }
 
 // StaticTemplatePacked serves content with contenType
-func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box *packr.Box) http.HandlerFunc {
-	tmplStr, err := (*box).FindString(fileName)
-	if err != nil {
-		h.logger.Println("box error:", err)
-		return nil
-	}
-	tmpl := template.Must(template.New("").Parse(tmplStr))
+func (h *Handler) StaticTemplatePacked(contentType string, content *[]byte) http.HandlerFunc {
+	tmpl := template.Must(template.New("").Parse(string(*content)))
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
+		p := map[string]interface{}{
+			"ws": "ws://" + r.Host + "/ws",
+		}
 		w.Header().Set("Content-type", contentType)
 		tmpl.Execute(w, p)
 	}
@@ -83,7 +83,9 @@ func (h *Handler) StaticTemplatePacked(contentType string, fileName string, box 
 // StaticTemplateFile serves content with contenType
 func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := map[string]interface{}{"ws": "ws://" + r.Host + "/echo"}
+		p := map[string]interface{}{
+			"ws": "ws://" + r.Host + "/ws",
+		}
 		w.Header().Set("Content-type", contentType)
 		dat, err := ioutil.ReadFile(path.Join("templates", fileName))
 		if err != nil {
@@ -123,7 +125,7 @@ func (h *Handler) readCommand(ws *websocket.Conn) (*mpc.Command, error) {
 }
 
 // Channel to websocket
-func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
+func (h *Handler) Channel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 
@@ -144,24 +146,28 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		defer ws.Close()
 
 		// open connection to mpc
-		client, err := mpc.New(mpdHost, mpdPass, h.logger)
+		client, err := mpc.New(h.mpdHost, h.mpdPort, h.mpdPass, h.logger)
 		if err != nil {
 			h.logger.Println("mpc:", err)
 			// FIXME: either the host & port for MPD is wrong, or MPD is
 			// down / restarting
 			// we could try again after some time?
 			// right now the user needs to reload the page to try again
-			h.writeMessage(ws, mpc.NewInfo(
+			h.writeMessage(ws, mpc.InfoMsg(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
+		client.Stats()
 		defer client.Close()
 
 		// channel for commands from the webclient
 		wc := make(chan *mpc.Command, 10)
 
 		go func() {
-			defer close(wc)
+			defer func() {
+				close(wc)
+				h.logger.Println("stopping webclient loop")
+			}()
 			for {
 				cmd, err := h.readCommand(ws)
 				if err != nil {
@@ -173,9 +179,7 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
-		h.writeMessage(ws, client.Status())
-		h.writeMessage(ws, client.CurrentSong())
-		h.writeMessage(ws, client.CurrentPlaylist())
+		h.writeMessage(ws, client.Update())
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -183,11 +187,11 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 			case event := <-*client.Event:
 				h.logger.Println("event:", event)
 				switch event {
-				case "player", "playlist":
-					h.writeMessage(ws, client.Status())
-					h.writeMessage(ws, client.CurrentSong())
-					h.writeMessage(ws, client.CurrentPlaylist())
+				case "player", "playlist", "options":
+					// send the playlist before the status, to have "nextsong" work correctly
+					h.writeMessage(ws, client.Update())
 				}
+
 			case cmd := <-wc:
 				if cmd == nil {
 					// wc closed → exit
@@ -197,29 +201,65 @@ func (h *Handler) Channel(mpdHost string, mpdPass string) http.HandlerFunc {
 				switch cmd.Command {
 				case mpc.Play:
 					if cmd.Data != "" {
-						err = client.Play(helpers.ToInt(cmd.Data))
+						err = client.Play(conv.ToInt(cmd.Data))
 					} else {
 						err = client.Play(-1)
 					}
+
 				case mpc.Resume:
 					err = client.Resume()
+
 				case mpc.Pause:
 					err = client.Pause()
+
 				case mpc.Stop:
 					err = client.Stop()
+
 				case mpc.Next:
 					err = client.Next()
+
 				case mpc.Previous:
 					err = client.Previous()
+
 				case mpc.Add:
 					err = client.Add(cmd.Data)
-				case mpc.Remove:
-					err = client.RemovePlaylistEntry(helpers.ToInt(cmd.Data))
 
-				case mpc.StatusRequest:
-					h.writeMessage(ws, client.Status())
+				case mpc.Remove:
+					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
+
+				case mpc.Prio:
+					args := strings.Split(cmd.Data, ":")
+					err = client.Prio(conv.ToInt(args[0]), conv.ToInt(args[1]))
+					// prio does not yield an update
+					// h.writeMessage(ws, client.Update())
+
+				case mpc.ModeConsume, mpc.ModeRepeat, mpc.ModeSingle, mpc.ModeRandom:
+					target := true
+					if cmd.Data == "disable" {
+						target = false
+					}
+					switch cmd.Command {
+					case mpc.ModeConsume:
+						client.Consume(target)
+
+					case mpc.ModeRepeat:
+						client.Repeat(target)
+
+					case mpc.ModeSingle:
+						client.Single(target)
+
+					case mpc.ModeRandom:
+						client.Random(target)
+					}
+
+				case mpc.UpdateRequest:
+					h.writeMessage(ws, client.Update())
+
 				case mpc.Search:
 					h.writeMessage(ws, client.Search(cmd.Data))
+
+				case mpc.Browse:
+					h.writeMessage(ws, client.ListDirectory(cmd.Data))
 				}
 				if err != nil {
 					h.logger.Println("command error:", err)

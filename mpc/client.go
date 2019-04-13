@@ -1,7 +1,9 @@
 package mpc
 
 import (
+	"fmt"
 	"log"
+	"path"
 	"strings"
 
 	"github.com/fhs/gompd/mpd"
@@ -10,6 +12,8 @@ import (
 // Client with host, port & password & mpc reference
 type Client struct {
 	addr     string // host:port
+	host     string
+	port     int
 	password string
 	logger   *log.Logger
 	mpc      *mpd.Client
@@ -18,9 +22,11 @@ type Client struct {
 }
 
 // New with host, port, password and in & out channels
-func New(addr string, password string, logger *log.Logger) (*Client, error) {
+func New(host string, port int, password string, logger *log.Logger) (*Client, error) {
 	mpc := &Client{
-		addr:     addr,
+		addr:     fmt.Sprintf("%s:%d", host, port),
+		host:     host,
+		port:     port,
 		password: password,
 		logger:   logger,
 	}
@@ -36,7 +42,7 @@ func (client *Client) reConnect() (err error) {
 		client.mpc, err = mpd.Dial("tcp", client.addr)
 	}
 	if err == nil {
-		client.logger.Printf("connected to %s", client.addr)
+		client.logger.Printf("connected to %s (%s)", client.addr, client.mpc.Version())
 		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
 			client.logger.Printf("listening to %s", client.addr)
@@ -55,6 +61,13 @@ func (client *Client) Close() (err error) {
 	}
 	client.Event = nil
 	return client.mpc.Close()
+}
+
+// Stats for the MPD database
+func (client *Client) Stats() error {
+	attr, err := client.mpc.Stats()
+	client.logger.Printf("Stats: %+v", attr)
+	return err
 }
 
 // Ping and try to re-connect if ping fails
@@ -107,35 +120,47 @@ func (client *Client) Previous() error {
 	return client.mpc.Previous()
 }
 
-// Status returns mpd.Attrs
-func (client *Client) Status() *Message {
+// Prio sets prio for song in the queue at pos to prio
+func (client *Client) Prio(prio int, pos int) error {
+	return client.mpc.SetPriority(prio, pos, -1)
+}
+
+func (client *Client) status() *mpd.Attrs {
 	// we get EOF here sometimes.  why?
 	client.Ping()
 	status, err := client.mpc.Status()
 	if err != nil {
 		client.logger.Panic(err) // FIXME: no panic
 	}
-	return NewStatus(&status)
+	client.logger.Printf("status: %+v", status)
+	return &status
 }
 
-// CurrentSong returns the currently active song
-func (client *Client) CurrentSong() *Message {
+func (client *Client) activeSong() *mpd.Attrs {
 	client.Ping()
 	attrs, err := client.mpc.CurrentSong()
 	if err != nil {
-		client.logger.Println("currentsong:", err)
+		client.logger.Println("ActiveSong:", err)
 	}
-	return NewCurrentSong(&attrs)
+	return &attrs
 }
 
-// CurrentPlaylist returns the currently active playlist / queue
-func (client *Client) CurrentPlaylist() *Message {
+func (client *Client) queue() *[]mpd.Attrs {
 	client.Ping()
 	attrs, err := client.mpc.PlaylistInfo(-1, -1)
 	if err != nil {
-		client.logger.Println("currentsong:", err)
+		client.logger.Println("ActivePlaylist:", err)
 	}
-	return NewCurrentPlaylist(&attrs)
+	return &attrs
+}
+
+// Update prepares an update message for the client containing:
+// status, activeSong and queue
+func (client *Client) Update() *Message {
+	status := client.status()
+	activeSong := client.activeSong()
+	queue := client.queue()
+	return UpdateDataMsg(status, activeSong, queue)
 }
 
 // RemovePlaylistEntry nr
@@ -144,23 +169,50 @@ func (client *Client) RemovePlaylistEntry(nr int) error {
 	return client.mpc.Delete(nr, -1)
 }
 
+// Consume mode to enable
+func (client *Client) Consume(enable bool) error {
+	return client.mpc.Consume(enable)
+}
+
+// Repeat mode to enable
+func (client *Client) Repeat(enable bool) error {
+	return client.mpc.Repeat(enable)
+}
+
+// Random mode to enable
+func (client *Client) Random(target bool) error {
+	return client.mpc.Random(target)
+}
+
+// Single mode to enable
+func (client *Client) Single(target bool) error {
+	return client.mpc.Single(target)
+}
+
+func escapeSearchToken(token string) string {
+	// FIXME: workaround for broken gompd search (%) => fix it upstream when you
+	// have an idead how to fix it :)
+	return strings.Replace(token, "%", "%%%%", -1)
+}
+
 // Search for search string tokenized by space and searched in any
+// FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
 func (client *Client) Search(search string) *Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
 			if strings.HasPrefix(token, "t:") {
 				searchTokens = append(searchTokens, "title")
-				searchTokens = append(searchTokens, token[2:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
 			} else if strings.HasPrefix(token, "a:") {
 				searchTokens = append(searchTokens, "artist")
-				searchTokens = append(searchTokens, token[2:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
 			} else if strings.HasPrefix(token, "al:") {
 				searchTokens = append(searchTokens, "album")
-				searchTokens = append(searchTokens, token[3:])
+				searchTokens = append(searchTokens, escapeSearchToken(token[3:]))
 			} else {
 				searchTokens = append(searchTokens, "any")
-				searchTokens = append(searchTokens, token)
+				searchTokens = append(searchTokens, escapeSearchToken(token))
 			}
 		}
 	}
@@ -171,14 +223,32 @@ func (client *Client) Search(search string) *Message {
 			client.logger.Println("search error:", err)
 			return nil
 		}
-		return NewSearchResult(&attrs)
+		return SearchResultMsg(&attrs)
 	}
 	return nil
 }
 
 // Add file to playlist
 func (client *Client) Add(file string) error {
-	return client.mpc.Add(file)
+	return client.mpc.Add(strings.Replace(file, "%", "%%", -1))
+}
+
+// ListDirectory lists the contents of directory
+func (client *Client) ListDirectory(directory string) *Message {
+	attrs, err := client.mpc.ListInfo(directory)
+	if err != nil {
+		client.logger.Println("directory list error:", err)
+		return nil
+	}
+	previousDirectory, _ := path.Split(directory)
+	if len(previousDirectory) > 1 {
+		previousDirectory = previousDirectory[:len(previousDirectory)-1]
+	}
+	hasPreviousDirectory := true
+	if directory == "" {
+		hasPreviousDirectory = false
+	}
+	return DirectoryListMsg(previousDirectory, hasPreviousDirectory, &attrs)
 }
 
 // eof

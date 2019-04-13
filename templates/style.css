@@ -1,219 +1,491 @@
+/* FIXME: lookup useful @media queries */
+
 body {
-  background: black;
   /* FIXME: better font selection */
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+
+  /*  font-family: "Roboto Mono", monospace;*/
+  font-family: "Righteous", cursive;
+
+  font-size: 28px;
   margin: 4px;
   padding: 0px;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 @media (min-width: 768px) {
   body {
-    background: #efefef;
+    /*background: #efefef;*/
+    font-size: 28px;
   }
 }
 
-/* Main grid */
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  width: 100%;
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  font-size: 1em;
+}
+
+/* common styles */
+.big {
+  font-size: 120%;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.medium {
+  font-size: 100%;
+}
+
+.small {
+  font-size: 0.75em;
+}
+
+.icon {
+  fill: none;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  display: block;
+  stroke: var(--foreground);
+  stroke-width: 8%;
+  stroke-linejoin: round;
+}
+
+.blink {
+  background: var(--c2);
+}
+
+.bordered {
+  /* add a round border & set the background */
+  border: 2px solid var(--foreground);
+  border-radius: 4px;
+  margin: 1px;
+  padding-bottom: 4px;
+
+  background: var(--c5);
+}
+
+.boxResponsive {
+  /* switching between column (mobile) and row (desktop) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hide {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+button {
+  padding: 2px;
+  margin: 2px;
+  box-sizing: unset;
+  border: 2px solid var(--foreground);
+  border-radius: 4px;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  font-size: 0.9em;
+  background: var(--c5);
+}
+
+.prio {
+  border: 1px solid var(--foreground);
+  margin-right: 4px;
+}
+
+button:hover {
+  opacity: 0.5;
+  background: var(--background);
+}
+
+button:focus {
+  opacity: 0.5;
+  background: var(--background);
+}
+
+button:disabled {
+  opacity: 0.5;
+  color: var(--c4);
+  background: var(--c2);
+}
+
+@media (min-width: 768px) {
+  .boxResponsive {
+    flex-direction: row;
+  }
+}
+
+.boxColumn {
+  /* always column */
+  display: flex;
+  flex-direction: column;
+}
+
+.boxRow {
+  /* always row */
+  display: flex;
+  flex-direction: row;
+  padding: 2px;
+}
+
+.boxRow .fas {
+  vertical-align: top;
+}
+
+.cell {
+  display: flex;
+}
+
+/* main grid */
 .main {
   display: grid;
-  grid-template-columns: 4px auto 1fr auto 4px;
+  grid-template-columns: 4px 1fr 4px;
   grid-template-areas:
-    ". error error error ."
-    ". switchView playerCurrentSong playerElapsedDuration ."
-    ". playerControl playerCurrentSong playerElapsedDuration ."
-    ". searchBox searchBox searchBox ."
-    ". playlist playlist playlist ."
-    ". searchResult searchResult searchResult .";
-}
-
-.error {
-  grid-area: error;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #ff1f1f;
-  font-size: 24px;
-}
-
-.switchView {
-  grid-area: switchView;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
-}
-
-.playerCurrentSong {
-  grid-area: playerCurrentSong;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  font-size: 16px;
-  background: #bfbfbf;
-}
-
-.title {
-  font-size: 24px;
-}
-
-.artist {
-  font-size: 20px;
-}
-
-.playerControl {
-  grid-area: playerControl;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "playerControlPrimary"
-    "playerControlSecondary"
-    "playerControlTertiary";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
+    ". mainError ."
+    ". mainControl ."
+    ". mainContent .";
 }
 
 @media (min-width: 768px) {
-
-  /* desktop */
-  .playerControl {
-    grid-area: playerControl;
-    display: grid;
-    grid-template-columns: auto auto;
+  .main {
+    grid-template-columns: 4px 1fr 4px;
+    /* FIXME: layout */
     grid-template-areas:
-      "playerControlPrimary playerControlSecondary playerControlTertiary";
+      ". mainError ."
+      ". mainControl ."
+      ". mainContent .";
   }
-
 }
 
-.playerControlPrimary {
-  grid-area: playerControlPrimary;
+.mainError {
+  grid-area: mainError;
+  background: #ff1f1f;
 }
 
-.playerControlSecondary {
-  grid-area: playerControlSecondary;
+.mainControl {
+  grid-area: mainControl;
 }
 
-.playerControlTertiary {
-  grid-area: playerControlTertiary;
+.mainContent {
+  grid-area: mainContent;
 }
 
-.playerElapsedDuration {
-  grid-area: playerElapsedDuration;
+/* end of main grid */
+
+/* mainControl grid */
+.mainControl {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto auto 1fr auto auto;
   grid-template-areas:
-    "playerElapsed"
-    "playerDuration";
-  height: 2em;
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
+    "ctrlView ctrlPlayer . ctrlMode ctrlMode";
 }
 
-.playerElapsed {
-  grid-area: playerElapsed;
-  text-align: right;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
+.ctrlView {
+  grid-area: ctrlView;
 }
 
-.playerDuration {
-  grid-area: playerDuration;
-  text-align: right;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #bfbfbf;
+.ctrlSong {
+  grid-area: ctrlSong;
 }
 
-.playlist {
-  grid-area: playlist;
+.ctrlElapsed {
+  grid-area: ctrlElapsed;
+  font-size: 0.5em;
+  align-self: end;
 }
 
-.playlistRow {
+.ctrlDuration {
+  grid-area: ctrlDuration;
+  text-align: left;
+  font-size: 0.5em;
+  align-self: end;
+}
+
+.ctrlPlayer {
+  grid-area: ctrlPlayer;
+}
+
+.ctrlMode {
+  grid-area: ctrlMode;
+}
+
+/* end of mainControl grid */
+
+/* ctrlView grid */
+.ctrlView {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto;
   grid-template-areas:
-    "playlistControl playlistSong";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
+    "ctrlViewList"
+    "ctrlViewSearch"
+    "ctrlViewBrowse";
+  height: 4em;
 }
 
-.searchBox {
-  grid-area: searchBox;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
-  background: #9f9f9f;
+.ctrlViewList {
+  grid-area: ctrlViewList;
 }
 
-.textInput {
-  margin: 4px;
+.ctrlViewSearch {
+  grid-area: ctrlViewSearch;
+}
+
+.ctrlViewBrowse {
+  grid-area: ctrlViewBrowse;
+}
+
+/* end of ctrlView grid */
+
+/* ctrlPlayer grid */
+.ctrlPlayer {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-areas: "ctrlPlayerPlay ctrlPlayerStop ctrlPlayerPrevious ctrlPlayerNext";
+  /*
+  grid-template-areas:
+    "ctrlPlayerPlay ctrlPlayerStop"
+    "ctrlPlayerPrevious ctrlPlayerNext";
+    */
+}
+
+.ctrlPlayerPlay {
+  grid-area: ctrlPlayerPlay;
+}
+
+.ctrlPlayerStop {
+  grid-area: ctrlPlayerStop;
+}
+
+.ctrlPlayerPrevious {
+  grid-area: ctrlPlayerPrevious;
+}
+
+.ctrlPlayerNext {
+  grid-area: ctrlPlayerNext;
+}
+
+/* end of ctrlPlayer grid */
+
+/* ctrlMode grid */
+.ctrlMode {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-areas: "ctrlModeConsume ctrlModeRepeat ctrlModeSingle ctrlModeRandom";
+}
+
+.ctrlModeConsume {
+  grid-area: ctrlModeConsume;
+}
+
+.ctrlModeRepeat {
+  grid-area: ctrlModeRepeat;
+}
+
+.ctrlModeSingle {
+  grid-area: ctrlModeSingle;
+}
+
+.ctrlModeRandom {
+  grid-area: ctrlModeRandom;
+}
+
+.toggleOn {
+  text-decoration: underline;
+}
+
+/* end of ctrlMode grid */
+
+/* ctrlSong gri */
+.ctrlSong {
   padding: 4px;
-}
-
-.searchResult {
-  grid-area: searchResult;
-}
-
-.searchResultRow {
+  height: 4em;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr 1fr auto;
   grid-template-areas:
-    "playlistControl playlistSong";
-  border: 2px solid black;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 2px;
+    "activeSongTitle activeSongTitle activeSongTitle activeSongTitle"
+    "activeSongArtist activeSongArtist activeSongArtist activeSongArtist"
+    ". activeSongAlbum activeSongAlbum ."
+    "ctrlElapsed activeSongAlbum activeSongAlbum ctrlDuration";
 }
 
-.playlistControl {
-  grid-area: playlistControl;
+.activeSongTitle {
+  grid-area: activeSongTitle;
+  text-align: center;
+  align-self: center;
+}
+
+.activeSongArtist {
+  grid-area: activeSongArtist;
+  text-align: center;
+  align-self: center;
+}
+
+.activeSongAlbum {
+  grid-area: activeSongAlbum;
+  text-align: center;
+  align-self: center;
+}
+
+/* a song in a list */
+.songRow {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "playlistControlPrimary"
-    "playlistControlSecondary";
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "songControl songPrio songCell";
+  margin-bottom: 4px;
 }
 
 @media (min-width: 768px) {
-  .playlistControl {
-    grid-template-columns: 1fr 1fr;
-
+  .songRow {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "songControl songPrio songCell";
+    margin-bottom: 4px;
   }
 }
 
-.playlistSong {
-  grid-area: playlistSong;
+.songRow button {
+  border: 0px;
+  background: none;
+}
+.songRow .songPrio button:disabled {
+  border: 1px solid var(--foreground);
+}
+
+/* a directory in a list */
+.directoryRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "directoryControl directoryCell";
+  margin-bottom: 4px;
+}
+
+@media (min-width: 768px) {
+  .directoryRow {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "directoryControl directoryCell";
+    margin-bottom: 4px;
+  }
+}
+
+.directoryRow button {
+  border: 0px;
+  background: none;
+}
+.directoryRow .songPrio button:disabled {
+  border: 1px solid var(--foreground);
+}
+.directoryControl {
+  grid-area: directoryControl;
+}
+.directoryCell {
+  grid-area: directoryCell;
+}
+
+.activeSong,
+.nextSong {
+  /* background: var(--c1) !important; */
+}
+
+.songCell {
+  grid-area: songCell;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  padding-top: 2px;
+  grid-template-areas:
+    "songCellTitle songCellDuration"
+    "songCellArtist songCellArtist"
+    "songCellAlbum songCellAlbum";
+}
+
+@media (min-width: 768px) {
+  /* desktop */
+  .songCell {
+    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-areas: "songCellTitle  songCellArtist songCellAlbum songCellDuration";
+  }
+}
+
+.songCellTitle {
+  grid-area: songCellTitle;
+  align-self: center;
+}
+
+.songCellArtist {
+  grid-area: songCellArtist;
+  align-self: center;
+}
+
+.songCellAlbum {
+  grid-area: songCellAlbum;
+  align-self: center;
+}
+
+.songCellDuration {
+  grid-area: songCellDuration;
+  text-align: right;
+  align-self: start;
+  padding-right: 2px;
+}
+
+/* unverififed */
+
+.listing {
+  grid-area: listing;
+}
+
+.listingRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "listingControl listingEntry";
+}
+
+.listingControl {
+  grid-area: listingControl;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "listingControlPrimary"
+    "listingControlSecondary";
+}
+
+@media (min-width: 768px) {
+  .listingControl {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.listingEntry {
+  grid-area: listingEntry;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "playlistTitle playlistDuration"
     "playlistArtist playlistArtist"
     "playlistAlbum playlistAlbum"
-    "playlistAlbumArtist playlistAlbumArtist";
-  font-size: 20px;
+    "directoryName directoryName";
+  font-size: 80%;
 }
 
 @media (min-width: 768px) {
-
   /* desktop */
-  .playlistSong {
-    grid-area: playlistSong;
-    display: grid;
+  .listingEntry {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
     grid-template-areas:
-      "playlistTitle playlistArtist playlistAlbum playlistAlbumArtist playlistDuration";
+      "playlistTitle playlistArtist playlistAlbum playlistAlbum playlistDuration"
+      "directoryName directoryName directoryName directoryName directoryName";
   }
 }
 
@@ -229,54 +501,28 @@ body {
   grid-area: playlistAlbum;
 }
 
-.playlistAlbumArtist {
-  grid-area: playlistAlbumArtist;
-}
-
 .playlistDuration {
   grid-area: playlistDuration;
 }
 
-button {
-  background: none;
-  box-sizing: unset;
-  border: 0;
-  outline: none;
-  -webkit-transition-duration: 0.6s;
-  /* Safari */
-  transition-duration: 0.6s;
-  margin: 4px;
-  font-size: 20px;
+div.listingRow:nth-child(even),
+div.songRow:nth-child(even) {
+  background: var(--c5);
 }
 
-button:hover {
-  background: #afafaf;
+div.listingRow:nth-child(even) button:disabled,
+div.songRow:nth-child(even) button:disabled {
+  color: var(--c4);
 }
 
-.playlist button {
-  color: black;
+div.listingRow:nth-child(odd),
+div.songRow:nth-child(odd) {
+  background: var(--c4);
 }
 
-.playlist button:hover {
-  background: lightgray;
-}
-
-.playlist button:focus {
-  background: lightgray;
-}
-
-.playlist button:disabled {
-  color: gray;
-}
-
-div.playlistRow:nth-child(even),
-div.searchResultRow:nth-child(even) {
-  background: #bfbfbf;
-}
-
-div.playlistRow:nth-child(odd),
-div.searchResultRow:nth-child(odd) {
-  background: #9f9f9f;
+div.listingRow:nth-child(odd) button:disabled,
+div.songRow:nth-child(odd) button:disabled {
+  color: var(--c5);
 }
 
 /* eof */
