@@ -2,7 +2,7 @@ var log = function(msg) {
   console.log(msg);
 };
 var debug = function(msg) {
-  if (true) log(msg);
+  if (false) log(msg);
 };
 // short for document.getElementById(id)
 var e = function(id) {
@@ -328,6 +328,9 @@ var processResponse = function(obj) {
     case "error":
     case "info":
       showError(data);
+      break;
+    case "version":
+      log("MPD protocol version: " + data);
       break;
     case "update":
       updateStatus(data.status);

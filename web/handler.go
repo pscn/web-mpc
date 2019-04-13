@@ -179,6 +179,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
+		h.writeMessage(ws, client.Version())
 		h.writeMessage(ws, client.Update())
 
 		ping := time.Tick(5 * time.Second)

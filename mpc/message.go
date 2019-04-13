@@ -16,6 +16,7 @@ type MessageType string
 const (
 	Error         MessageType = "error"
 	Info          MessageType = "info"
+	Version       MessageType = "version"
 	Update        MessageType = "update"
 	SearchResult  MessageType = "searchResult"
 	DirectoryList MessageType = "directoryList"
@@ -54,6 +55,11 @@ func (msg *Message) Error() string {
 // InfoMsg creates a new Event including an error
 func InfoMsg(str string) *Message {
 	return NewMessage(Info, str)
+}
+
+// VersionMsg creates a new Event including an error
+func VersionMsg(str string) *Message {
+	return NewMessage(Version, str)
 }
 
 // StatusData represents the data we get as MPC status

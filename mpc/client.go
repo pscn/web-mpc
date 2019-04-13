@@ -63,6 +63,11 @@ func (client *Client) Close() (err error) {
 	return client.mpc.Close()
 }
 
+// Version returns the protocol version in use
+func (client *Client) Version() *Message {
+	return VersionMsg(client.mpc.Version())
+}
+
 // Stats for the MPD database
 func (client *Client) Stats() error {
 	attr, err := client.mpc.Stats()
