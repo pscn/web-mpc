@@ -510,20 +510,20 @@ window.addEventListener("load", function(evt) {
 
   var stop = function() {
     debug("stop");
-    ["play"].map(show);
-    ["pause", "resume"].map(hide);
-    ["stop", "next", "previous"].map(disable);
+    ["play", "remove"].map(show);
+    ["pause", "resume", "previous"].map(hide);
+    ["stop", "previous"].map(disable);
   };
   var play = function() {
     debug("play");
     ["pause"].map(show);
-    ["resume", "play"].map(hide);
+    ["resume", "play", "remove"].map(hide);
     ["stop", "next", "previous"].map(enable);
   };
   var pause = function() {
     debug("pause");
     ["resume"].map(show);
-    ["pause", "play"].map(hide);
+    ["pause", "play", "remove"].map(hide);
     ["stop", "next", "previous"].map(enable);
   };
   var togglePlayPause = function(state) {
@@ -537,7 +537,7 @@ window.addEventListener("load", function(evt) {
         break;
     }
   };
-
+  // FIXME: add logic for remove in player control
   // add onclick to every button
   for (var k in views) {
     e(views[k]).onclick = showView(k);
