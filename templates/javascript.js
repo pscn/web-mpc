@@ -1,9 +1,33 @@
+var log = function(msg) {
+  console.log(msg);
+};
 var debug = function(msg) {
-  if (false) console.log(msg);
+  if (false) log(msg);
 };
 // short for document.getElementById(id)
 var e = function(id) {
   return document.getElementById(id);
+};
+
+// https://stackoverflow.com/questions/7444451/how-to-get-the-actual-rendered-font-when-its-not-defined-in-css
+var css = function(element, property) {
+  return window.getComputedStyle(element, null).getPropertyValue(property);
+};
+
+// https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
+var getTextWidth = function(text, fontSize) {
+  // if given, use cached canvas for better performance
+  // else, create new canvas
+  var canvas =
+    getTextWidth.canvas ||
+    (getTextWidth.canvas = document.createElement("canvas"));
+  var fontFamily =
+    getTextWidth.fontFamily ||
+    (getTextWidth.fontFamily = css(e("body"), "font-family"));
+  var context = canvas.getContext("2d");
+  context.font = fontSize + "px " + fontFamily;
+  var metrics = context.measureText(text);
+  return metrics.width;
 };
 // short for document.getElementById(id).classList.add(class)
 var addcls = function(id, cls) {
@@ -81,16 +105,37 @@ var addEvent = function(el, type, fn) {
 
 // Resize voodoo
 var resize = function(el, minFS, maxFS) {
-  var fs = Math.min((el.clientWidth / el.innerHTML.length) * 1.2, maxFS);
-  fs = Math.max(fs, minFS);
-  el.style.fontSize = parseInt(parseInt(fs) / 4) * 4 + "px";
+  var fs = maxFS;
+  var txt = el.innerHTML;
+  var maxWidth = el.clientWidth;
+  while (fs >= minFS && getTextWidth(txt, fs) > maxWidth) {
+    fs -= 2;
+  }
+  if (fs < minFS) {
+    fs = minFS;
+    maxWidth *= 2; // we allow one page break
+    var truncated = false;
+    while (txt.length > 8 && getTextWidth(txt, fs) > maxWidth) {
+      log("too long: " + txt);
+      txt = txt.slice(0, txt.length - 1);
+      truncated = true;
+    }
+    if (truncated) {
+      el.innerHTML = txt.slice(0, txt.length - 3) + "&hellip;";
+    }
+  }
+  el.style.fontSize = fs + "px";
 };
 var resizer = function() {
   var el = document.getElementsByClassName("resize");
   var i;
   for (i = 0; i < el.length; i++) {
-    resize(el[i], 18, 32);
+    resize(el[i], 12, 28);
   }
+};
+
+var newResize = function(el) {
+  var maxFS = el.clientHeight;
 };
 
 var triggerResize = function() {
@@ -253,7 +298,7 @@ window.addEventListener("load", function(evt) {
     e("title").innerHTML = title;
     //e("title").innerHTML = title;
     if (artist != album_artist) {
-      e("album").innerHTML = album + "&nbsp;[" + album_artist + "]";
+      e("album").innerHTML = album + " [" + album_artist + "]";
     } else {
       e("album").innerHTML = album;
     }
@@ -272,7 +317,7 @@ window.addEventListener("load", function(evt) {
       // only show album artist if it's different
       node.querySelector("#songCellAlbum").innerHTML =
         node.querySelector("#songCellAlbum").innerHTML +
-        "&nbsp;[" +
+        " [" +
         album_artist +
         "]";
     }
@@ -432,7 +477,7 @@ window.addEventListener("load", function(evt) {
             node.querySelector("#srTitle").innerHTML = entry.title;
             if (entry.artist != entry.album_artist) {
               node.querySelector("#srAlbum").innerHTML =
-                entry.album + "&nbsp;[" + entry.album_artist + "]";
+                entry.album + " [" + entry.album_artist + "]";
             } else {
               node.querySelector("#srAlbum").innerHTML = entry.album;
             }
