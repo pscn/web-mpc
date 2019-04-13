@@ -108,7 +108,7 @@ var resize = function(el, minFS, maxFS) {
   var fs = maxFS;
   var txt = el.innerHTML;
   var maxWidth = el.clientWidth;
-  while (fs >= minFS && getTextWidth(txt, fs) > maxWidth) {
+  while (fs >= minFS && getTextWidth(txt, fs) + fs > maxWidth) {
     fs -= 2;
   }
   if (fs < minFS) {
