@@ -2,8 +2,11 @@
 
 body {
   /* FIXME: better font selection */
-  font-family: "Roboto", sans-serif;
-  /*font-family: 'Bowlby One SC';*/
+
+/*  font-family: "Roboto Mono", monospace;*/
+  font-family: 'Righteous', cursive;
+
+
   font-size: 28px;
   margin: 4px;
   padding: 0px;
