@@ -227,7 +227,7 @@ func init() {
   	panic(err)
   }
   container["templates/style.css"], err = decode(`` +
-    `H4sICFU4slwA/2MzUjViR1V1WTNOegCsGftv47b5d/8VnIoOiRHbSXpZLwoGbMtuwI` +
+    `H4sICM4+slwA/2MzUjViR1V1WTNOegCsGftv47b5d/8VnIoOiRHbSXpZLwoGbMtuwI` +
     `Bdd7gMw4ChP9DSJ5sLRWok5UeL/O8FX7JIi7KTHIrmQn7v9ydmMUV/+/t/Pn/KEeX8` +
     `uW1QK6FqKfpTDSXB6P8tCAISTReTyZKXe/TrBKEDzRKUAoEqzhSSQKFQhDODbLAMYF` +
     `bhmtB9jrKvfMkVR58549kVqjnjssEFPEwXkyNUslor4K3MrlDRCkk28DDxWJL8Ajm6` +
@@ -247,29 +247,29 @@ func init() {
     `0JQytBTPeam1OAq0FaAf3vTEHdUKxgZg20VYBuKuGrIcTCArDMjc+zuZH0SQgu0Dzr` +
     `3z1ypgSnA7fAFJpn54S50/tcRftrFsV73irktomkCcNGpMwYNMQn2YHLr95pWlB+YB` +
     `8n/XdVdVPdVA8duRc3wMCBQlytQgIXXBtdTBGwEvEqTAqfJV5ikCx9Nc7NGdwqbn/o` +
-    `gHSn8fwplKD/JrBF+pcnzlYjv2TfhuQLxXsQaG4On3kJ3S+ZqyyPHTnW3x+wjKwBLH` +
-    `1/wPpEcSNdV4wQHag3cT7YwREMkzt7Z0exBFrlOqKpSeTF/rUV2HxZDMj1sGPBZ8y2` +
-    `lDpesHPwgFgLOWAa7w/g6fuB3I1T1ezCPlhd/gbhe03ynpep/yBSRWn1BFgU6+jyL4` +
-    `JvJWT99eEHvzD3eaWyTMNCbCsmhW+hIYXVIUVhoZGfj/zpneyiGri5F+nXd4nwR8r5` +
-    `1qFWkP7Z0+VJ8aZ3/CJgQ3gre1c/wU71jl+h5hvoXTxSwMyEaDE9GfykDtkRzrAmmZ` +
-    `1Q00VUKYZlslr0z7i2jOVJiqfDjnCsUlqOw4gpjQ+TVBoaUzg3J2ksPKYysUgTGfBA` +
-    `rkZp6bPVdJYgV7te845MHU9SLeGRM9nWh5HyFRrAqjs+EbaiPShmJa+zsCF6Fom+6M` +
-    `AhjROTILHQkMJpkqCw0EiGUTYpw0AtheKrFYV/2miagVJCwe3E0R9oJQj9gT4QzSBs` +
-    `PpZmyq4E6ULZjd1ufXbrn2+0H/yMelWs/doyPgdwocgGtAr/IooCOnHOYqo/C6W7/s` +
-    `mLY0K6bGt04tzrRX7tOGB8EXwlQEoU7AAu/WI7ojhH4PSq0F8L+ivJkcFJARb+LgnG` +
-    `NWkBGvwe/p0jkyI8xiseF4fFDkktyca+HIx/mB/q4Xrutjv/2OGeM8YUetHlh5HUtU` +
-    `YYwojqoOkS1Ff+2/dNHwfpNqpZ+y1PGpMJN788AqVZ7xkkeDo7/SHZV/l8Hd+u5bCe` +
-    `/jvRa9N74PI54t7f+5G1z6kvB7J5J3Po3eWsbLONFyP7IsHFPgpxd/+mOI+GuGPtPX` +
-    `i4eF+Mj3Q+S8l3qDke5ECdV0Y6oP0m4Z4f2RO1rhgeEfnHpkEKoDTukFeTOYOd6ib1` +
-    `Yjr02Hdz2X/z9Zuxr6RYoL9/zWDvz3T/7G7eo29PvWx5aXYa+lM3NEMkN9LCY4xjhl` +
-    `JwOucRbDFF7vHePmWF7hk13P/vHTDazzpTUcqoQP/e9tBvawc2ieB120NqykbSE2wO` +
-    `O8JJPkO7QAA8h0vqMSWGx1uFmbSxAKmwUP2MdPPYPwIvpqhlGxCkIhXYVXiuWzM5fm` +
-    `1y11ZZd/j2Pdsx9q3DHT8xJfZZIDrRXELoK+t3vExD1l8EqbHYZ0OwJyg4K7FX+cQ0` +
-    `GTDoVK0dKqHvoIQvDOytnSztDs1KS7A16E9R1/LXrsTCY4xjyic4OYyu//+Ea0DBKY` +
-    `veDD+6PyW/stMduTHpnB8qgW4rYf493fH8S/6ws2KvHDsg4ddxn5x/6rXUUMMokwLg` +
-    `Q4A/3DxDaEQx1CYDYIifaogx3FCVZNNrTjlT61mxJrS8gA2wyysDd9ttDEx86Pg/o4` +
-    `5zjjemcUlD69XxXy3HhPKyTFqjYSljzuF7ri1DuAOm3HVfAcArXW+/BQAA//9f15iO` +
-    `1CQAAA==`)
+    `gHSn8fwplKD/JrBF+pcnzlYjv2TvIvlC8R4E6v06N4fPvITul8zVlhcRudbfH7CMtA` +
+    `EsfX/A+kRxI11fjBAdqDdzPtjREYyTO3tnh7EEWuU6pqlZ5MX+tRXYfFsMyPWwY8Fn` +
+    `TLeUOl6wc/CAWAs5YBrvD+Dp+4HsjZPVbMM+WF0GB+F7Tfqel6v/IFJFufgEWBTr6P` +
+    `Ivgm8lZP0F4ge/Mvd5pbJMw0JsKyaFb6EhhdUhRWGhkZ+P/Omd7KIauLkX6df3ifBH` +
+    `yvn98tU/e7o8Kd70jl8EbAhvZe/qJ9ip3vEr1HwDvYtHCpiZEC2mJ4Of1OGozSQ0ye` +
+    `yMmi6iSjEsk9Wif8a1ZSxPUjwdtoRjldJyHEZMaXyYpNLQmMK5OUlj4TGViUWayIAH` +
+    `cjVKS5+tprMEudr1mndk6niSagmPnMm2PoyUr9AAVt3xibAV7UExK3mdhQ3Rs0j0RQ` +
+    `cOaZyYBImFhhROkwSFhUYyjLJJGQZqKRRfrSj800bTDJQSCm4njv5EK0HoT/SBaAZh` +
+    `87E0U3YlSBfKbux2C7RbAH2j/eBn1Kti7ReX8TmAC0U2oFX4F1EU0IlzFlP9WSjd9U` +
+    `9eHBPSZVujE+deL/JrxwHji+ArAVKiYAdw6RfbEcU5AqdXhf5a0F9JjgxOCrDwd0kw` +
+    `rkkL0OD38O8cmRThMV7xvDgsdkhqSTb27WD80/xQD9dzt9355w73oDGm0IsuP4ykrj` +
+    `XCEEZUB02XoL7yX79v+jxIt1HN2m950phMuPnlESjNeg8hwePZ6U/Jvsrn6/h2LYf1` +
+    `9F+KXpveE5fPEfcC34+sfVB9OZDNO5lDLy9nZZttvBjZNwku9lGIu/s3xXk0xB1r78` +
+    `HDxftifKTzWUq+Q83xIAfqvDLSAe03Cff8yJ6odcXwiMg/Nw1SAKVxh7yazBnsVDep` +
+    `F9Oh576by/6rr9+MfSXFAv39awZ7f6b7h3fzIn176m3LS7PT0J+6oRkiuZEWHmMcM5` +
+    `SC0znPYIspcs/39jErdM+o4f5/74DRftaZilJGBfr3tod+WzuwSQSv2x5SUzaSnmBz` +
+    `2BFO8hnaBQLgOVxSjykxPN4qzKSNBUiFhepnpJvH/hl4MUUt24AgFanArsJz3ZrJ8W` +
+    `uTu7bKusO379mOsW8d7viJKbHPAtGJ5hJCX1m/42Uasv4iSI3FPhuCPUHBWYm9yiem` +
+    `yYBBp2rtUAl9ByV8YWBv7WRpd2hWWoKtQX+Kupa/diUWHmMcUz7ByWF0/f8nXAMKTl` +
+    `n0ZvjR/TH5lZ3uyI1J5/xQCXRbCfPv6Y7n3/KHnRV75dgBCb+O++T8U6+lhhpGmRQA` +
+    `HwL84eYZQiOKoTYZAEP8VEOM4YaqJJtec8qZWs+KNaHlBWyAXV4ZuNtuY2DiQ8f/IX` +
+    `Wcc7wxjUsaWq+O/245JpSXZdIaDUsZcw7fc20Zwh0w5a77CgBe6Xr7LQAA//8GAYv7` +
+    `1iQAAA==`)
   if err != nil {
   	panic(err)
   }

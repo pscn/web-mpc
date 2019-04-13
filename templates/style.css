@@ -187,7 +187,7 @@ button:disabled {
   grid-template-areas:
     "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
     "ctrlView ctrlSong ctrlSong ctrlSong ctrlSong"
-    "ctrlView ctrlPlayer . ctrlMode ctrlMode";
+    "ctrlPlayer ctrlPlayer . ctrlMode ctrlMode";
 }
 
 .ctrlView {
