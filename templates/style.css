@@ -198,7 +198,6 @@ button:disabled {
 
 .ctrlSong {
   grid-area: ctrlSong;
-  padding: 4px;
 }
 
 .ctrlElapsed {
@@ -310,6 +309,8 @@ button:disabled {
 
 /* ctrlSong gri */
 .ctrlSong {
+  padding: 4px;
+  height: 4em;
   display: grid;
   grid-template-columns: auto 1fr 1fr auto;
   grid-template-areas:
@@ -322,7 +323,7 @@ button:disabled {
 .activeSongTitle {
   grid-area: activeSongTitle;
   text-align: center;
-  align-self: start;
+  align-self: center;
 }
 
 .activeSongArtist {
@@ -334,7 +335,7 @@ button:disabled {
 .activeSongAlbum {
   grid-area: activeSongAlbum;
   text-align: center;
-  align-self: end;
+  align-self: center;
 }
 
 /* a song in a list */
