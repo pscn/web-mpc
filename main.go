@@ -9,7 +9,7 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-//go:generate file2go -output templates/files.go templates/index.html templates/javascript.js templates/style.css templates/theme-default.css templates/theme-juri.css
+//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css
 
 var addr = flag.String("addr", ":8666", "http service address")
 var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
