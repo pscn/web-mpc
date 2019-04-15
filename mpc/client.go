@@ -196,7 +196,7 @@ func escapeSearchToken(token string) string {
 
 // Search for search string tokenized by space and searched in any
 // FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
-func (client *Client) Search(search string) *Message {
+func (client *Client) Search(search string, page int) *Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
@@ -222,7 +222,7 @@ func (client *Client) Search(search string) *Message {
 			client.logger.Println("search error:", err)
 			return nil
 		}
-		return SearchResultMsg(&attrs)
+		return SearchResultMsg(&attrs, page, 10)
 	}
 	return nil
 }

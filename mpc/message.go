@@ -221,24 +221,33 @@ func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 // SearchResultData converted from *mpd.attrs
 type SearchResultData struct {
 	SearchResult []SongData `json:"searchResult"`
-	Truncated    bool       `json:"truncated"` // have we omited some results?
-	MaxResults   int        `json:"maxResults"`
+	Page         int        `json:"page"`
+	LastPage     int        `json:"lastPage"`
 }
 
 // SearchResultMsg from mpd.Attrs
-func SearchResultMsg(attrArr *[]mpd.Attrs) *Message {
-	event := &SearchResultData{
-		Truncated:  false,
-		MaxResults: MaxSearchResults,
-	}
+func SearchResultMsg(attrArr *[]mpd.Attrs, searchPage int, songsPerPage int) *Message {
+	event := &SearchResultData{}
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
 	}
-	iattrArr := *attrArr
-	if len(iattrArr) > 50 {
-		event.Truncated = true
-		iattrArr = iattrArr[:50]
+	searchLength := len(*attrArr)
+	if searchLength < songsPerPage {
+		event.Page = 1
+		event.LastPage = 1
+	} else {
+		event.LastPage = searchLength / songsPerPage
+		event.Page = searchPage
+		if songsPerPage*searchPage > searchLength {
+			event.Page = event.LastPage
+		}
 	}
+	start := (event.Page - 1) * songsPerPage
+	end := start + songsPerPage
+	if end > searchLength {
+		end = searchLength
+	}
+	iattrArr := (*attrArr)[start:end]
 	event.SearchResult = make([]SongData, len(iattrArr))
 	for i, attrs := range iattrArr {
 		event.SearchResult[i] = *songData(&attrs)

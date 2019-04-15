@@ -180,6 +180,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 
 		// update the web client with the current status
 		currentPage := 1
+		currentSearchPage := 1
+		lastSearch := ""
 		h.writeMessage(ws, client.Version())
 		h.writeMessage(ws, client.Update(currentPage))
 
@@ -262,7 +264,13 @@ func (h *Handler) Channel() http.HandlerFunc {
 					h.writeMessage(ws, client.Update(currentPage))
 
 				case mpc.Search:
-					h.writeMessage(ws, client.Search(cmd.Data))
+					currentSearchPage = 1
+					lastSearch = cmd.Data
+					h.writeMessage(ws, client.Search(cmd.Data, currentSearchPage))
+
+				case mpc.SearchPage:
+					currentSearchPage = conv.ToInt(cmd.Data)
+					h.writeMessage(ws, client.Search(lastSearch, currentSearchPage))
 
 				case mpc.Browse:
 					h.writeMessage(ws, client.ListDirectory(cmd.Data))

@@ -19,6 +19,7 @@ const (
 	Clean         CommandType = "clean"
 	Remove        CommandType = "remove"
 	Search        CommandType = "search"
+	SearchPage    CommandType = "searchPage"
 	UpdateRequest CommandType = "updateRequest"
 	Browse        CommandType = "browse"
 	ModeRandom    CommandType = "random"

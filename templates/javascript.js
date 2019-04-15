@@ -196,7 +196,6 @@ var readableSeconds = function(value) {
   return min + ":" + sec;
 };
 var gPage = 1;
-var gLastPage = 1;
 
 // this functions runs forever and gets called every second to update the
 // elapsed and duration information of the active song
@@ -329,6 +328,51 @@ var newSongNode = function(id, entry, nr) {
   return node;
 };
 
+var pagination = function(page, lastPage, cmdStr) {
+  if (lastPage == 1) {
+    return null;
+  }
+  var node = e("pagination").cloneNode(true);
+  node.classList.remove("hide");
+  previousPage = page - 1;
+  nextPage = page + 1;
+  node.querySelector("#currentPage").innerHTML = page + "/" + lastPage;
+  if (page == 1) {
+    disable(node.querySelector("#firstPage"));
+  } else {
+    enable(node.querySelector("#firstPage"));
+    node.querySelector("#firstPage").onclick = btnCommand(cmdStr, "1");
+  }
+  if (previousPage < 1) {
+    disable(node.querySelector("#previousPage"));
+  } else {
+    enable(node.querySelector("#previousPage"));
+    node.querySelector("#previousPage").onclick = btnCommand(
+      cmdStr,
+      previousPage.toString()
+    );
+  }
+  if (nextPage > lastPage) {
+    disable(node.querySelector("#nextPage"));
+  } else {
+    enable(node.querySelector("#nextPage"));
+    node.querySelector("#nextPage").onclick = btnCommand(
+      cmdStr,
+      nextPage.toString()
+    );
+  }
+  if (page == lastPage) {
+    disable(node.querySelector("#lastPage"));
+  } else {
+    enable(node.querySelector("#lastPage"));
+    node.querySelector("#lastPage").onclick = btnCommand(
+      cmdStr,
+      lastPage.toString()
+    );
+  }
+  return node;
+};
+
 var processResponse = function(obj) {
   const { type, data } = obj;
   log({ type, data });
@@ -346,6 +390,13 @@ var processResponse = function(obj) {
 
       e("playlist").innerHTML = ""; // delete old playlist
       gPlaylistFiles.length = 0;
+
+      gPage = data.page;
+      node = pagination(data.page, data.lastPage, "updateRequest");
+      if (node != null) {
+        e("playlist").append(node);
+      }
+
       // used to figure out if we need to show prio buttons or not:
       // if state == stop && activeFile is set && queuesize <=2 → no need to show buttons
       // if state == stop && activeFile is not set → show buttons
@@ -411,59 +462,17 @@ var processResponse = function(obj) {
         }
         e("playlist").append(node);
       });
-      gPage = data.page;
-      gLastPage = data.lastPage;
-      previousPage = gPage - 1;
-      nextPage = gPage + 1;
-      if (gLastPage == 1) {
-        hideId("playlistPagination");
-      } else {
-        showId("playlistPagination");
-        e("currentPage").innerHTML = gPage + "/" + gLastPage;
-        if (gPage == 1) {
-          disableId("firstPage");
-        } else {
-          enableId("firstPage");
-          e("firstPage").onclick = btnCommand("updateRequest", "1");
-        }
-        if (previousPage < 1) {
-          disableId("previousPage");
-        } else {
-          enableId("previousPage");
-          e("previousPage").onclick = btnCommand(
-            "updateRequest",
-            previousPage.toString()
-          );
-        }
-        if (nextPage > gLastPage) {
-          disableId("nextPage");
-        } else {
-          enableId("nextPage");
-          e("nextPage").onclick = btnCommand(
-            "updateRequest",
-            nextPage.toString()
-          );
-        }
-        if (gPage == gLastPage) {
-          disableId("lastPage");
-        } else {
-          enableId("lastPage");
-          e("lastPage").onclick = btnCommand(
-            "updateRequest",
-            gLastPage.toString()
-          );
-        }
-      }
 
       updateActiveSong(data.activeSong);
       triggerResize();
       break;
     case "searchResult":
       e("searchResult").innerHTML = ""; // delete old search result
-      // debug({ gFiles: gPlaylistFiles });
-      if (data.truncated) {
-        showError("search result limited to " + data.maxResults);
+      node = pagination(data.page, data.lastPage, "searchPage");
+      if (node != null) {
+        e("searchResult").append(node);
       }
+      // debug({ gFiles: gPlaylistFiles });
       if (data.searchResult.length == 0) {
         showError("nothing found");
       }
