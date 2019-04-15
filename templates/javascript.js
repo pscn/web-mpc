@@ -416,17 +416,9 @@ var processResponse = function(obj) {
       previousPage = gPage - 1;
       nextPage = gPage + 1;
       if (gLastPage == 1) {
-        hideId("firstPage");
-        hideId("previousPage");
-        hideId("currentPage");
-        hideId("nextPage");
-        hideId("lastPage");
+        hideId("playlistPagination");
       } else {
-        showId("firstPage");
-        showId("previousPage");
-        showId("currentPage");
-        showId("nextPage");
-        showId("lastPage");
+        showId("playlistPagination");
         e("currentPage").innerHTML = gPage + "/" + gLastPage;
         if (gPage == 1) {
           disableId("firstPage");
