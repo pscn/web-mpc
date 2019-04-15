@@ -220,7 +220,7 @@ func (client *Client) Search(search string, page int) *Message {
 		attrs, err := client.mpc.Search(searchTokens...)
 		if err != nil {
 			client.logger.Println("search error:", err)
-			return nil
+			return ErrorMsg("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
 		return SearchResultMsg(&attrs, page, 10)
 	}
