@@ -44,7 +44,7 @@ func main() {
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css",
 			templates.ContentMust("templates/style.css")))
 		mux.HandleFunc("/favicon.ico", h.StaticPacked("image/x-icon",
-			templates.ContentMust("favicon.ico")))
+			templates.ContentMust("templates/favicon.ico")))
 
 	}
 	mux.HandleFunc("/ws", h.Channel())
