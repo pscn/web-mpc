@@ -65,7 +65,7 @@ input[type="password"] {
   border: 2px solid var(--foreground);
   border-radius: 4px;
   margin: 1px;
-  padding-bottom: 4px;
+  /*padding-bottom: 4px;*/
 
   background: var(--c5);
 }
@@ -409,10 +409,37 @@ button:disabled {
 }
 .directoryCell {
   grid-area: directoryCell;
+  align-self: center;
+}
+.playlistPagination {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: "firstPage previousPage currentPage nextPage lastPage";
 }
 .playlistPagination button {
   width: unset;
   height: unset;
+}
+.firstPage {
+  grid-area: firstPage;
+  align-self: start;
+}
+.previousPage {
+  grid-area: previousPage;
+  align-self: start;
+}
+.currentPage {
+  grid-area: currentPage;
+  align-self: center;
+  text-align: center;
+}
+.nextPage {
+  grid-area: nextPage;
+  align-self: end;
+}
+.lastPage {
+  grid-area: lastPage;
+  align-self: end;
 }
 
 .songCell {

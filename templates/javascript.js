@@ -416,18 +416,25 @@ var processResponse = function(obj) {
       previousPage = gPage - 1;
       nextPage = gPage + 1;
       if (gLastPage == 1) {
-        disableId("firstPage");
-        disableId("previousPage");
-        disableId("nextPage");
-        disableId("lastPage");
+        hideId("firstPage");
+        hideId("previousPage");
+        hideId("currentPage");
+        hideId("nextPage");
+        hideId("lastPage");
       } else {
+        showId("firstPage");
+        showId("previousPage");
+        showId("currentPage");
+        showId("nextPage");
+        showId("lastPage");
+        e("currentPage").innerHTML = gPage + "/" + gLastPage;
         if (gPage == 1) {
           disableId("firstPage");
         } else {
           enableId("firstPage");
           e("firstPage").onclick = btnCommand("updateRequest", "1");
         }
-        if (previousPage <= 1) {
+        if (previousPage < 1) {
           disableId("previousPage");
         } else {
           enableId("previousPage");
@@ -436,7 +443,7 @@ var processResponse = function(obj) {
             previousPage.toString()
           );
         }
-        if (nextPage >= gLastPage) {
+        if (nextPage > gLastPage) {
           disableId("nextPage");
         } else {
           enableId("nextPage");

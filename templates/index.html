@@ -326,10 +326,19 @@
         <!-- playlist View -->
         <div id="viewPlaylist" class="mainContent">
           <div id="playlistPagination" class="playlistPagination">
-            <button id="firstPage">First</button>
-            <button id="previousPage">Previous</button>
-            <button id="nextPage">Next</button>
-            <button id="lastPage">Last</button>
+            <div class="firstPage">
+              <button id="firstPage">First</button>
+            </div>
+            <div class="previousPage">
+              <button id="previousPage">Previous</button>
+            </div>
+            <div id="currentPage" class="currentPage"> 1/1 </div>
+            <div class="nextPage">
+              <button id="nextPage">Next</button>
+            </div>
+            <div class="lastPage">
+              <button id="lastPage">Last</button>
+            </div>
           </div>
           <div id="playlist">
             <!-- playlistEntries go here -->
