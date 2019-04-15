@@ -155,8 +155,10 @@ func (q queueData) Less(i, j int) bool {
 		return true
 	}
 	if q[i].Prio == q[j].Prio {
+		// this sorts recently add items first (actually it's last, but we reverse it)
 		return q[i].Position < q[j].Position
 	}
+	// highest prio first (actually it's last, but we reverse it)
 	return q[i].Prio < q[j].Prio
 }
 
