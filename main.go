@@ -9,7 +9,7 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css
+//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
 
 var addr = flag.String("addr", ":8666", "http service address")
 var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
@@ -31,6 +31,7 @@ func main() {
 		mux.HandleFunc("/theme-default.css", h.StaticFile("text/css", "theme-default.css"))
 		mux.HandleFunc("/theme-juri.css", h.StaticFile("text/css", "theme-juri.css"))
 		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
+		mux.HandleFunc("/favicon.ico", h.StaticFile("image/x-icon", "favicon.ico"))
 	} else {
 		mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
 			templates.ContentMust("templates/index.html")))
@@ -42,6 +43,8 @@ func main() {
 			templates.ContentMust("templates/theme-juri.css")))
 		mux.HandleFunc("/style.css", h.StaticPacked("text/css",
 			templates.ContentMust("templates/style.css")))
+		mux.HandleFunc("/favicon.ico", h.StaticPacked("image/x-icon",
+			templates.ContentMust("favicon.ico")))
 
 	}
 	mux.HandleFunc("/ws", h.Channel())
