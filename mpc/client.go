@@ -128,6 +128,15 @@ func (client *Client) Prio(prio int, pos int) error {
 	return client.mpc.SetPriority(prio, pos, -1)
 }
 
+// AddPrio sets prio for song in the queue at pos to prio
+func (client *Client) AddPrio(prio int, file string) error {
+	id, err := client.mpc.AddID(strings.Replace(file, "%", "%%", -1), -1)
+	if err != nil {
+		client.logger.Panic(err) // FIXME: no panic
+	}
+	return client.mpc.SetPriorityID(prio, id)
+}
+
 func (client *Client) status() *mpd.Attrs {
 	status, err := client.mpc.Status()
 	if err != nil {
@@ -200,13 +209,13 @@ func (client *Client) Search(search string, page int) *Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
-			if strings.HasPrefix(token, "t:") {
+			if strings.HasPrefix(strings.ToLower(token), "t:") {
 				searchTokens = append(searchTokens, "title")
 				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
-			} else if strings.HasPrefix(token, "a:") {
+			} else if strings.HasPrefix(strings.ToLower(token), "a:") {
 				searchTokens = append(searchTokens, "artist")
 				searchTokens = append(searchTokens, escapeSearchToken(token[2:]))
-			} else if strings.HasPrefix(token, "al:") {
+			} else if strings.HasPrefix(strings.ToLower(token), "al:") {
 				searchTokens = append(searchTokens, "album")
 				searchTokens = append(searchTokens, escapeSearchToken(token[3:]))
 			} else {

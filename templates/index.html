@@ -162,6 +162,13 @@
         <path d="M 10.470588,10.376471 10,11.035294 l
           1.152941,0.211765 z"></path>
       </symbol>
+      <symbol id="icon-add" viewBox="0 0 20 20">
+        <path
+          d="m 2.5,7.75 0.25,3.5 5.25,0
+          0,6.5 4.5,0.25 -0.5,-7 6,0.25
+          -0.25,-3.5 -5.75,0 0.25,-5.75
+          -4.25,0.25 0,5.75 z"></path>
+      </symbol>
     </svg>
 
     <!-- load our javascript -->
@@ -417,7 +424,38 @@
         <div id="searchEntry" class="songRow bordered hide">
           <div class="songControl boxResponsive">
             <div class="cell">
-              <button id="srAdd">+</button>
+              <div class="songPrio boxResponsive">
+                <div class="cell">
+                  <button id="srAdd" title="add to top queue" class="prio">
+                    <svg class="icon" aria-hidden="true" focusable="false">
+                      <use xlink:href="#icon-add"></use>
+                    </svg>
+                  </button>
+                </div>
+                <div class="cell">
+                  <button id="srPrio1" title="add to top queue" class="prio">
+                    <svg class="icon" aria-hidden="true" focusable="false">
+                      <use xlink:href="#icon-top"></use>
+                    </svg>
+                  </button>
+                </div>
+                <div class="cell">
+                  <button id="srPrio2" title="add to middle queue"
+                    class="prio">
+                    <svg class="icon" aria-hidden="true" focusable="false">
+                      <use xlink:href="#icon-middle"></use>
+                    </svg>
+                  </button>
+                </div>
+                <div class="cell">
+                  <button id="srPrio3" title="add to bottom queue"
+                    class="prio">
+                    <svg class="icon" aria-hidden="true" focusable="false">
+                      <use xlink:href="#icon-bottom"></use>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="songCell">

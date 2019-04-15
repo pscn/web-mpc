@@ -237,8 +237,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 				case mpc.Prio:
 					args := strings.Split(cmd.Data, ":")
 					err = client.Prio(conv.ToInt(args[0]), conv.ToInt(args[1]))
-					// prio does not yield an update
-					// h.writeMessage(ws, client.Update())
+
+				case mpc.AddPrio:
+					args := strings.Split(cmd.Data, ":")
+					err = client.AddPrio(conv.ToInt(args[0]), args[1])
 
 				case mpc.ModeConsume, mpc.ModeRepeat, mpc.ModeSingle, mpc.ModeRandom:
 					target := true

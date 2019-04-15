@@ -83,7 +83,6 @@ input[type="password"] {
   left: -9999px !important;
 }
 
-
 .prio {
   border: 1px solid var(--foreground);
   margin-right: 4px;
@@ -373,11 +372,12 @@ button:disabled {
 }
 
 .songRow button {
-  border: 0px;
+  border: 1px;
   background: none;
 }
 .songRow .songPrio button:disabled {
-  border: 1px solid var(--foreground);
+  /* border: 1px solid var(--foreground);*/
+  background: var(--background);
 }
 
 /* a directory in a list */

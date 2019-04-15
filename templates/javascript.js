@@ -479,16 +479,55 @@ var processResponse = function(obj) {
       data.searchResult.map(function(entry, i) {
         const { file } = entry;
         const node = newSongNode("searchEntry", entry, i);
-        const btn = node.querySelector("#srAdd");
-        // disable button for files already in the playlist
-        if (gPlaylistFiles.includes(file)) {
-          // FIXME: should we add a button to remove it from the playlist?
-          disable(btn);
+
+        const btnAdd = node.querySelector("#srAdd");
+        const btnPrio1 = node.querySelector("#srPrio1");
+        const btnPrio2 = node.querySelector("#srPrio2");
+        const btnPrio3 = node.querySelector("#srPrio3");
+        if (!gState["random"]) {
+          hide(btnPrio1);
+          hide(btnPrio2);
+          hide(btnPrio3);
+
+          // disable button for files already in the playlist
+          if (gPlaylistFiles.includes(file)) {
+            // FIXME: should we add a button to remove it from the playlist?
+            disable(btn);
+          }
+          btnAdd.onclick = function() {
+            disable(btn);
+            return command("add", file);
+          };
+        } else {
+          hide(btnAdd);
+
+          // disable button for files already in the playlist
+          if (gPlaylistFiles.includes(file)) {
+            // FIXME: should we add a button to remove it from the playlist?
+            disable(btnPrio1);
+            disable(btnPrio2);
+            disable(btnPrio3);
+          }
+          btnPrio1.onclick = function() {
+            disable(btnPrio1);
+            disable(btnPrio2);
+            disable(btnPrio3);
+            return command("addPrio", "255:" + file);
+          };
+          btnPrio2.onclick = function() {
+            disable(btnPrio1);
+            disable(btnPrio2);
+            disable(btnPrio3);
+            return command("addPrio", "127:" + file);
+          };
+          btnPrio3.onclick = function() {
+            disable(btnPrio1);
+            disable(btnPrio2);
+            disable(btnPrio3);
+            return command("addPrio", "0:" + file);
+          };
         }
-        btn.onclick = function() {
-          disable(btn);
-          return command("add", file);
-        };
+
         e("searchResult").append(node);
       });
       triggerResize();

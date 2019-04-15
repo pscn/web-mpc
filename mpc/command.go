@@ -16,6 +16,7 @@ const (
 	Next          CommandType = "next"
 	Previous      CommandType = "previous"
 	Add           CommandType = "add"
+	AddPrio       CommandType = "addPrio"
 	Clean         CommandType = "clean"
 	Remove        CommandType = "remove"
 	Search        CommandType = "search"
