@@ -83,6 +83,12 @@ input[type="password"] {
   left: -9999px !important;
 }
 
+
+.prio {
+  border: 1px solid var(--foreground);
+  margin-right: 4px;
+}
+
 button {
   padding: 2px;
   margin: 2px;
@@ -96,19 +102,12 @@ button {
   background: var(--c5);
 }
 
-.prio {
-  border: 1px solid var(--foreground);
-  margin-right: 4px;
-}
-
 button:hover {
-  opacity: 0.5;
-  background: var(--background);
+  background: var(--c5);
 }
 
 button:focus {
-  opacity: 0.5;
-  background: var(--background);
+  background: var(--c5);
 }
 
 button:disabled {
