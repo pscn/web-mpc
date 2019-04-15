@@ -614,10 +614,13 @@ window.addEventListener("load", function(evt) {
   e("submitSearch").onclick = function(evt) {
     return command("search", e("searchText").value);
   };
-
+  // this often leads to sending the search twice, disabled until I find time
+  // to fix it
+  /*
   e("searchText").onchange = function(evt) {
     return command("search", e("searchText").value);
   };
+  */
 
   ["play", "resume", "pause", "stop", "next", "previous", "clean"].map(function(
     value
