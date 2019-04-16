@@ -188,7 +188,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		ping := time.Tick(5 * time.Second)
 		for {
 			select {
-			case event := <-*client.Event:
+			case event := <-client.Event:
 				h.logger.Println("event:", event)
 				switch event {
 				case "player", "playlist", "options":
@@ -211,10 +211,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 					}
 
 				case mpc.Resume:
-					err = client.Resume()
+					err = client.Pause(false)
 
 				case mpc.Pause:
-					err = client.Pause()
+					err = client.Pause(true)
 
 				case mpc.Stop:
 					err = client.Stop()
@@ -229,14 +229,14 @@ func (h *Handler) Channel() http.HandlerFunc {
 					err = client.Add(cmd.Data)
 
 				case mpc.Remove:
-					err = client.RemovePlaylistEntry(conv.ToInt(cmd.Data))
+					err = client.Delete(conv.ToInt(cmd.Data), -1)
 
 				case mpc.Clean:
 					err = client.Clean()
 
 				case mpc.Prio:
 					args := strings.Split(cmd.Data, ":")
-					err = client.Prio(conv.ToInt(args[0]), conv.ToInt(args[1]))
+					err = client.SetPriority(conv.ToInt(args[0]), conv.ToInt(args[1]), -1)
 
 				case mpc.AddPrio:
 					args := strings.Split(cmd.Data, ":")

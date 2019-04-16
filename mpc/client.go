@@ -11,14 +11,13 @@ import (
 
 // Client with host, port & password & mpc reference
 type Client struct {
+	*mpd.Client
+	*mpd.Watcher
+	*log.Logger
 	addr        string // host:port
 	host        string
 	port        int
 	password    string
-	logger      *log.Logger
-	mpc         *mpd.Client
-	mpw         *mpd.Watcher
-	Event       *chan string
 	queueLength int
 	queuePage   int
 }
@@ -30,7 +29,7 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 		host:        host,
 		port:        port,
 		password:    password,
-		logger:      logger,
+		Logger:      logger,
 		queueLength: -1,
 		queuePage:   1,
 	}
@@ -39,18 +38,17 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 
 func (client *Client) reConnect() (err error) {
 	if client.password != "" {
-		client.logger.Printf("connecting to %s with %s", client.addr, client.password)
-		client.mpc, err = mpd.DialAuthenticated("tcp", client.addr, client.password)
+		client.Printf("connecting to %s with %s", client.addr, client.password)
+		client.Client, err = mpd.DialAuthenticated("tcp", client.addr, client.password)
 	} else {
-		client.logger.Printf("connecting to %s", client.addr)
-		client.mpc, err = mpd.Dial("tcp", client.addr)
+		client.Printf("connecting to %s", client.addr)
+		client.Client, err = mpd.Dial("tcp", client.addr)
 	}
 	if err == nil {
-		client.logger.Printf("connected to %s (%s)", client.addr, client.mpc.Version())
-		client.mpw, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
+		client.Printf("connected to %s (%s)", client.addr, client.Version())
+		client.Watcher, err = mpd.NewWatcher("tcp", client.addr, client.password, "")
 		if err == nil {
-			client.logger.Printf("listening to %s", client.addr)
-			client.Event = &client.mpw.Event
+			client.Printf("listening to %s", client.addr)
 		}
 	}
 	return
@@ -58,143 +56,52 @@ func (client *Client) reConnect() (err error) {
 
 // Close the MPDClient
 func (client *Client) Close() (err error) {
-	client.logger.Println("closing connection")
-	err = client.mpw.Close() // close client
+	client.Println("closing connection")
+	err = client.Client.Close() // close client
 	if err != nil {
-		client.logger.Println("failed to close watcher:", err)
+		client.Println("failed to close watcher:", err)
 	}
-	client.Event = nil
-	return client.mpc.Close()
+	return client.Watcher.Close()
 }
 
 // Version returns the protocol version in use
 func (client *Client) Version() *Message {
-	return VersionMsg(client.mpc.Version())
+	return VersionMsg(client.Client.Version())
 }
 
 // Stats for the MPD database
 func (client *Client) Stats() error {
-	attr, err := client.mpc.Stats()
-	client.logger.Printf("Stats: %+v", attr)
+	attr, err := client.Client.Stats()
+	client.Printf("Stats: %+v", attr)
 	return err
-}
-
-// Ping and try to re-connect if ping fails
-// Panics if we can not re-connect FIXME: don't panic
-func (client *Client) Ping() (err error) {
-	if err = client.mpc.Ping(); err != nil {
-		if err = client.reConnect(); err != nil {
-			client.logger.Panic(err) // FIXME: no panic
-		}
-		if err = client.mpc.Ping(); err != nil {
-			client.logger.Panic(err) // FIXME: no panic
-		}
-	}
-	return
-}
-
-// Play start playing
-func (client *Client) Play(nr int) error {
-	return client.mpc.Play(nr)
-}
-
-// Pause playing
-func (client *Client) Pause() error {
-	return client.mpc.Pause(true)
-}
-
-// Resume playing
-func (client *Client) Resume() error {
-	return client.mpc.Pause(false)
-}
-
-// Stop stops playing
-func (client *Client) Stop() error {
-	return client.mpc.Stop()
-}
-
-// Next song in playlist
-func (client *Client) Next() error {
-	return client.mpc.Next()
-}
-
-// Previous song in playlist
-func (client *Client) Previous() error {
-	return client.mpc.Previous()
-}
-
-// Prio sets prio for song in the queue at pos to prio
-func (client *Client) Prio(prio int, pos int) error {
-	return client.mpc.SetPriority(prio, pos, -1)
 }
 
 // AddPrio sets prio for song in the queue at pos to prio
 func (client *Client) AddPrio(prio int, file string) error {
-	id, err := client.mpc.AddID(strings.Replace(file, "%", "%%", -1), -1)
+	id, err := client.Client.AddID(strings.Replace(file, "%", "%%", -1), -1)
 	if err != nil {
-		client.logger.Panic(err) // FIXME: no panic
+		client.Panic(err) // FIXME: no panic
 	}
-	return client.mpc.SetPriorityID(prio, id)
-}
-
-func (client *Client) status() *mpd.Attrs {
-	status, err := client.mpc.Status()
-	if err != nil {
-		client.logger.Panic(err) // FIXME: no panic
-	}
-	client.logger.Printf("status: %+v", status)
-	return &status
-}
-
-func (client *Client) activeSong() *mpd.Attrs {
-	attrs, err := client.mpc.CurrentSong()
-	if err != nil {
-		client.logger.Println("ActiveSong:", err)
-	}
-	return &attrs
-}
-
-func (client *Client) queue() *[]mpd.Attrs {
-	attrs, err := client.mpc.PlaylistInfo(-1, -1)
-	if err != nil {
-		client.logger.Println("ActivePlaylist:", err)
-	}
-	client.queueLength = len(attrs)
-	return &attrs
+	return client.Client.SetPriorityID(prio, id)
 }
 
 // Update prepares an update message for the client containing:
 // status, activeSong and queue
 func (client *Client) Update(page int) *Message {
-	status := client.status()
-	activeSong := client.activeSong()
-	queue := client.queue()
-	return UpdateDataMsg(status, activeSong, queue, page, 10)
-}
-
-// RemovePlaylistEntry nr
-func (client *Client) RemovePlaylistEntry(nr int) error {
-	return client.mpc.Delete(nr, -1)
-}
-
-// Consume mode to enable
-func (client *Client) Consume(enable bool) error {
-	return client.mpc.Consume(enable)
-}
-
-// Repeat mode to enable
-func (client *Client) Repeat(enable bool) error {
-	return client.mpc.Repeat(enable)
-}
-
-// Random mode to enable
-func (client *Client) Random(target bool) error {
-	return client.mpc.Random(target)
-}
-
-// Single mode to enable
-func (client *Client) Single(target bool) error {
-	return client.mpc.Single(target)
+	status, err := client.Status()
+	if err != nil {
+		client.Panic(err)
+	}
+	activeSong, err := client.CurrentSong()
+	if err != nil {
+		client.Panic(err)
+	}
+	queue, err := client.PlaylistInfo(-1, -1)
+	if err != nil {
+		client.Panic(err)
+	}
+	client.queueLength = len(queue)
+	return UpdateDataMsg(&status, &activeSong, &queue, page, 10)
 }
 
 func escapeSearchToken(token string) string {
@@ -224,11 +131,11 @@ func (client *Client) Search(search string, page int) *Message {
 			}
 		}
 	}
-	client.logger.Printf("tokens: %v", searchTokens)
+	client.Printf("tokens: %v", searchTokens)
 	if len(searchTokens) > 0 {
-		attrs, err := client.mpc.Search(searchTokens...)
+		attrs, err := client.Client.Search(searchTokens...)
 		if err != nil {
-			client.logger.Println("search error:", err)
+			client.Println("search error:", err)
 			return ErrorMsg("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
 		return SearchResultMsg(&attrs, page, 10)
@@ -238,19 +145,19 @@ func (client *Client) Search(search string, page int) *Message {
 
 // Add file to playlist
 func (client *Client) Add(file string) error {
-	return client.mpc.Add(strings.Replace(file, "%", "%%", -1))
+	return client.Client.Add(strings.Replace(file, "%", "%%", -1))
 }
 
 // Clean the queue
 func (client *Client) Clean() error {
-	return client.mpc.Delete(0, client.queueLength)
+	return client.Client.Delete(0, client.queueLength)
 }
 
 // ListDirectory lists the contents of directory
 func (client *Client) ListDirectory(directory string) *Message {
-	attrs, err := client.mpc.ListInfo(directory)
+	attrs, err := client.ListInfo(directory)
 	if err != nil {
-		client.logger.Println("directory list error:", err)
+		client.Println("directory list error:", err)
 		return nil
 	}
 	previousDirectory, _ := path.Split(directory)
