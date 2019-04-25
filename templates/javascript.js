@@ -493,10 +493,10 @@ var processResponse = function(obj) {
           // disable button for files already in the playlist
           if (gPlaylistFiles.includes(file)) {
             // FIXME: should we add a button to remove it from the playlist?
-            disable(btn);
+            disable(btnAdd);
           }
           btnAdd.onclick = function() {
-            disable(btn);
+            disable(btnAdd);
             return command("add", file);
           };
         } else {
