@@ -188,6 +188,11 @@ func (h *Handler) Channel() http.HandlerFunc {
 		ping := time.Tick(5 * time.Second)
 		for {
 			select {
+			case <-ping:
+				err := client.Ping()
+				if err != nil {
+					h.logger.Println("ping failed:", err)
+				}
 			case event := <-client.Event:
 				h.logger.Println("event:", event)
 				switch event {
@@ -279,11 +284,6 @@ func (h *Handler) Channel() http.HandlerFunc {
 				}
 				if err != nil {
 					h.logger.Println("command error:", err)
-				}
-			case <-ping:
-				err := client.Ping()
-				if err != nil {
-					h.logger.Println("ping failed:", err)
 				}
 			}
 		}
