@@ -285,14 +285,14 @@ var updateStatus = function(data) {
   }
   // update the mode ctrl
   ["consume", "repeat", "single", "random"].map(function(value) {
-    const eDis = e(value + "Disable");
-    const eEn = e(value + "Enable");
+    const eDisable = e(value + "Disable");
+    const eEnable = e(value + "Enable");
     if (gState[value]) {
-      show(eDis);
-      hide(eEn);
+      show(eDisable);
+      hide(eEnable);
     } else {
-      hide(eDis);
-      show(eEn);
+      hide(eDisable);
+      show(eEnable);
     }
   });
 };
@@ -466,6 +466,7 @@ var processResponse = function(obj) {
       updateActiveSong(data.activeSong);
       triggerResize();
       break;
+    
     case "searchResult":
       e("searchResult").innerHTML = ""; // delete old search result
       node = pagination(data.page, data.lastPage, "searchPage");
