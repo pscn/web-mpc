@@ -192,6 +192,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 				err := client.Ping()
 				if err != nil {
 					h.logger.Println("ping failed:", err)
+					err = client.Connect()
+					if err != nil {
+						h.logger.Println("connect failed:", err)
+					}
 				}
 			case event := <-client.Event:
 				h.logger.Println("event:", event)
