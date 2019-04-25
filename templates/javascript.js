@@ -69,7 +69,8 @@ const views = {
   // view name: button ID
   viewPlaylist: "list",
   viewSearch: "search",
-  viewDirectory: "browser"
+  viewDirectory: "browser",
+  viewPlaylists: "playlists"
 };
 var showView = function(view) {
   return function() {
@@ -95,6 +96,9 @@ var showView = function(view) {
     switch (view) {
       case "viewDirectory":
         command("browse", ""); // send a command
+        break;
+      case "viewPlaylists":
+        command("playlists", ""); // send a command
         break;
       case "viewSearch":
         if (view == "viewSearch") {
@@ -466,7 +470,7 @@ var processResponse = function(obj) {
       updateActiveSong(data.activeSong);
       triggerResize();
       break;
-    
+
     case "searchResult":
       e("searchResult").innerHTML = ""; // delete old search result
       node = pagination(data.page, data.lastPage, "searchPage");
@@ -544,10 +548,10 @@ var processResponse = function(obj) {
         node.querySelector("#directoryName").innerHTML =
           data.parent != "" ? data.parent : "..";
 
-        ["#directoryName", "#dlBrowse"].map(function(v) {
+        ["#directoryName", "#browse"].map(function(v) {
           node.querySelector(v).onclick = btnCommand("browse", data.parent);
         });
-        disable(node.querySelector("#dlAdd"));
+        disable(node.querySelector("#add"));
         e("directoryList").append(node);
       }
       data.directoryList.map(function(entry, i) {
@@ -558,10 +562,10 @@ var processResponse = function(obj) {
           node.id = "dlRow" + i;
           rmcls(node, "hide");
           node.querySelector("#directoryName").innerHTML = directory;
-          ["#directoryName", "#dlBrowse"].map(function(v) {
+          ["#directoryName", "#browse"].map(function(v) {
             node.querySelector(v).onclick = btnCommand("browse", directory);
           });
-          const btn = node.querySelector("#dlAdd");
+          const btn = node.querySelector("#add");
           btn.onclick = function() {
             disable(btn);
             return command("add", directory);
@@ -580,6 +584,40 @@ var processResponse = function(obj) {
           };
         }
         e("directoryList").append(node);
+        triggerResize();
+      });
+      break;
+    case "playlistList":
+      e("playlistList").innerHTML = "";
+      if (data.hasParent) {
+        node = e("playlistListEntry").cloneNode(true);
+        node.id = "dlRowParent";
+        node.title = data.parent;
+        show(node);
+        node.querySelector("#playlistName").innerHTML =
+          data.parent != "" ? data.parent : "..";
+
+        ["#playlistName", "#plBrowse"].map(function(v) {
+          node.querySelector(v).onclick = btnCommand("browse", data.parent);
+        });
+        disable(node.querySelector("#plAdd"));
+        e("playlistList").append(node);
+      }
+      data.playlistList.map(function(entry, i) {
+        const { playlist } = entry;
+        var node = e("playlistListEntry").cloneNode(true);
+        node.id = "dlRow" + i;
+        rmcls(node, "hide");
+        node.querySelector("#playlistName").innerHTML = playlist;
+        ["#playlistName", "#browse"].map(function(v) {
+          node.querySelector(v).onclick = btnCommand("browse", playlist);
+        });
+        const btn = node.querySelector("#add");
+        btn.onclick = function() {
+          disable(btn);
+          return command("add", playlist);
+        };
+        e("playlistList").append(node);
         triggerResize();
       });
       break;
@@ -663,7 +701,7 @@ window.addEventListener("load", function(evt) {
   e("submitSearch").onclick = function(evt) {
     return command("search", e("searchText").value);
   };
-  e("searchText").addEventListener("keyup", function (event) {
+  e("searchText").addEventListener("keyup", function(event) {
     if (e("searchText").value.length > 3) {
       command("search", e("searchText").value);
     }

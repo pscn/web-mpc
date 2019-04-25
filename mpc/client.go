@@ -36,6 +36,7 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 	return mpc, mpc.Connect()
 }
 
+// Connect the client
 func (client *Client) Connect() (err error) {
 	if client.password != "" {
 		client.Printf("connecting to %s with %s", client.addr, client.password)
@@ -169,6 +170,16 @@ func (client *Client) ListDirectory(directory string) *Message {
 		hasPreviousDirectory = false
 	}
 	return DirectoryListMsg(previousDirectory, hasPreviousDirectory, &attrs)
+}
+
+// ListPlaylists lists all playlists
+func (client *Client) ListPlaylists(page int) *Message {
+	attrs, err := client.Client.ListPlaylists()
+	if err != nil {
+		client.Println("playlist list error:", err)
+		return nil
+	}
+	return PlaylistListMsg(&attrs, page, 10)
 }
 
 // eof

@@ -23,6 +23,8 @@ const (
 	SearchPage    CommandType = "searchPage"
 	UpdateRequest CommandType = "updateRequest"
 	Browse        CommandType = "browse"
+	Playlists     CommandType = "playlists"
+	PlaylistsPage CommandType = "playlistsPage"
 	ModeRandom    CommandType = "random"
 	ModeRepeat    CommandType = "repeat"
 	ModeSingle    CommandType = "single"

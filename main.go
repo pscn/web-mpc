@@ -1,26 +1,26 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
 
+	"github.com/karrick/golf"
 	"github.com/pscn/web-mpc/templates"
 	"github.com/pscn/web-mpc/web"
 )
 
 //go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
 
-var addr = flag.String("addr", ":8666", "http service address")
-var mpdHost = flag.String("mpd", "127.0.0.1:6600", "MPD service address")
-var mpdPass = flag.String("password", "", "MPD password")
-var devel = flag.Bool("local", false,
+var addr = golf.StringP('a', "addr", ":8666", "http service address")
+var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
+var mpdPass = golf.StringP('p', "password", "", "MPD password")
+var devel = golf.BoolP('l', "local", false,
 	"serves html, jss & css from the local templates directory")
 
 var verbosity = 2
 
 func main() {
-	flag.Parse()
+	golf.Parse()
 	log.SetFlags(0)
 	h := web.New(verbosity, !*devel, *mpdHost, *mpdPass)
 	mux := http.NewServeMux()

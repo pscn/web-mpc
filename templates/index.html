@@ -215,6 +215,13 @@
               </svg>
             </button>
           </div>
+          <div class="ctrlViewPlaylists">
+            <button id="playlists">
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use xlink:href="#icon-folder"></use>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- play, pause etc. -->
@@ -472,21 +479,45 @@
           </div>
         </div>
 
-        <div id="directoryListEntry" class="directoryRow bordered hide">
-          <div class="directoryControl boxResponsive">
+        <div id="directoryListEntry" class="listRow bordered hide">
+          <div class="listControl boxResponsive">
             <div class="cell">
-              <button id="dlBrowse">
+              <button id="browse">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use xlink:href="#icon-folder"></use>
                 </svg>
               </button>
             </div>
             <div class="cell">
-              <button id="dlAdd">+</button>
+              <button id="add">+</button>
             </div>
           </div>
-          <div class="directoryCell">
-            <div id="directoryName" class="directoryName resize">Name</div>
+          <div class="listCell">
+            <div id="directoryName" class="listName resize">Name</div>
+          </div>
+        </div>
+
+        <div id="viewPlaylists" class="mainContent hide">
+          <div id="playlistList" class="listing">
+            <!-- directory listing -->
+          </div>
+        </div>
+
+        <div id="playlistListEntry" class="listRow bordered hide">
+          <div class="listControl boxResponsive">
+            <div class="cell">
+              <button id="browse">
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use xlink:href="#icon-folder"></use>
+                </svg>
+              </button>
+            </div>
+            <div class="cell">
+              <button id="add">+</button>
+            </div>
+          </div>
+          <div class="listCell">
+            <div id="playlistName" class="listName resize">Name</div>
           </div>
         </div>
 

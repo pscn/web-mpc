@@ -20,6 +20,7 @@ const (
 	Update        MessageType = "update"
 	SearchResult  MessageType = "searchResult"
 	DirectoryList MessageType = "directoryList"
+	PlaylistList  MessageType = "playlistList"
 )
 
 // MaxSearchResults to return when searching
@@ -173,7 +174,7 @@ type UpdateData struct {
 
 // UpdateDataMsg creates a new Event including the current song data mapped from mpd.Attrs
 func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
-	queuePage int, songsPerPage int) *Message {
+	page int, perPage int) *Message {
 	event := &UpdateData{}
 	event.Status = *statusData(status)
 	event.ActiveSong = *songData(song)
@@ -195,26 +196,13 @@ func UpdateDataMsg(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 	sort.Sort(sort.Reverse(queueData(event.Queue)))
 
 	// pagination
-	queueLength := len(event.Queue)
-	fmt.Printf("page: %d\n", queuePage)
-	if queueLength < songsPerPage {
-		event.Page = 1
-		event.LastPage = 1
-	} else {
-		event.LastPage = queueLength / songsPerPage
-		event.Page = queuePage
-		if songsPerPage*queuePage > queueLength {
-			event.Page = event.LastPage
-		}
-		start := (event.Page - 1) * songsPerPage
-		end := start + songsPerPage
-		if end > queueLength {
-			end = queueLength
-		}
-		//fmt.Printf("page: %d\n", queuePage)
-		//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
-		event.Queue = event.Queue[start:end]
-	}
+	fmt.Printf("page: %d\n", page)
+	var start, end int
+	event.Page, event.LastPage, start, end = paginate(len(event.Queue), page, perPage)
+	//fmt.Printf("page: %d\n", queuePage)
+	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
+	event.Queue = event.Queue[start:end]
+
 	return NewMessage(Update, event)
 }
 
@@ -226,27 +214,15 @@ type SearchResultData struct {
 }
 
 // SearchResultMsg from mpd.Attrs
-func SearchResultMsg(attrArr *[]mpd.Attrs, searchPage int, songsPerPage int) *Message {
+func SearchResultMsg(attrArr *[]mpd.Attrs, page int, perPage int) *Message {
 	event := &SearchResultData{}
 	if attrArr == nil {
 		return NewMessage(SearchResult, event)
 	}
-	searchLength := len(*attrArr)
-	if searchLength < songsPerPage {
-		event.Page = 1
-		event.LastPage = 1
-	} else {
-		event.LastPage = searchLength / songsPerPage
-		event.Page = searchPage
-		if songsPerPage*searchPage > searchLength {
-			event.Page = event.LastPage
-		}
-	}
-	start := (event.Page - 1) * songsPerPage
-	end := start + songsPerPage
-	if end > searchLength {
-		end = searchLength
-	}
+	var start, end int
+	event.Page, event.LastPage, start, end = paginate(len(*attrArr), page, perPage)
+	//fmt.Printf("page: %d\n", queuePage)
+	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
 	iattrArr := (*attrArr)[start:end]
 	event.SearchResult = make([]SongData, len(iattrArr))
 	for i, attrs := range iattrArr {
@@ -337,6 +313,89 @@ func DirectoryListMsg(previousDirectory string, hasPreviousDirectory bool, attrA
 func (msg *Message) DirectoryList() *DirectoryListData {
 	if msg.Type == DirectoryList { // FIXME: how to inform the develeoper?
 		return msg.Data.(*DirectoryListData)
+	}
+	return nil
+}
+
+// PlaylistData name of the playlist
+type PlaylistData struct {
+	Playlist string `json:"playlist"`
+}
+
+// PlaylistListData holding playlists
+type PlaylistListData struct {
+	PlaylistList []PlaylistData `json:"playlistList"`
+	Page         int            `json:"page"`
+	LastPage     int            `json:"lastPage"`
+}
+
+type playlistData []PlaylistData
+
+func (p playlistData) Len() int      { return len(p) }
+func (p playlistData) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p playlistData) Less(i, j int) bool {
+	return p[i].Playlist < p[j].Playlist
+}
+
+func paginate(length, page, perPage int) (currentPage int, lastPage int, start int, end int) {
+	if length < perPage {
+		currentPage = 1
+		lastPage = 1
+		start = 1
+		end = length
+	} else {
+		lastPage = length / perPage
+		currentPage = page
+		if currentPage*perPage > length {
+			currentPage = lastPage
+		}
+		start = (currentPage - 1) * perPage
+		end = start + perPage
+		if end > length {
+			end = length
+		}
+	}
+	return
+}
+
+// PlaylistListMsg from mpd.Attrs
+func PlaylistListMsg(attrArr *[]mpd.Attrs, page int, perPage int) *Message {
+	event := &PlaylistListData{}
+	if attrArr == nil {
+		return NewMessage(PlaylistList, event)
+	}
+	cnt := 0
+	for _, attrs := range *attrArr {
+		fmt.Printf("playlist: %+v\n", attrs)
+		if attrs["playlist"] != "" {
+			cnt++
+		}
+	}
+	event.PlaylistList = make([]PlaylistData, cnt)
+	i := 0
+	for _, attrs := range *attrArr {
+		log.Printf("%+v\n", attrs)
+		if attrs["playlist"] != "" {
+			event.PlaylistList[i] = PlaylistData{
+				Playlist: attrs["playlist"],
+			}
+			i++
+		}
+	}
+	sort.Sort(playlistData(event.PlaylistList))
+
+	var start, end int
+	event.Page, event.LastPage, start, end = paginate(len(event.PlaylistList), page, perPage)
+	fmt.Printf("page: %d\n", event.Page)
+	fmt.Printf("size: %d; start: %d; end: %d\n", len(event.PlaylistList), start, end)
+	event.PlaylistList = event.PlaylistList[start:end]
+	return NewMessage(PlaylistList, event)
+}
+
+// PlaylistList payload of an event
+func (msg *Message) PlaylistList() *PlaylistListData {
+	if msg.Type == PlaylistList { // FIXME: how to inform the develeoper?
+		return msg.Data.(*PlaylistListData)
 	}
 	return nil
 }

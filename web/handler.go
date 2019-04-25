@@ -285,6 +285,13 @@ func (h *Handler) Channel() http.HandlerFunc {
 
 				case mpc.Browse:
 					h.writeMessage(ws, client.ListDirectory(cmd.Data))
+
+				case mpc.Playlists:
+					currentSearchPage = 1
+					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
+				case mpc.PlaylistsPage:
+					currentSearchPage = conv.ToInt(cmd.Data)
+					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
 				}
 				if err != nil {
 					h.logger.Println("command error:", err)

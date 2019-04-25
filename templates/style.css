@@ -51,8 +51,8 @@ input[type="password"] {
 
 .icon {
   fill: none;
-  width: 1em;
-  height: 1em;
+  width: 0.9em;
+  height: 0.9em;
   overflow: hidden;
   display: block;
   stroke: var(--foreground);
@@ -89,13 +89,13 @@ input[type="password"] {
 }
 
 button {
-  padding: 2px;
-  margin: 2px;
+  padding: 1px;
+  margin: 1px;
   box-sizing: unset;
   border: 2px solid var(--foreground);
   border-radius: 4px;
-  width: 1em;
-  height: 1em;
+  width: 0.9em;
+  height: 0.9em;
   text-align: center;
   font-size: 0.9em;
   background: var(--c5);
@@ -229,7 +229,8 @@ button:disabled {
   grid-template-areas:
     "ctrlViewList"
     "ctrlViewSearch"
-    "ctrlViewBrowse";
+    "ctrlViewBrowse"
+    "ctrlViewPlaylists";
   height: 3em;
 }
 
@@ -243,6 +244,10 @@ button:disabled {
 
 .ctrlViewBrowse {
   grid-area: ctrlViewBrowse;
+}
+
+.ctrlViewPlaylists {
+  grid-area: ctrlViewPlaylists;
 }
 
 /* end of ctrlView grid */
@@ -380,34 +385,34 @@ button:disabled {
   background: var(--background);
 }
 
-/* a directory in a list */
-.directoryRow {
+/* a list */
+.listRow {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-areas: "directoryControl directoryCell";
+  grid-template-areas: "listControl listCell";
   margin-bottom: 4px;
 }
 
 @media (min-width: 768px) {
-  .directoryRow {
+  .listRow {
     grid-template-columns: auto 1fr;
-    grid-template-areas: "directoryControl directoryCell";
+    grid-template-areas: "listControl listCell";
     margin-bottom: 4px;
   }
 }
 
-.directoryRow button {
+.listRow button {
   border: 0px;
   background: none;
 }
-.directoryRow .songPrio button:disabled {
+.listRow .songPrio button:disabled {
   border: 1px solid var(--foreground);
 }
-.directoryControl {
-  grid-area: directoryControl;
+.listControl {
+  grid-area: listControl;
 }
-.directoryCell {
-  grid-area: directoryCell;
+.listCell {
+  grid-area: listCell;
   align-self: center;
 }
 .pagination {
@@ -517,7 +522,7 @@ button:disabled {
     "playlistTitle playlistDuration"
     "playlistArtist playlistArtist"
     "playlistAlbum playlistAlbum"
-    "directoryName directoryName";
+    "listName listName";
   font-size: 80%;
 }
 
@@ -527,7 +532,7 @@ button:disabled {
     grid-template-columns: 3fr 2fr 3fr 1fr auto;
     grid-template-areas:
       "playlistTitle playlistArtist playlistAlbum playlistAlbum playlistDuration"
-      "directoryName directoryName directoryName directoryName directoryName";
+      "listName listName listName listName listName";
   }
 }
 
