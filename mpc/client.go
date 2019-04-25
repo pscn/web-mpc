@@ -33,10 +33,10 @@ func New(host string, port int, password string, logger *log.Logger) (*Client, e
 		queueLength: -1,
 		queuePage:   1,
 	}
-	return mpc, mpc.reConnect()
+	return mpc, mpc.Connect()
 }
 
-func (client *Client) reConnect() (err error) {
+func (client *Client) Connect() (err error) {
 	if client.password != "" {
 		client.Printf("connecting to %s with %s", client.addr, client.password)
 		client.Client, err = mpd.DialAuthenticated("tcp", client.addr, client.password)
@@ -134,7 +134,7 @@ func (client *Client) Search(search string, page int) *Message {
 	client.Printf("tokens: %v", searchTokens)
 	if len(searchTokens) > 0 {
 		attrs, err := client.Client.Search(searchTokens...)
-		if err != nil {
+		if err != nil { // this can happen if we would get too many results
 			client.Println("search error:", err)
 			return ErrorMsg("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
