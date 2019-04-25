@@ -663,6 +663,11 @@ window.addEventListener("load", function(evt) {
   e("submitSearch").onclick = function(evt) {
     return command("search", e("searchText").value);
   };
+  e("searchText").addEventListener("keyup", function (event) {
+    if (e("searchText").value.length > 3) {
+      command("search", e("searchText").value);
+    }
+  });
   // this often leads to sending the search twice, disabled until I find time
   // to fix it
   /*
