@@ -4,39 +4,35 @@ import (
 	"github.com/fhs/gompd/mpd"
 )
 
-const SearchResult MessageType = "searchResult"
+// MaxSearchResults to return when searching
+const MaxSearchResults = 50
 
-// SearchResultData converted from *mpd.attrs
-type SearchResultData struct {
-	SearchResult []QueuedSongData `json:"searchResult"`
-	Page         int              `json:"page"`
-	LastPage     int              `json:"lastPage"`
+// TypeSearchResult message of type SearchResult
+const TypeSearchResult MessageType = "searchResult"
+
+// searchResult converted from *mpd.attrs
+type searchResult struct {
+	SearchResult songs `json:"searchResult"`
+	Page         int   `json:"page"`
+	LastPage     int   `json:"lastPage"`
 }
 
-// SearchResultMsg from mpd.Attrs
-func SearchResultMsg(attrArr *[]mpd.Attrs, page int, perPage int) *Message {
-	event := &SearchResultData{}
+// SearchResult from mpd.Attrs
+func SearchResult(attrArr *[]mpd.Attrs, page int, perPage int) *Message {
+	event := &searchResult{}
 	if attrArr == nil {
-		return NewMessage(SearchResult, event)
+		return New(TypeSearchResult, event)
 	}
 	var start, end int
 	event.Page, event.LastPage, start, end = paginate(len(*attrArr), page, perPage)
 	//fmt.Printf("page: %d\n", queuePage)
 	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
 	iattrArr := (*attrArr)[start:end]
-	event.SearchResult = make([]QueuedSongData, len(iattrArr))
+	event.SearchResult = make(songs, len(iattrArr))
 	for i, attrs := range iattrArr {
-		event.SearchResult[i] = *mpd2QueuedSongData(&attrs)
+		event.SearchResult[i] = *mpd2Song(&attrs)
 	}
-	return NewMessage(SearchResult, event)
-}
-
-// SearchResult payload of an event
-func (msg *Message) SearchResult() *SearchResultData {
-	if msg.Type == SearchResult { // FIXME: how to inform the develeoper?
-		return msg.Data.(*SearchResultData)
-	}
-	return nil
+	return New(TypeSearchResult, event)
 }
 
 // eof

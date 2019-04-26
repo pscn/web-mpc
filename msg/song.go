@@ -5,8 +5,8 @@ import (
 	"github.com/pscn/web-mpc/conv"
 )
 
-// SongData converted from *mpd.attrs
-type SongData struct {
+// song converted from *mpd.attrs
+type song struct {
 	Album       string `json:"album"`
 	AlbumArtist string `json:"album_artist"`
 	Artist      string `json:"artist"`
@@ -19,7 +19,10 @@ type SongData struct {
 	Disc        int    `json:"disc"`
 }
 
-func mpd2SongData(attrs *mpd.Attrs) *SongData {
+// songs list of song
+type songs []song
+
+func mpd2Song(attrs *mpd.Attrs) *song {
 	// for some requests MPD returns it camelcase, for others all lowercase
 	if (*attrs)["Artist"] != "" { // camelcase
 		if (*attrs)["AlbumArtist"] == "" {
@@ -29,7 +32,7 @@ func mpd2SongData(attrs *mpd.Attrs) *SongData {
 			(*attrs)["Duration"] = (*attrs)["Time"]
 		}
 		// fmt.Printf("attrs: %+v\n", attrs)
-		return &SongData{
+		return &song{
 			Album:       (*attrs)["Album"],
 			AlbumArtist: (*attrs)["AlbumArtist"],
 			Artist:      (*attrs)["Artist"],
@@ -51,7 +54,7 @@ func mpd2SongData(attrs *mpd.Attrs) *SongData {
 		(*attrs)["duration"] = (*attrs)["time"]
 	}
 	// fmt.Printf("attrs: %+v\n", attrs)
-	return &SongData{
+	return &song{
 		Album:       (*attrs)["album"],
 		AlbumArtist: (*attrs)["albumartist"],
 		Artist:      (*attrs)["artist"],

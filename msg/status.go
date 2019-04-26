@@ -5,8 +5,8 @@ import (
 	"github.com/pscn/web-mpc/conv"
 )
 
-// Status represents the data we get as MPC status
-type Status struct {
+// status represents the data we get as MPC status
+type status struct {
 	Consume  bool   `json:"consume"`
 	Duration int    `json:"duration"`
 	Elapsed  int    `json:"elapsed"`
@@ -19,8 +19,8 @@ type Status struct {
 	Volume   int    `json:"volume"`
 }
 
-func mpd2Status(attrs *mpd.Attrs) *Status {
-	return &Status{
+func mpd2Status(attrs *mpd.Attrs) *status {
+	return &status{
 		Consume:  conv.ToBool((*attrs)["consume"]),
 		Duration: conv.ToInt((*attrs)["duration"]),
 		Elapsed:  conv.ToInt((*attrs)["elapsed"]),

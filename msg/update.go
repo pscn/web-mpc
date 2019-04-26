@@ -7,25 +7,26 @@ import (
 	"github.com/fhs/gompd/mpd"
 )
 
-// Update message containing status, queue and active song FIXME: naming
-const Update MessageType = "update"
+// TypeUpdate message containing status, queue and active song FIXME: naming
+const TypeUpdate MessageType = "update"
 
-// UpdateData contains everything (status, active song, queue) the client needs
-type UpdateData struct {
-	Status     Status          `json:"status"`
-	ActiveSong QueuedSongData  `json:"activeSong"`
-	Queue      QueuedSongsData `json:"queue"`
-	Page       int             `json:"page"`
-	LastPage   int             `json:"lastPage"`
+// update contains everything (status, active song, queue) the client needs
+type update struct {
+	Status     status      `json:"status"`
+	ActiveSong song        `json:"activeSong"`
+	Queue      queuedSongs `json:"queue"`
+	Page       int         `json:"page"`
+	LastPage   int         `json:"lastPage"`
 }
 
-// NewUpdate creates a new Event including the current song data mapped from mpd.Attrs
-func NewUpdate(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
+// Update creates a new Event including the current song data mapped from mpd.Attrs
+func Update(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 	page int, perPage int) *Message {
-	event := &UpdateData{}
-	event.Status = *mpd2Status(status)
-	event.ActiveSong = *mpd2QueuedSongData(song)
-	event.Queue = make([]QueuedSongData, len(*queue))
+	event := &update{
+		Status:     *mpd2Status(status),
+		ActiveSong: *mpd2Song(song),
+		Queue:      make(queuedSongs, len(*queue)),
+	}
 	for i, attrs := range *queue {
 		event.Queue[i] = *mpd2QueuedSongData(&attrs)
 	}
@@ -40,7 +41,7 @@ func NewUpdate(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 		event.Queue[event.Status.NextSong].IsNext = true
 	}
 	// order by song → nextsong → prio
-	sort.Sort(sort.Reverse(QueuedSongsData(event.Queue)))
+	sort.Sort(sort.Reverse(queuedSongs(event.Queue)))
 
 	// pagination
 	fmt.Printf("page: %d\n", page)
@@ -50,7 +51,7 @@ func NewUpdate(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
 	event.Queue = event.Queue[start:end]
 
-	return NewMessage(Update, event)
+	return New(TypeUpdate, event)
 }
 
 // eof

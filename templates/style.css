@@ -6,7 +6,7 @@ body {
   /*  font-family: "Roboto Mono", monospace;*/
   font-family: "Righteous", cursive;
 
-  font-size: 28px;
+  font-size: 24px;
   margin: 4px;
   padding: 0px;
   color: var(--foreground);
@@ -449,12 +449,12 @@ button:disabled {
 .songCell {
   grid-area: songCell;
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto 1fr auto;
   padding-top: 2px;
   grid-template-areas:
-    "songCellDisc songCellTrack songCellTitle songCellDuration"
-    "songCellArtist songCellArtist songCellArtist songCellArtist"
-    "songCellAlbum songCellAlbum songCellAlbum songCellAlbum";
+    "songCellTrack songCellTitle songCellDuration"
+    ". songCellArtist songCellArtist"
+    "songCellDisc songCellAlbum songCellAlbum";
 }
 
 @media (min-width: 768px) {

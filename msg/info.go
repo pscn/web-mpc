@@ -1,10 +1,11 @@
 package msg
 
-const Info MessageType = "info"
+// TypeInfo message of type Info
+const TypeInfo MessageType = "info"
 
-// InfoMsg creates a new Message including an information
-func InfoMsg(str string) *Message {
-	return NewMessage(Info, str)
+// Info creates a new Message including an information
+func Info(str string) *Message {
+	return New(TypeInfo, str)
 }
 
 // eof

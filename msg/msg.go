@@ -8,17 +8,14 @@ import (
 // MessageType to identify the type of message
 type MessageType string
 
-// MaxSearchResults to return when searching
-const MaxSearchResults = 50
-
 // Message from the clients EventLoop
 type Message struct {
 	Type MessageType `json:"type"`
 	Data interface{} `json:"data"`
 }
 
-// NewMessage creates a new Message with type and data
-func NewMessage(msgType MessageType, data interface{}) *Message {
+// New creates a new Message with type and data
+func New(msgType MessageType, data interface{}) *Message {
 	return &Message{msgType, data}
 }
 

@@ -154,7 +154,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 			// down / restarting
 			// we could try again after some time?
 			// right now the user needs to reload the page to try again
-			h.writeMessage(ws, msg.InfoMsg(
+			h.writeMessage(ws, msg.Info(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
@@ -213,84 +213,84 @@ func (h *Handler) Channel() http.HandlerFunc {
 				}
 				h.logger.Printf("cmd: %s\n", cmd)
 				switch cmd.Command {
-				case mpc.Play:
+				case mpc.TypePlay:
 					if cmd.Data != "" {
 						err = client.Play(conv.ToInt(cmd.Data))
 					} else {
 						err = client.Play(-1)
 					}
 
-				case mpc.Resume:
+				case mpc.TypeResume:
 					err = client.Pause(false)
 
-				case mpc.Pause:
+				case mpc.TypePause:
 					err = client.Pause(true)
 
-				case mpc.Stop:
+				case mpc.TypeStop:
 					err = client.Stop()
 
-				case mpc.Next:
+				case mpc.TypeNext:
 					err = client.Next()
 
-				case mpc.Previous:
+				case mpc.TypePrevious:
 					err = client.Previous()
 
-				case mpc.Add:
+				case mpc.TypeAdd:
 					err = client.Add(cmd.Data)
 
-				case mpc.Remove:
+				case mpc.TypeRemove:
 					err = client.Delete(conv.ToInt(cmd.Data), -1)
 
-				case mpc.Clean:
+				case mpc.TypeClean:
 					err = client.Clean()
 
-				case mpc.Prio:
+				case mpc.TypePrio:
 					args := strings.Split(cmd.Data, ":")
 					err = client.SetPriority(conv.ToInt(args[0]), conv.ToInt(args[1]), -1)
 
-				case mpc.AddPrio:
+				case mpc.TypeAddPrio:
 					args := strings.Split(cmd.Data, ":")
 					err = client.AddPrio(conv.ToInt(args[0]), args[1])
 
-				case mpc.ModeConsume, mpc.ModeRepeat, mpc.ModeSingle, mpc.ModeRandom:
+				case mpc.TypeModeConsume, mpc.TypeModeRepeat, mpc.TypeModeSingle, mpc.TypeModeRandom:
 					target := true
 					if cmd.Data == "disable" {
 						target = false
 					}
 					switch cmd.Command {
-					case mpc.ModeConsume:
+					case mpc.TypeModeConsume:
 						client.Consume(target)
 
-					case mpc.ModeRepeat:
+					case mpc.TypeModeRepeat:
 						client.Repeat(target)
 
-					case mpc.ModeSingle:
+					case mpc.TypeModeSingle:
 						client.Single(target)
 
-					case mpc.ModeRandom:
+					case mpc.TypeModeRandom:
 						client.Random(target)
 					}
 
-				case mpc.UpdateRequest:
+				case mpc.TypeUpdateRequest:
 					currentPage = conv.ToInt(cmd.Data)
 					h.writeMessage(ws, client.Update(currentPage))
 
-				case mpc.Search:
+				case mpc.TypeSearch:
 					currentSearchPage = 1
 					lastSearch = cmd.Data
 					h.writeMessage(ws, client.Search(cmd.Data, currentSearchPage))
 
-				case mpc.SearchPage:
+				case mpc.TypeSearchPage:
 					currentSearchPage = conv.ToInt(cmd.Data)
 					h.writeMessage(ws, client.Search(lastSearch, currentSearchPage))
 
-				case mpc.Browse:
+				case mpc.TypeBrowse:
 					h.writeMessage(ws, client.ListDirectory(cmd.Data))
 
-				case mpc.Playlists:
+				case mpc.TypePlaylists:
 					currentSearchPage = 1
 					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
-				case mpc.PlaylistsPage:
+				case mpc.TypePlaylistsPage:
 					currentSearchPage = conv.ToInt(cmd.Data)
 					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
 				}

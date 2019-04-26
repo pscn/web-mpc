@@ -7,36 +7,36 @@ import (
 	"github.com/fhs/gompd/mpd"
 )
 
-// DirectoryListType message
-const DirectoryListType MessageType = "directoryList"
+// TypeDirectoryList message
+const TypeDirectoryList MessageType = "directoryList"
 
-// directoryEntry an entry inside of a directory
+// dirEntry an entry inside of a directory
 // Type can be file or directory
 // FIXME: naming?  file should be song?
-type directoryEntry struct {
+type dirEntry struct {
 	Type string `json:"type"`
 	Name string `json:"directory"`
-	SongData
+	song
 }
 
-type directoryEntries []directoryEntry
+type dirEntries []dirEntry
 
-// directory holds the contents of the directory Name
+// dir holds the contents of the dir Name
 // Parent to give the UI something to link back to
-// HasParent to distinguish between root & first level directory, both having
+// HasParent to distinguish between root & first level dir, both having
 // a Parent == ""
-type directory struct {
-	Name      string           `json:"name"`
-	Parent    string           `json:"parent"`
-	HasParent bool             `json:"hasParent"`
-	Entries   directoryEntries `json:"directoryList"`
-	Page      int              `json:"page"`
-	LastPage  int              `json:"lastPage"`
+type dir struct {
+	Name      string     `json:"name"`
+	Parent    string     `json:"parent"`
+	HasParent bool       `json:"hasParent"`
+	Entries   dirEntries `json:"directoryList"`
+	Page      int        `json:"page"`
+	LastPage  int        `json:"lastPage"`
 }
 
-func (p directoryEntries) Len() int      { return len(p) }
-func (p directoryEntries) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
-func (p directoryEntries) Less(i, j int) bool {
+func (p dirEntries) Len() int      { return len(p) }
+func (p dirEntries) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p dirEntries) Less(i, j int) bool {
 	if p[i].Type != p[j].Type {
 		if p[i].Type == "file" {
 			return true
@@ -52,30 +52,30 @@ func (p directoryEntries) Less(i, j int) bool {
 	return p[i].Name < p[j].Name
 }
 
-func mpd2DirectoryEntry(attrs *mpd.Attrs) *directoryEntry {
+func mpd2DirectoryEntry(attrs *mpd.Attrs) *dirEntry {
 	if (*attrs)["directory"] != "" {
-		return &directoryEntry{
+		return &dirEntry{
 			Type: "directory",
 			Name: (*attrs)["directory"],
 		}
 	} else if (*attrs)["file"] != "" {
-		return &directoryEntry{
-			Type:     "file",
-			SongData: *mpd2SongData(attrs),
+		return &dirEntry{
+			Type: "file",
+			song: *mpd2Song(attrs),
 		}
 	}
 	return nil
 }
 
-// DirectoryList from mpd.Attrs
-func DirectoryList(current string, previous string, hasPrevious bool, attrsList *[]mpd.Attrs, page int, perPage int) *Message {
-	event := &directory{
-		Name:      current,
-		Parent:    previous,
-		HasParent: hasPrevious,
+// Directory from mpd.Attrs
+func Directory(cur string, prev string, hasPrev bool, attrsList *[]mpd.Attrs, page int, perPage int) *Message {
+	event := &dir{
+		Name:      cur,
+		Parent:    prev,
+		HasParent: hasPrev,
 	}
 	if attrsList == nil {
-		return NewMessage(DirectoryListType, event)
+		return New(TypeDirectoryList, event)
 	}
 	for _, attrs := range *attrsList {
 		entry := mpd2DirectoryEntry(&attrs)
@@ -94,7 +94,7 @@ func DirectoryList(current string, previous string, hasPrevious bool, attrsList 
 	fmt.Printf("size: %d; start: %d; end: %d\n", len(event.Entries), start, end)
 	event.Entries = event.Entries[start:end]
 
-	return NewMessage(DirectoryListType, event)
+	return New(TypeDirectoryList, event)
 }
 
 // eof

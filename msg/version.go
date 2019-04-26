@@ -1,10 +1,11 @@
 package msg
 
-const Version MessageType = "version"
+// TypeVersion message of type Version
+const TypeVersion MessageType = "version"
 
-// VersionMsg creates a new Message including the version
-func VersionMsg(str string) *Message {
-	return NewMessage(Version, str)
+// Version creates a new Message including the version
+func Version(str string) *Message {
+	return New(TypeVersion, str)
 }
 
 // eof

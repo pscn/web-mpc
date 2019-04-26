@@ -2,13 +2,13 @@ package msg
 
 import (
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/fhs/gompd/mpd"
 )
 
-const PlaylistListType MessageType = "playlistList"
+// TypePlaylistList message of tpye PlaylistList
+const TypePlaylistList MessageType = "playlistList"
 
 // playlistListEntry name of the playlist
 // FIXME: naming is so wrong
@@ -18,18 +18,16 @@ type playlistListEntry struct {
 
 type playlistListEntries []playlistListEntry
 
-// playlists holding playlists
-type playlists struct {
+// playlistList holding playlistList
+type playlistList struct {
 	Playlists playlistListEntries `json:"playlistList"`
 	Page      int                 `json:"page"`
 	LastPage  int                 `json:"lastPage"`
 }
 
-func (p playlistListEntries) Len() int      { return len(p) }
-func (p playlistListEntries) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
-func (p playlistListEntries) Less(i, j int) bool {
-	return p[i].Name < p[j].Name
-}
+func (p playlistListEntries) Len() int           { return len(p) }
+func (p playlistListEntries) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p playlistListEntries) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
 // FIXME: naming
 func mpd2PlaylistListEntry(attrs *mpd.Attrs) *playlistListEntry {
@@ -40,17 +38,16 @@ func mpd2PlaylistListEntry(attrs *mpd.Attrs) *playlistListEntry {
 
 // PlaylistList from mpd.Attrs
 func PlaylistList(attrsList *[]mpd.Attrs, page int, perPage int) *Message {
-	event := &playlists{}
+	event := &playlistList{}
 	if attrsList == nil {
-		return NewMessage(PlaylistListType, event)
+		return New(TypePlaylistList, event)
 	}
-	for _, attrs := range *attrsList {
-		log.Printf("%+v\n", attrs)
-		event.Playlists = append(event.Playlists, *mpd2PlaylistListEntry(&attrs))
+	event.Playlists = make(playlistListEntries, len(*attrsList))
+	for i, attrs := range *attrsList {
+		fmt.Printf("%+v\n", attrs)
+		event.Playlists[i] = *mpd2PlaylistListEntry(&attrs)
 	}
-	if event.Playlists == nil || event.Playlists.Len() == 0 {
-		return NewMessage(PlaylistListType, event)
-	}
+
 	// sort alphabeticaly
 	sort.Sort(event.Playlists)
 
@@ -60,15 +57,7 @@ func PlaylistList(attrsList *[]mpd.Attrs, page int, perPage int) *Message {
 	fmt.Printf("page: %d\n", event.Page)
 	fmt.Printf("size: %d; start: %d; end: %d\n", len(event.Playlists), start, end)
 	event.Playlists = event.Playlists[start:end]
-	return NewMessage(PlaylistListType, event)
-}
-
-// PlaylistList payload of an event
-func (msg *Message) PlaylistList() *playlists {
-	if msg.Type == PlaylistListType { // FIXME: how to inform the develeoper?
-		return msg.Data.(*playlists)
-	}
-	return nil
+	return New(TypePlaylistList, event)
 }
 
 // eof

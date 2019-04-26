@@ -1,11 +1,11 @@
 package msg
 
-// Error Message
-const Error MessageType = "error"
+// TypeError Message
+const TypeError MessageType = "error"
 
-// NewError creates a new Message including an error
-func NewError(str string) *Message {
-	return NewMessage(Error, str)
+// Error creates a new Message including an error
+func Error(str string) *Message {
+	return New(TypeError, str)
 }
 
 // eof

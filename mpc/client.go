@@ -68,7 +68,7 @@ func (client *Client) Close() (err error) {
 
 // Version returns the protocol version in use
 func (client *Client) Version() *msg.Message {
-	return msg.VersionMsg(client.Client.Version())
+	return msg.Version(client.Client.Version())
 }
 
 // Stats for the MPD database
@@ -103,7 +103,7 @@ func (client *Client) Update(page int) *msg.Message {
 		client.Panic(err)
 	}
 	client.queueLength = len(queue)
-	return msg.NewUpdate(&status, &activeSong, &queue, page, 10)
+	return msg.Update(&status, &activeSong, &queue, page, 10)
 }
 
 func escapeSearchToken(token string) string {
@@ -138,9 +138,9 @@ func (client *Client) Search(search string, page int) *msg.Message {
 		attrs, err := client.Client.Search(searchTokens...)
 		if err != nil { // this can happen if we would get too many results
 			client.Println("search error:", err)
-			return msg.NewError("Hrhr nice try... (Stephan mach kein Scheiß!)")
+			return msg.Error("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
-		return msg.SearchResultMsg(&attrs, page, 10)
+		return msg.SearchResult(&attrs, page, 10)
 	}
 	return nil
 }
@@ -170,7 +170,7 @@ func (client *Client) ListDirectory(directory string) *msg.Message {
 	if directory == "" {
 		hasPrevious = false
 	}
-	return msg.DirectoryList(directory, previous, hasPrevious, &attrs, 1, 10)
+	return msg.Directory(directory, previous, hasPrevious, &attrs, 1, 10)
 }
 
 // ListPlaylists lists all playlists

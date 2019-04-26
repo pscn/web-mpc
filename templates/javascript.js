@@ -125,6 +125,16 @@ var resize = function(el, minFS, maxFS) {
   var txt = el.innerHTML;
   var maxWidth = el.clientWidth;
   while (fs >= minFS && getTextWidth(txt, fs) + fs > maxWidth) {
+    log(
+      "txt:" +
+        txt +
+        " fs:" +
+        fs +
+        " textWidth:" +
+        getTextWidth(txt, fs) +
+        " maxWidth:" +
+        maxWidth
+    );
     fs -= 2;
   }
   if (fs < minFS) {
@@ -151,7 +161,7 @@ var resizer = function() {
   var el = document.getElementsByClassName("resize");
   var i;
   for (i = 0; i < el.length; i++) {
-    resize(el[i], 12, 18);
+    resize(el[i], 12, 24); // FIXME: take body font-size as max
   }
 };
 
