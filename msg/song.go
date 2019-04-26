@@ -18,19 +18,44 @@ type SongData struct {
 }
 
 func mpd2SongData(attrs *mpd.Attrs) *SongData {
-	if (*attrs)["AlbumArtist"] == "" {
-		(*attrs)["AlbumArtist"] = (*attrs)["Artist"]
+	// for some requests MPD returns it camelcase, for others all lowercase
+	if (*attrs)["Artist"] != "" { // camelcase
+		if (*attrs)["AlbumArtist"] == "" {
+			(*attrs)["AlbumArtist"] = (*attrs)["Artist"]
+		}
+		if (*attrs)["Duration"] == "" {
+			(*attrs)["Duration"] = (*attrs)["Time"]
+		}
+		// fmt.Printf("attrs: %+v\n", attrs)
+		return &SongData{
+			Album:       (*attrs)["Album"],
+			AlbumArtist: (*attrs)["AlbumArtist"],
+			Artist:      (*attrs)["Artist"],
+			Duration:    conv.ToInt((*attrs)["Time"]),
+			File:        (*attrs)["file"],
+			Genre:       (*attrs)["Genre"],
+			Released:    (*attrs)["Date"],
+			Title:       (*attrs)["Title"],
+		}
+	}
+	// lowercase
+
+	if (*attrs)["albumartist"] == "" {
+		(*attrs)["albumartist"] = (*attrs)["artist"]
+	}
+	if (*attrs)["duration"] == "" {
+		(*attrs)["duration"] = (*attrs)["time"]
 	}
 	// fmt.Printf("attrs: %+v\n", attrs)
 	return &SongData{
-		Album:       (*attrs)["Album"],
-		AlbumArtist: (*attrs)["AlbumArtist"],
-		Artist:      (*attrs)["Artist"],
-		Duration:    conv.ToInt((*attrs)["Time"]),
+		Album:       (*attrs)["album"],
+		AlbumArtist: (*attrs)["albumartist"],
+		Artist:      (*attrs)["artist"],
+		Duration:    conv.ToInt((*attrs)["duration"]),
 		File:        (*attrs)["file"],
-		Genre:       (*attrs)["Genre"],
-		Released:    (*attrs)["Date"],
-		Title:       (*attrs)["Title"],
+		Genre:       (*attrs)["genre"],
+		Released:    (*attrs)["date"],
+		Title:       (*attrs)["title"],
 	}
 }
 

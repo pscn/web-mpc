@@ -170,7 +170,7 @@ func (client *Client) ListDirectory(directory string) *msg.Message {
 	if directory == "" {
 		hasPrevious = false
 	}
-	return msg.DirectoryList(directory, previous, hasPrevious, &attrs)
+	return msg.DirectoryList(directory, previous, hasPrevious, &attrs, 1, 10)
 }
 
 // ListPlaylists lists all playlists
@@ -180,7 +180,7 @@ func (client *Client) ListPlaylists(page int) *msg.Message {
 		client.Println("playlist list error:", err)
 		return nil
 	}
-	return msg.PlaylistListMsg(&attrs, page, 10)
+	return msg.PlaylistList(&attrs, page, 10)
 }
 
 // eof
