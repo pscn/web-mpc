@@ -1,7 +1,6 @@
 package web
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -10,9 +9,9 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"time"
 
+	"github.com/pscn/web-mpc/cmd"
 	"github.com/pscn/web-mpc/conv"
 	"github.com/pscn/web-mpc/msg"
 
@@ -114,15 +113,14 @@ func (h *Handler) writeMessage(ws *websocket.Conn, msg *msg.Message) error {
 	return err
 }
 
-func (h *Handler) readCommand(ws *websocket.Conn) (*mpc.Command, error) {
-	var cmd mpc.Command
+func (h *Handler) readCommand(ws *websocket.Conn) (*cmd.Command, error) {
 	_, data, err := ws.ReadMessage()
 	if err != nil {
 		h.logger.Println("read:", err)
-		return &cmd, err
+		return nil, err
 	}
-	err = json.Unmarshal(data, &cmd)
-	return &cmd, err
+	cmd, err := cmd.Unmarshal(data)
+	return cmd, err
 }
 
 // Channel to websocket
@@ -162,7 +160,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		defer client.Close()
 
 		// channel for commands from the webclient
-		wc := make(chan *mpc.Command, 10)
+		wc := make(chan *cmd.Command, 10)
 
 		go func() {
 			defer func() {
@@ -180,11 +178,12 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
-		currentPage := 1
-		currentSearchPage := 1
+		page := 1
+		searchPage := 1
+		playlistPage := 1
 		lastSearch := ""
 		h.writeMessage(ws, client.Version())
-		h.writeMessage(ws, client.Update(currentPage))
+		h.writeMessage(ws, client.Update(page))
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -202,101 +201,24 @@ func (h *Handler) Channel() http.HandlerFunc {
 				h.logger.Println("event:", event)
 				switch event {
 				case "player", "playlist", "options":
-					// send the playlist before the status, to have "nextsong" work correctly
-					h.writeMessage(ws, client.Update(currentPage))
+					h.writeMessage(ws, client.Update(page))
 				}
 
-			case cmd := <-wc:
-				if cmd == nil {
+			case c := <-wc:
+				if c == nil {
 					// wc closed → exit
 					return
 				}
-				h.logger.Printf("cmd: %s\n", cmd)
-				switch cmd.Command {
-				case mpc.TypePlay:
-					if cmd.Data != "" {
-						err = client.Play(conv.ToInt(cmd.Data))
-					} else {
-						err = client.Play(-1)
-					}
-
-				case mpc.TypeResume:
-					err = client.Pause(false)
-
-				case mpc.TypePause:
-					err = client.Pause(true)
-
-				case mpc.TypeStop:
-					err = client.Stop()
-
-				case mpc.TypeNext:
-					err = client.Next()
-
-				case mpc.TypePrevious:
-					err = client.Previous()
-
-				case mpc.TypeAdd:
-					err = client.Add(cmd.Data)
-
-				case mpc.TypeRemove:
-					err = client.Delete(conv.ToInt(cmd.Data), -1)
-
-				case mpc.TypeClean:
-					err = client.Clean()
-
-				case mpc.TypePrio:
-					args := strings.Split(cmd.Data, ":")
-					err = client.SetPriority(conv.ToInt(args[0]), conv.ToInt(args[1]), -1)
-
-				case mpc.TypeAddPrio:
-					args := strings.Split(cmd.Data, ":")
-					err = client.AddPrio(conv.ToInt(args[0]), args[1])
-
-				case mpc.TypeModeConsume, mpc.TypeModeRepeat, mpc.TypeModeSingle, mpc.TypeModeRandom:
-					target := true
-					if cmd.Data == "disable" {
-						target = false
-					}
-					switch cmd.Command {
-					case mpc.TypeModeConsume:
-						client.Consume(target)
-
-					case mpc.TypeModeRepeat:
-						client.Repeat(target)
-
-					case mpc.TypeModeSingle:
-						client.Single(target)
-
-					case mpc.TypeModeRandom:
-						client.Random(target)
-					}
-
-				case mpc.TypeUpdateRequest:
-					currentPage = conv.ToInt(cmd.Data)
-					h.writeMessage(ws, client.Update(currentPage))
-
-				case mpc.TypeSearch:
-					currentSearchPage = 1
-					lastSearch = cmd.Data
-					h.writeMessage(ws, client.Search(cmd.Data, currentSearchPage))
-
-				case mpc.TypeSearchPage:
-					currentSearchPage = conv.ToInt(cmd.Data)
-					h.writeMessage(ws, client.Search(lastSearch, currentSearchPage))
-
-				case mpc.TypeBrowse:
-					h.writeMessage(ws, client.ListDirectory(cmd.Data))
-
-				case mpc.TypePlaylists:
-					currentSearchPage = 1
-					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
-				case mpc.TypePlaylistsPage:
-					currentSearchPage = conv.ToInt(cmd.Data)
-					h.writeMessage(ws, client.ListPlaylists(currentSearchPage))
-				}
+				h.logger.Printf("cmd: %s\n", c)
+				c.Page, c.SearchPage, c.PlaylistPage, c.LastSearch = page, searchPage, playlistPage, lastSearch
+				msg, err := c.Exec(client)
 				if err != nil {
 					h.logger.Println("command error:", err)
 				}
+				if msg != nil {
+					h.writeMessage(ws, msg)
+				}
+				page, searchPage, playlistPage, lastSearch = c.Page, c.SearchPage, c.PlaylistPage, c.LastSearch
 			}
 		}
 	}
