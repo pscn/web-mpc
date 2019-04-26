@@ -50,8 +50,8 @@ type Command struct {
 	LastSearch   string
 }
 
-// Unmarshal the JSON from data to Command
-func Unmarshal(data []byte) (*Command, error) {
+// FromJSON the JSON from data to Command
+func FromJSON(data []byte) (*Command, error) {
 	var c Command
 	err := json.Unmarshal(data, &c)
 	return &c, err

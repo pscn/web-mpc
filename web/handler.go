@@ -119,7 +119,7 @@ func (h *Handler) readCommand(ws *websocket.Conn) (*cmd.Command, error) {
 		h.logger.Println("read:", err)
 		return nil, err
 	}
-	cmd, err := cmd.Unmarshal(data)
+	cmd, err := cmd.FromJSON(data)
 	return cmd, err
 }
 
