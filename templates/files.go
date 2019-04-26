@@ -51,7 +51,7 @@ func decode(base64Encoded string) *[]byte {
 
 func init() {
 	container = make(map[string]*[]byte)
-	
+
 	container["templates/icons.html"] = decode(`` +
 		`H4sICAAAAAAA/2RHVnRjR3hoZEdWelhHbGpiMjV6TG1oMGJXdz0A7Fpfj9u4EX/fTz` +
 		`GnQ4HeQeKSFKk/jrVAmyuQhxY9oEWA9o2WaFuNLBmS7Ngp+t2LIWVbbryWvEgeVBzu` +

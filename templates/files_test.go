@@ -23,7 +23,8 @@ func TestContentDoesNotExist(t *testing.T) {
 }
 
 func TestContentExists(t *testing.T) {
-  var err error
+	var err error
+
 	_, err = Content("templates/icons.html")
 	if err != nil {
 		t.Fatalf("Content \"templates/icons.html\" not found: %s", err)
