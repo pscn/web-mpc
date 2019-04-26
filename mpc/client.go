@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/fhs/gompd/mpd"
+	"github.com/pscn/web-mpc/msg"
 )
 
 // Client with host, port & password & mpc reference
@@ -66,8 +67,8 @@ func (client *Client) Close() (err error) {
 }
 
 // Version returns the protocol version in use
-func (client *Client) Version() *Message {
-	return VersionMsg(client.Client.Version())
+func (client *Client) Version() *msg.Message {
+	return msg.VersionMsg(client.Client.Version())
 }
 
 // Stats for the MPD database
@@ -88,7 +89,7 @@ func (client *Client) AddPrio(prio int, file string) error {
 
 // Update prepares an update message for the client containing:
 // status, activeSong and queue
-func (client *Client) Update(page int) *Message {
+func (client *Client) Update(page int) *msg.Message {
 	status, err := client.Status()
 	if err != nil {
 		client.Panic(err)
@@ -102,7 +103,7 @@ func (client *Client) Update(page int) *Message {
 		client.Panic(err)
 	}
 	client.queueLength = len(queue)
-	return UpdateDataMsg(&status, &activeSong, &queue, page, 10)
+	return msg.NewUpdate(&status, &activeSong, &queue, page, 10)
 }
 
 func escapeSearchToken(token string) string {
@@ -113,7 +114,7 @@ func escapeSearchToken(token string) string {
 
 // Search for search string tokenized by space and searched in any
 // FIXME: escape special characters.  e. g. % does not work. why?  MPD docu?
-func (client *Client) Search(search string, page int) *Message {
+func (client *Client) Search(search string, page int) *msg.Message {
 	var searchTokens []string
 	for _, token := range strings.Split(search, " ") {
 		if token != "" {
@@ -137,9 +138,9 @@ func (client *Client) Search(search string, page int) *Message {
 		attrs, err := client.Client.Search(searchTokens...)
 		if err != nil { // this can happen if we would get too many results
 			client.Println("search error:", err)
-			return ErrorMsg("Hrhr nice try... (Stephan mach kein Scheiß!)")
+			return msg.NewError("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
-		return SearchResultMsg(&attrs, page, 10)
+		return msg.SearchResultMsg(&attrs, page, 10)
 	}
 	return nil
 }
@@ -155,31 +156,31 @@ func (client *Client) Clean() error {
 }
 
 // ListDirectory lists the contents of directory
-func (client *Client) ListDirectory(directory string) *Message {
+func (client *Client) ListDirectory(directory string) *msg.Message {
 	attrs, err := client.ListInfo(directory)
 	if err != nil {
 		client.Println("directory list error:", err)
 		return nil
 	}
-	previousDirectory, _ := path.Split(directory)
-	if len(previousDirectory) > 1 {
-		previousDirectory = previousDirectory[:len(previousDirectory)-1]
+	previous, _ := path.Split(directory)
+	if len(previous) > 1 {
+		previous = previous[:len(previous)-1]
 	}
-	hasPreviousDirectory := true
+	hasPrevious := true
 	if directory == "" {
-		hasPreviousDirectory = false
+		hasPrevious = false
 	}
-	return DirectoryListMsg(previousDirectory, hasPreviousDirectory, &attrs)
+	return msg.DirectoryList(directory, previous, hasPrevious, &attrs)
 }
 
 // ListPlaylists lists all playlists
-func (client *Client) ListPlaylists(page int) *Message {
+func (client *Client) ListPlaylists(page int) *msg.Message {
 	attrs, err := client.Client.ListPlaylists()
 	if err != nil {
 		client.Println("playlist list error:", err)
 		return nil
 	}
-	return PlaylistListMsg(&attrs, page, 10)
+	return msg.PlaylistListMsg(&attrs, page, 10)
 }
 
 // eof

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/pscn/web-mpc/conv"
+	"github.com/pscn/web-mpc/msg"
 
 	"github.com/gorilla/websocket"
 	"github.com/pscn/web-mpc/mpc"
@@ -96,12 +97,12 @@ func (h *Handler) StaticTemplateFile(contentType string, fileName string) http.H
 	}
 }
 
-func (h *Handler) writeMessage(ws *websocket.Conn, msg *mpc.Message) error {
+func (h *Handler) writeMessage(ws *websocket.Conn, msg *msg.Message) error {
 	if msg == nil {
 		h.logger.Println("cowardly refusing to work with nil")
 		return nil
 	}
-	data, err := json.Marshal(msg)
+	data, err := msg.JSON()
 	if err != nil {
 		h.logger.Println("marshal:", err)
 		return err
@@ -153,7 +154,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 			// down / restarting
 			// we could try again after some time?
 			// right now the user needs to reload the page to try again
-			h.writeMessage(ws, mpc.InfoMsg(
+			h.writeMessage(ws, msg.InfoMsg(
 				fmt.Sprintf("failed to connect to MPD: %v", err)))
 			return
 		}
