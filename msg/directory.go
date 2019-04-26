@@ -43,6 +43,12 @@ func (p directoryEntries) Less(i, j int) bool {
 		}
 		return false
 	}
+	if p[i].Disc != p[j].Disc {
+		return p[i].Disc < p[j].Disc
+	}
+	if p[i].Track != p[j].Track {
+		return p[i].Track < p[j].Track
+	}
 	return p[i].Name < p[j].Name
 }
 

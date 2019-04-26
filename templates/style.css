@@ -449,20 +449,30 @@ button:disabled {
 .songCell {
   grid-area: songCell;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto auto 1fr auto;
   padding-top: 2px;
   grid-template-areas:
-    "songCellTitle songCellDuration"
-    "songCellArtist songCellArtist"
-    "songCellAlbum songCellAlbum";
+    "songCellDisc songCellTrack songCellTitle songCellDuration"
+    "songCellArtist songCellArtist songCellArtist songCellArtist"
+    "songCellAlbum songCellAlbum songCellAlbum songCellAlbum";
 }
 
 @media (min-width: 768px) {
   /* desktop */
   .songCell {
-    grid-template-columns: 1fr 1fr 1fr auto;
-    grid-template-areas: "songCellTitle  songCellArtist songCellAlbum songCellDuration";
+    grid-template-columns: auto auto 1fr 1fr 1fr auto;
+    grid-template-areas: "songCellDisc songCellTrack songCellTitle songCellArtist songCellAlbum songCellDuration";
   }
+}
+
+.songCellDisc {
+  grid-area: songCellDisc;
+  align-self: center;
+}
+
+.songCellTrack {
+  grid-area: songCellTrack;
+  align-self: center;
 }
 
 .songCellTitle {

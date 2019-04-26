@@ -318,13 +318,28 @@ var updateActiveSong = function(data) {
 };
 
 var newSongNode = function(id, entry, nr) {
-  const { file, artist, title, album, album_artist, duration } = entry;
+  const {
+    file,
+    disc,
+    track,
+    artist,
+    title,
+    album,
+    album_artist,
+    duration
+  } = entry;
   var node = e(id).cloneNode(true);
   node.classList.remove("hide");
   node.title = file;
   node.id = id + nr;
-  node.querySelector("#songCellArtist").innerHTML = artist;
+  if (disc) {
+    node.querySelector("#songCellDisc").innerHTML = disc;
+  }
+  if (track) {
+    node.querySelector("#songCellTrack").innerHTML = track;
+  }
   node.querySelector("#songCellTitle").innerHTML = title;
+  node.querySelector("#songCellArtist").innerHTML = artist;
   // only show album artist if it's different
   node.querySelector("#songCellAlbum").innerHTML =
     album + (artist != album_artist ? "<wbr>[" + album_artist + "]" : "");

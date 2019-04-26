@@ -15,6 +15,8 @@ type SongData struct {
 	Genre       string `json:"genre"`
 	Released    string `json:"released"`
 	Title       string `json:"title"`
+	Track       int    `json:"track"`
+	Disc        int    `json:"disc"`
 }
 
 func mpd2SongData(attrs *mpd.Attrs) *SongData {
@@ -36,6 +38,8 @@ func mpd2SongData(attrs *mpd.Attrs) *SongData {
 			Genre:       (*attrs)["Genre"],
 			Released:    (*attrs)["Date"],
 			Title:       (*attrs)["Title"],
+			Track:       conv.ToInt((*attrs)["Track"]),
+			Disc:        conv.ToInt((*attrs)["Disc"]),
 		}
 	}
 	// lowercase
@@ -56,6 +60,8 @@ func mpd2SongData(attrs *mpd.Attrs) *SongData {
 		Genre:       (*attrs)["genre"],
 		Released:    (*attrs)["date"],
 		Title:       (*attrs)["title"],
+		Track:       conv.ToInt((*attrs)["track"]),
+		Disc:        conv.ToInt((*attrs)["disc"]),
 	}
 }
 
