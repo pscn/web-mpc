@@ -126,7 +126,8 @@ func (c *Command) Exec(client *mpc.Client) (msg *msg.Message, err error) {
 		}
 
 	case TypeUpdateRequest:
-		msg = client.Update(conv.ToInt(c.Data))
+		c.Page = conv.ToInt(c.Data)
+		msg = client.Update(c.Page)
 
 	case TypeSearch:
 		c.SearchPage = 1
