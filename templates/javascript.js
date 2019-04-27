@@ -328,17 +328,17 @@ var newSongNode = function(id, entry, nr) {
   node.title = file;
   node.id = id + nr;
   if (disc) {
-    node.querySelector("#songCellDisc").innerHTML = disc;
+    node.querySelector("#songRowDisc").innerHTML = disc;
   }
   if (track) {
-    node.querySelector("#songCellTrack").innerHTML = track;
+    node.querySelector("#songRowTrack").innerHTML = track;
   }
-  node.querySelector("#songCellTitle").innerHTML = title;
-  node.querySelector("#songCellArtist").innerHTML = artist;
+  node.querySelector("#songRowTitle").innerHTML = title;
+  node.querySelector("#songRowArtist").innerHTML = artist;
   // only show album artist if it's different
-  node.querySelector("#songCellAlbum").innerHTML =
+  node.querySelector("#songRowAlbum").innerHTML =
     album + (artist != album_artist ? "<wbr>[" + album_artist + "]" : "");
-  node.querySelector("#songCellDuration").innerHTML = readableSeconds(duration);
+  node.querySelector("#songRowDuration").innerHTML = readableSeconds(duration);
   return node;
 };
 

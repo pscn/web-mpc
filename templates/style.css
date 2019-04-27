@@ -74,7 +74,7 @@ input[type="password"] {
   /* switching between column (mobile) and row (desktop) */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-self: start;
 }
 
 .hide {
@@ -360,21 +360,6 @@ button:disabled {
   height: 0.4em;
   border-right: 1px solid var(--foreground);
 }
-/* a song in a list */
-.songRow {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  grid-template-areas: "songControl songPrio songCell";
-  margin-bottom: 4px;
-}
-
-@media (min-width: 768px) {
-  .songRow {
-    grid-template-columns: auto auto 1fr;
-    grid-template-areas: "songControl songPrio songCell";
-    margin-bottom: 4px;
-  }
-}
 
 .songRow button {
   border: 1px;
@@ -408,6 +393,7 @@ button:disabled {
 .listRow .songPrio button:disabled {
   border: 1px solid var(--foreground);
 }
+
 .listControl {
   grid-area: listControl;
 }
@@ -446,52 +432,91 @@ button:disabled {
   align-self: end;
 }
 
-.songCell {
-  grid-area: songCell;
+.songRow {
+  grid-area: songRow;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr 1fr 20fr 2fr;
   padding-top: 2px;
   grid-template-areas:
-    "songCellTrack songCellTitle songCellDuration"
-    ". songCellArtist songCellArtist"
-    "songCellDisc songCellAlbum songCellAlbum";
+    "songPlay songPrioUp songRowTitle songRowDuration"
+    ". songPrioMiddle songRowArtist songRowArtist"
+    "songRemove songPrioDown songRowAlbum songRowAlbum";
+}
+
+.songRowDisc {
+  grid-area: songRowDisc;
+  align-self: center;
+
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+.songRowTrack {
+  grid-area: songRowTrack;
+  align-self: center;
+  text-align: right;
+  padding-right: 0.5em;
+
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
 }
 
 @media (min-width: 768px) {
   /* desktop */
-  .songCell {
-    grid-template-columns: auto auto 1fr 1fr 1fr auto;
-    grid-template-areas: "songCellDisc songCellTrack songCellTitle songCellArtist songCellAlbum songCellDuration";
+  .songRow {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 8fr 10fr 12fr 2fr;
+    grid-template-areas: 
+    "songPlay songRemove songPrioUp songPrioMiddle songPrioDown songRowTitle songRowArtist songRowAlbum songRowDuration";
   }
+  /*
+  .songRowTrack {
+    position: unset !important;
+    top: unset !important;
+    left: unset !important;
+  }
+  */
 }
 
-.songCellDisc {
-  grid-area: songCellDisc;
+.songPlay {
+  grid-area: songPlay;
+  align-self: center;
+}
+.songRemove {
+  grid-area: songRemove;
+  align-self: center;
+}
+.songPrioUp {
+  grid-area: songPrioUp;
+  align-self: center;
+}
+.songPrioMiddle {
+  grid-area: songPrioMiddle;
+  align-self: center;
+}
+.songPrioDown {
+  grid-area: songPrioDown;
   align-self: center;
 }
 
-.songCellTrack {
-  grid-area: songCellTrack;
+.songRowTitle {
+  grid-area: songRowTitle;
   align-self: center;
 }
 
-.songCellTitle {
-  grid-area: songCellTitle;
+.songRowArtist {
+  grid-area: songRowArtist;
   align-self: center;
 }
 
-.songCellArtist {
-  grid-area: songCellArtist;
+.songRowAlbum {
+  grid-area: songRowAlbum;
   align-self: center;
 }
 
-.songCellAlbum {
-  grid-area: songCellAlbum;
-  align-self: center;
-}
-
-.songCellDuration {
-  grid-area: songCellDuration;
+.songRowDuration {
+  grid-area: songRowDuration;
   text-align: right;
   align-self: start;
   padding-right: 2px;
