@@ -178,9 +178,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
-		page := 1
-		searchPage := 1
-		playlistPage := 1
+		page, searchPage, playlistPage := 1, 1, 1
 		lastSearch := ""
 		h.writeMessage(ws, client.Version())
 		h.writeMessage(ws, client.Update(page))
@@ -197,8 +195,9 @@ func (h *Handler) Channel() http.HandlerFunc {
 						h.logger.Println("connect failed:", err)
 					}
 				}
+
 			case event := <-client.Event:
-				h.logger.Println("event:", event)
+				h.logger.Printf("event: %+v, page:%d", event, page)
 				switch event {
 				case "player", "playlist", "options":
 					h.writeMessage(ws, client.Update(page))
@@ -209,8 +208,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 					// wc closed → exit
 					return
 				}
-				h.logger.Printf("cmd: %s\n", c)
 				c.Page, c.SearchPage, c.PlaylistPage, c.LastSearch = page, searchPage, playlistPage, lastSearch
+				h.logger.Printf("cmd: %+v, page: %d\n", c, page)
 				msg, err := c.Exec(client)
 				if err != nil {
 					h.logger.Println("command error:", err)
