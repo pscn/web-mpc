@@ -1,23 +1,30 @@
 package msg
 
-func paginate(length, page, perPage int) (currentPage int, lastPage int, start int, end int) {
+import (
+	"fmt"
+	"math"
+)
+
+func paginate(length, page, perPage int) (current int, last int, start int, end int) {
+	fmt.Printf("length: %d, page: %d, perPage: %d\n", length, page, perPage)
 	if length < perPage {
-		currentPage = 1
-		lastPage = 1
+		current = 1
+		last = 1
 		start = 1
 		end = length
 	} else {
-		lastPage = length / perPage
-		currentPage = page
-		if currentPage*perPage > length {
-			currentPage = lastPage
+		last = int(math.Ceil(float64(length) / float64(perPage)))
+		current = page
+		if current*perPage > length {
+			current = last
 		}
-		start = (currentPage - 1) * perPage
+		start = (current - 1) * perPage
 		end = start + perPage
 		if end > length {
 			end = length
 		}
 	}
+	fmt.Printf("current: %d, last: %d, start: %d, end: %d\n", current, last, start, end)
 	return
 }
 
