@@ -13,7 +13,7 @@ const TypeUpdate MessageType = "update"
 // update contains everything (status, active song, queue) the client needs
 type update struct {
 	Status     status      `json:"status"`
-	ActiveSong song        `json:"activeSong"`
+	ActiveSong queuedSong  `json:"activeSong"`
 	Queue      queuedSongs `json:"queue"`
 	Page       int         `json:"page"`
 	LastPage   int         `json:"lastPage"`
@@ -24,11 +24,11 @@ func Update(status *mpd.Attrs, song *mpd.Attrs, queue *[]mpd.Attrs,
 	page int, perPage int) *Message {
 	event := &update{
 		Status:     *mpd2Status(status),
-		ActiveSong: *mpd2Song(song),
+		ActiveSong: *mpd2QueuedSong(song),
 		Queue:      make(queuedSongs, len(*queue)),
 	}
 	for i, attrs := range *queue {
-		event.Queue[i] = *mpd2QueuedSongData(&attrs)
+		event.Queue[i] = *mpd2QueuedSong(&attrs)
 	}
 	if event.Status.Song != -1 {
 		event.Queue[event.Status.Song].IsActive = true

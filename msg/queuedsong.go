@@ -14,7 +14,7 @@ type queuedSong struct {
 	Prio     int  `json:"prio"`
 }
 
-func mpd2QueuedSongData(attrs *mpd.Attrs) *queuedSong {
+func mpd2QueuedSong(attrs *mpd.Attrs) *queuedSong {
 	if (*attrs)["Prio"] == "" {
 		(*attrs)["Prio"] = "0"
 	}
