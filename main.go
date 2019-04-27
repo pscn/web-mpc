@@ -11,7 +11,7 @@ import (
 	"github.com/pscn/web-mpc/web"
 )
 
-//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico templates/*.svg
+//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
 
 var addr = golf.StringP('a', "addr", ":8666", "http service address")
 var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
@@ -38,8 +38,6 @@ func main() {
 				mux.HandleFunc("/"+f, h.StaticFile("text/css", f))
 			case strings.HasSuffix(f, "ico"):
 				mux.HandleFunc("/"+f, h.StaticFile("image/x-icon", f))
-			case strings.HasSuffix(f, "svg"):
-				mux.HandleFunc("/"+f, h.StaticFile("image/svg+xml", f))
 			}
 		}
 	} else {
@@ -56,9 +54,6 @@ func main() {
 					templates.ContentMust(file)))
 			case strings.HasSuffix(f, "ico"):
 				mux.HandleFunc("/"+f, h.StaticPacked("image/x-icon",
-					templates.ContentMust(file)))
-			case strings.HasSuffix(f, "svg"):
-				mux.HandleFunc("/"+f, h.StaticPacked("image/svg+xml",
 					templates.ContentMust(file)))
 			}
 		}
