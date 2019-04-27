@@ -3,13 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/karrick/golf"
 	"github.com/pscn/web-mpc/templates"
 	"github.com/pscn/web-mpc/web"
 )
 
-//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
+//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico templates/*.svg
 
 var addr = golf.StringP('a', "addr", ":8666", "http service address")
 var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
@@ -27,25 +29,39 @@ func main() {
 	// read templates and add listener
 	if *devel {
 		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
-		mux.HandleFunc("/javascript.js", h.StaticFile("text/javascript", "javascript.js"))
-		mux.HandleFunc("/theme-default.css", h.StaticFile("text/css", "theme-default.css"))
-		mux.HandleFunc("/theme-juri.css", h.StaticFile("text/css", "theme-juri.css"))
-		mux.HandleFunc("/style.css", h.StaticFile("text/css", "style.css"))
-		mux.HandleFunc("/favicon.ico", h.StaticFile("image/x-icon", "favicon.ico"))
+		for _, file := range templates.Filenames() {
+			f := filepath.Base(file)
+			switch {
+			case strings.HasSuffix(f, "js"):
+				mux.HandleFunc("/"+f, h.StaticFile("text/javascript", f))
+			case strings.HasSuffix(f, "css"):
+				mux.HandleFunc("/"+f, h.StaticFile("text/css", f))
+			case strings.HasSuffix(f, "ico"):
+				mux.HandleFunc("/"+f, h.StaticFile("image/x-icon", f))
+			case strings.HasSuffix(f, "svg"):
+				mux.HandleFunc("/"+f, h.StaticFile("image/svg+xml", f))
+			}
+		}
 	} else {
 		mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
 			templates.ContentMust("templates/index.html")))
-		mux.HandleFunc("/javascript.js", h.StaticPacked("text/javascript",
-			templates.ContentMust("templates/javascript.js")))
-		mux.HandleFunc("/theme-default.css", h.StaticPacked("text/css",
-			templates.ContentMust("templates/theme-default.css")))
-		mux.HandleFunc("/theme-juri.css", h.StaticPacked("text/css",
-			templates.ContentMust("templates/theme-juri.css")))
-		mux.HandleFunc("/style.css", h.StaticPacked("text/css",
-			templates.ContentMust("templates/style.css")))
-		mux.HandleFunc("/favicon.ico", h.StaticPacked("image/x-icon",
-			templates.ContentMust("templates/favicon.ico")))
-
+		for _, file := range templates.Filenames() {
+			f := filepath.Base(file)
+			switch {
+			case strings.HasSuffix(f, "js"):
+				mux.HandleFunc("/"+f, h.StaticPacked("text/javascript",
+					templates.ContentMust(file)))
+			case strings.HasSuffix(f, "css"):
+				mux.HandleFunc("/"+f, h.StaticPacked("text/css",
+					templates.ContentMust(file)))
+			case strings.HasSuffix(f, "ico"):
+				mux.HandleFunc("/"+f, h.StaticPacked("image/x-icon",
+					templates.ContentMust(file)))
+			case strings.HasSuffix(f, "svg"):
+				mux.HandleFunc("/"+f, h.StaticPacked("image/svg+xml",
+					templates.ContentMust(file)))
+			}
+		}
 	}
 	mux.HandleFunc("/ws", h.Channel())
 	log.Printf("Web MPC starting…")
