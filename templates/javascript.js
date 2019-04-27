@@ -125,16 +125,6 @@ var resize = function(el, minFS, maxFS) {
   var txt = el.innerHTML;
   var maxWidth = el.clientWidth;
   while (fs >= minFS && getTextWidth(txt, fs) + fs > maxWidth) {
-    log(
-      "txt:" +
-        txt +
-        " fs:" +
-        fs +
-        " textWidth:" +
-        getTextWidth(txt, fs) +
-        " maxWidth:" +
-        maxWidth
-    );
     fs -= 2;
   }
   if (fs < minFS) {
@@ -152,11 +142,6 @@ var resize = function(el, minFS, maxFS) {
   }
   el.style.fontSize = fs + "px";
 };
-/*
-var resizer = function () {
-  return true;
-};
-*/
 var resizer = function() {
   var el = document.getElementsByClassName("resize");
   var i;
