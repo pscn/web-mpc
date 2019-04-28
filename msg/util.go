@@ -10,7 +10,7 @@ func paginate(length, page, perPage int) (current int, last int, start int, end 
 	if length < perPage {
 		current = 1
 		last = 1
-		start = 1
+		start = 0
 		end = length
 	} else {
 		last = int(math.Ceil(float64(length) / float64(perPage)))
