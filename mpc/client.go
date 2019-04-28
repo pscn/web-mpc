@@ -140,7 +140,8 @@ func (client *Client) Search(search string, page int) *msg.Message {
 			client.Println("search error:", err)
 			return msg.Error("Hrhr nice try... (Stephan mach kein Scheiß!)")
 		}
-		return msg.SearchResult(&attrs, page, 10)
+		queue, err := client.Client.PlaylistInfo(-1, -1)
+		return msg.SearchResult(&attrs, &queue, page, 10)
 	}
 	return nil
 }
