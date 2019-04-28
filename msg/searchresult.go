@@ -24,9 +24,12 @@ func SearchResult(attrArr *[]mpd.Attrs, queueArr *[]mpd.Attrs, page int, perPage
 		return New(TypeSearchResult, event)
 	}
 	// read queue to provide for IsQueued
-	queue := make(map[string]bool, len(*queueArr))
-	for _, attrs := range *queueArr {
-		queue[attrs["file"]] = true
+	var queue map[string]bool
+	if len(*queueArr) > 0 {
+		queue = make(map[string]bool, len(*queueArr))
+		for _, attrs := range *queueArr {
+			queue[attrs["file"]] = true
+		}
 	}
 	var start, end int
 	event.Page, event.LastPage, start, end = paginate(len(*attrArr), page, perPage)
@@ -36,8 +39,10 @@ func SearchResult(attrArr *[]mpd.Attrs, queueArr *[]mpd.Attrs, page int, perPage
 	event.SearchResult = make(songs, len(iattrArr))
 	for i, attrs := range iattrArr {
 		event.SearchResult[i] = *mpd2Song(&attrs)
-		if _, ok := queue[event.SearchResult[i].File]; ok {
-			event.SearchResult[i].IsQueued = true
+		if queue != nil {
+			if _, ok := queue[event.SearchResult[i].File]; ok {
+				event.SearchResult[i].IsQueued = true
+			}
 		}
 	}
 	return New(TypeSearchResult, event)
