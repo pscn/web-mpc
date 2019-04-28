@@ -416,13 +416,14 @@
           <div v-for="entry in searchResult" class="songRow bordered">
             <!-- add without prio -->
             <div v-if="!state.random" class="songAdd">
-              <button class="songPrio" :disabled="entry.queued"
+              <button class="songAdd" :disabled="entry.queued"
                 v-on:click="search('add', '', entry)">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use xlink:href="#icon-add"></use>
                 </svg>
               </button>
             </div>
+
             <!-- add with prio -->
             <div v-if="state.random" v-for="priority in priorities"
               :class="priority.class">
@@ -433,8 +434,6 @@
                 </svg>
               </button>
             </div>
-            <div class="songRowDisc"></div>
-            <div class="songRowTrack"></div>
             <div class="songRowTitle resize">${entry.title}</div>
             <div class="songRowArtist resize">${entry.artist}</div>
             <div class="songRowAlbum resize">${entry.album}</div>

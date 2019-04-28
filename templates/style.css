@@ -470,13 +470,6 @@ button:disabled {
     grid-template-areas: 
     "songPlay songRemove songPrioUp songPrioMiddle songPrioDown songRowTitle songRowArtist songRowAlbum songRowDuration";
   }
-  /*
-  .songRowTrack {
-    position: unset !important;
-    top: unset !important;
-    left: unset !important;
-  }
-  */
 }
 
 .songPlay {
