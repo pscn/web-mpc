@@ -1,3 +1,81 @@
+var app = new Vue({
+  el: "#web-mpc",
+  delimiters: ["${", "}"], // do not clash with gos templates
+  data: {
+    activeSong: {},
+    elapsed: 0,
+    duration: 0,
+    progress: 0,
+    state: {},
+    view: "queue",
+    views: [
+      { name: "queue", class: "ctrlViewList", icon: "#icon-queue" },
+      { name: "search", class: "ctrlViewSearch", icon: "#icon-search" },
+      { name: "directory", class: "ctrlViewBrowse", icon: "#icon-folder" },
+      { name: "playlists", class: "ctrlViewPlaylists", icon: "#icon-list" }
+    ],
+    modes: [
+      { name: "random", class: "ctrlModeRandom" },
+      { name: "repeat", class: "ctrlModeRepeat" },
+      { name: "single", class: "ctrlModeSingle" },
+      { name: "consume", class: "ctrlModeConsume" }
+    ],
+    queue: {},
+    queuePage: 1,
+    queueLastPage: 1,
+    queueAction: [
+      { cmd: "play", class: "songPlay", icon: "#icon-play" },
+      { cmd: "remove", class: "songRemove", icon: "#icon-ban" }
+    ],
+    searchResult: {},
+    searchText: "",
+    searchPage: 1,
+    searchLastPage: 1,
+    priorities: [
+      { value: 255, class: "songPrioUp", icon: "#icon-top" },
+      { value: 127, class: "songPrioMiddle", icon: "#icon-middle" },
+      { value: 0, class: "songPrioDown", icon: "#icon-bottom" }
+    ]
+  },
+  methods: {
+    toggleMode: function(mode) {
+      if (this.$data.state[mode]) {
+        command(mode, "disable");
+      } else {
+        command(mode, "enable");
+      }
+    },
+    modeIcon: function(mode) {
+      if (this.$data.state[mode]) {
+        return "#icon-" + mode; // icon-random
+      } else {
+        return "#icon-" + mode + "-disabled"; // icon-random-disabled
+      }
+    },
+    command: function(cmd, data) {
+      return command(cmd, data.toString());
+    },
+    search: function(cmd, value, entry) {
+      switch (cmd) {
+        case "add":
+          entry.queued = true;
+          return command("add".entry.file);
+        case "addPrio":
+          entry.queued = true;
+          return command(cmd, value + ":" + entry.file);
+      }
+    },
+    readableSeconds: function(value) {
+      var min = parseInt(value / 60);
+      var sec = parseInt(value % 60);
+      if (sec < 10) {
+        sec = "0" + sec;
+      }
+      return min + ":" + sec;
+    }
+  }
+});
+
 var log = function(msg) {
   console.log(msg);
 };
@@ -62,55 +140,6 @@ var enableId = function(id) {
   enable(e(id));
 };
 
-/*
- * switch betwwen different views
- */
-const views = {
-  // view name: button ID
-  viewPlaylist: "list",
-  viewSearch: "search",
-  viewDirectory: "browser",
-  viewPlaylists: "playlists"
-};
-var showView = function(view) {
-  return function() {
-    log("handle:" + view);
-    for (var k in views) {
-      // disable/enable view buttons & show/hide view
-      const el = e(k);
-      switch (k) {
-        case view: // show matching view
-          log("show:" + k);
-          show(el);
-          disableId(views[k]);
-          break;
-        default:
-          // hidde others
-          log("hidde:" + k);
-          hide(el);
-          enableId(views[k]);
-          break;
-      }
-    }
-    // special actions based on the select view
-    switch (view) {
-      case "viewDirectory":
-        command("browse", ""); // send a command
-        break;
-      case "viewPlaylists":
-        command("playlists", ""); // send a command
-        break;
-      case "viewSearch":
-        if (view == "viewSearch") {
-          const el = e("searchText");
-          el.select();
-          el.focus();
-        }
-        break;
-    }
-  };
-};
-
 var addEvent = function(el, type, fn) {
   if (el.addEventListener) {
     el.addEventListener(type, fn, false);
@@ -160,6 +189,9 @@ var ws_addr, ws;
 var command = function(cmd, data) {
   if (!ws) return false;
   log({ cmd, data });
+  if (cmd == "search" && data.length < 3) {
+    return false;
+  }
   ws.send(JSON.stringify({ command: cmd, data: data }));
   return true;
 };
@@ -173,17 +205,6 @@ var btnCommand = function(cmd, data) {
 };
 
 // a few 'globals' to track the process and current state of the player
-var gDuration = 1.0;
-var gElapsed = 0.0;
-var gState = {
-  play: "pause",
-  consume: false,
-  repeat: false,
-  single: false,
-  random: false,
-  song: 0,
-  nextsong: 0
-};
 var gErrors = [];
 var gPlaylistFiles = [];
 var readableSeconds = function(value) {
@@ -199,16 +220,14 @@ var gPage = 1;
 // this functions runs forever and gets called every second to update the
 // elapsed and duration information of the active song
 var updateProgress = function() {
-  e("elapsed").innerHTML = readableSeconds(gElapsed);
-  e("duration").innerHTML = readableSeconds(gDuration);
-  if (gState["play"] == "play" && gElapsed < gDuration) {
+  if (app.state["play"] == "play" && app.elapsed < app.duration) {
     // increment the seconds if playing and not finished
-    gElapsed += 1;
+    app.elapsed += 1;
   }
-  if (gState["play"] == "stop") {
-    e("progress").style.width = "0%";
+  if (app.state["play"] == "stop") {
+    app.progress = 0;
   } else {
-    e("progress").style.width = (gElapsed / gDuration) * 100 + "%";
+    app.progress = (app.elapsed / app.duration) * 100;
   }
   setTimeout(updateProgress, 1000);
 };
@@ -259,7 +278,7 @@ var updateStatus = function(data) {
     song,
     nextsong
   } = data;
-  gState = {
+  app.state = {
     play: state,
     consume: consume,
     repeat: repeat,
@@ -273,36 +292,21 @@ var updateStatus = function(data) {
     case "pause":
     case "play":
       togglePlayPause(state);
-      gDuration = duration;
-      gElapsed = elapsed;
+      app.duration = duration;
+      app.elapsed = elapsed;
       break;
     case "stop":
       stop();
-      gDuration = 0.0;
-      gElapsed = 0.0;
+      app.duration = 0;
+      app.elapsed = 0;
       break;
   }
-  // update the mode ctrl
-  ["consume", "repeat", "single", "random"].map(function(value) {
-    const eDisable = e(value + "Disable");
-    const eEnable = e(value + "Enable");
-    if (gState[value]) {
-      show(eDisable);
-      hide(eEnable);
-    } else {
-      hide(eDisable);
-      show(eEnable);
-    }
-  });
 };
 
 var updateActiveSong = function(data) {
   const { file, artist, title, album_artist, album, position } = data;
   e("ctrlSong").title = file;
-  e("artist").innerHTML = artist;
-  e("title").innerHTML = title;
-  e("album").innerHTML =
-    album + (artist != album_artist ? "<wbr>[" + album_artist + "]" : "");
+  app.activeSong = data;
   const el = e("remove");
   if (position == -1) {
     disable(el);
@@ -401,150 +405,76 @@ var processResponse = function(obj) {
       break;
     case "update":
       updateStatus(data.status);
-
-      e("playlist").innerHTML = ""; // delete old playlist
-      gPlaylistFiles.length = 0;
-
-      gPage = data.page;
-      node = pagination(data.page, data.lastPage, "updateRequest");
-      if (node != null) {
-        e("playlist").append(node);
-      }
-
-      // used to figure out if we need to show prio buttons or not:
-      // if state == stop && activeFile is set && queuesize <=2 → no need to show buttons
-      // if state == stop && activeFile is not set → show buttons
-      // if state != stop && queuesize <=2 → do not show buttons
-      // FIXME: is that correct?
-      const queueSize = data.queue.length;
-      const state = data.status.state;
-      const activeFile = data.activeSong.file;
-      data.queue.map(function(entry, i) {
-        const { file, prio, position, isActive, isNext } = entry;
-        if (isActive) {
-          return; // don't show the active song in the list
-        }
-        gPlaylistFiles.push(file);
-        var node = newSongNode("playlistEntry", entry, i);
-        const btnPlay = node.querySelector("#plPlay");
-        if (isActive) {
-          disable(btnPlay);
-          addcls(node, "activeSong");
-        } else {
-          btnPlay.onclick = btnCommand("play", position.toString());
-        }
-        if (isNext) {
-          addcls(node, "nextSong");
-        }
-        node.querySelector("#plRemove").onclick = btnCommand(
-          "remove",
-          position.toString()
-        );
-        // FIXME: this only makes sense in certain modes (random + ?)
-        const btnPrio1 = node.querySelector("#plPrio1");
-        const btnPrio2 = node.querySelector("#plPrio2");
-        const btnPrio3 = node.querySelector("#plPrio3");
-        if (!gState["random"]) {
-          hide(btnPrio1);
-          hide(btnPrio2);
-          hide(btnPrio3);
-        } else {
-          // see explanation above
-          if (
-            (state != "stop" || activeFile != "") &&
-            (isActive || queueSize <= 2)
-          ) {
-            disable(btnPrio1);
-            disable(btnPrio2);
-            disable(btnPrio3);
-          } else {
-            switch (prio) {
-              case 0:
-                disable(btnPrio3);
-                break;
-              case 127:
-                disable(btnPrio2);
-                break;
-              case 255:
-                disable(btnPrio1);
-                break;
-            }
-            btnPrio1.onclick = btnCommand("prio", "255:" + position.toString());
-            btnPrio2.onclick = btnCommand("prio", "127:" + position.toString());
-            btnPrio3.onclick = btnCommand("prio", "0:" + position.toString());
+      app.queue = data.queue;
+      app.queuePage = data.page;
+      app.queueLastPage = data.lastPage;
+      if (false) {
+        // used to figure out if we need to show prio buttons or not:
+        // if state == stop && activeFile is set && queuesize <=2 → no need to show buttons
+        // if state == stop && activeFile is not set → show buttons
+        // if state != stop && queuesize <=2 → do not show buttons
+        // FIXME: is that correct?
+        const queueSize = data.queue.length;
+        const state = data.status.state;
+        const activeFile = data.activeSong.file;
+        data.queue.map(function(entry, i) {
+          const { file, prio, position, isActive, isNext } = entry;
+          if (isActive) {
+            return; // don't show the active song in the list
           }
-        }
-        e("playlist").append(node);
-      });
-
+          gPlaylistFiles.push(file);
+          var node = newSongNode("playlistEntry", entry, i);
+          if (isNext) {
+            addcls(node, "nextSong");
+          }
+          // FIXME: this only makes sense in certain modes (random + ?)
+          const btnPrio1 = node.querySelector("#plPrio1");
+          const btnPrio2 = node.querySelector("#plPrio2");
+          const btnPrio3 = node.querySelector("#plPrio3");
+          if (app.state["random"]) {
+            // see explanation above
+            if (
+              (state != "stop" || activeFile != "") &&
+              (isActive || queueSize <= 2)
+            ) {
+              disable(btnPrio1);
+              disable(btnPrio2);
+              disable(btnPrio3);
+            } else {
+              switch (prio) {
+                case 0:
+                  disable(btnPrio3);
+                  break;
+                case 127:
+                  disable(btnPrio2);
+                  break;
+                case 255:
+                  disable(btnPrio1);
+                  break;
+              }
+              btnPrio1.onclick = btnCommand(
+                "prio",
+                "255:" + position.toString()
+              );
+              btnPrio2.onclick = btnCommand(
+                "prio",
+                "127:" + position.toString()
+              );
+              btnPrio3.onclick = btnCommand("prio", "0:" + position.toString());
+            }
+          }
+          e("playlist").append(node);
+        });
+      }
       updateActiveSong(data.activeSong);
       triggerResize();
       break;
 
     case "searchResult":
-      e("searchResult").innerHTML = ""; // delete old search result
-      node = pagination(data.page, data.lastPage, "searchPage");
-      if (node != null) {
-        e("searchResult").append(node);
-      }
-      // debug({ gFiles: gPlaylistFiles });
-      if (data.searchResult.length == 0) {
-        showError("nothing found");
-      }
-      data.searchResult.map(function(entry, i) {
-        const { file } = entry;
-        const node = newSongNode("searchEntry", entry, i);
-
-        const btnAdd = node.querySelector("#srAdd");
-        const btnPrio1 = node.querySelector("#srPrio1");
-        const btnPrio2 = node.querySelector("#srPrio2");
-        const btnPrio3 = node.querySelector("#srPrio3");
-        if (!gState["random"]) {
-          hide(btnPrio1);
-          hide(btnPrio2);
-          hide(btnPrio3);
-
-          // disable button for files already in the playlist
-          if (gPlaylistFiles.includes(file)) {
-            // FIXME: should we add a button to remove it from the playlist?
-            disable(btnAdd);
-          }
-          btnAdd.onclick = function() {
-            disable(btnAdd);
-            return command("add", file);
-          };
-        } else {
-          hide(btnAdd);
-
-          // disable button for files already in the playlist
-          if (gPlaylistFiles.includes(file)) {
-            // FIXME: should we add a button to remove it from the playlist?
-            disable(btnPrio1);
-            disable(btnPrio2);
-            disable(btnPrio3);
-          }
-          btnPrio1.onclick = function() {
-            disable(btnPrio1);
-            disable(btnPrio2);
-            disable(btnPrio3);
-            return command("addPrio", "255:" + file);
-          };
-          btnPrio2.onclick = function() {
-            disable(btnPrio1);
-            disable(btnPrio2);
-            disable(btnPrio3);
-            return command("addPrio", "127:" + file);
-          };
-          btnPrio3.onclick = function() {
-            disable(btnPrio1);
-            disable(btnPrio2);
-            disable(btnPrio3);
-            return command("addPrio", "0:" + file);
-          };
-        }
-
-        e("searchResult").append(node);
-      });
+      const { searchResult, page, lastPage } = data;
+      app.searchResult = searchResult;
+      app.searchPage = page;
+      app.searchLastPage = lastPage;
       triggerResize();
 
       break;
@@ -698,24 +628,6 @@ window.addEventListener("load", function(evt) {
   openWebSocket();
 
   updateProgress();
-
-  // add onclick to every button
-  for (var k in views) {
-    e(views[k]).onclick = showView(k);
-  }
-  ["random", "consume", "repeat", "single"].map(function(value) {
-    e(value + "Enable").onclick = btnCommand(value, "enable");
-    e(value + "Disable").onclick = btnCommand(value, "disable");
-  });
-
-  e("submitSearch").onclick = function(evt) {
-    return command("search", e("searchText").value);
-  };
-  e("searchText").addEventListener("keyup", function(event) {
-    if (e("searchText").value.length > 3) {
-      command("search", e("searchText").value);
-    }
-  });
   // this often leads to sending the search twice, disabled until I find time
   // to fix it
   /*
@@ -735,9 +647,6 @@ window.addEventListener("load", function(evt) {
     // progress setTimeout functions
     command("updateRequest", gPage.toString());
   };
-
-  // show the viewPlaylist
-  showId("viewPlaylist");
 });
 
 // eof

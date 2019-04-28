@@ -466,7 +466,7 @@ button:disabled {
 @media (min-width: 768px) {
   /* desktop */
   .songRow {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 8fr 10fr 12fr 2fr;
+    grid-template-columns: 1fr 1fr auto auto auto 8fr 10fr 12fr 2fr;
     grid-template-areas: 
     "songPlay songRemove songPrioUp songPrioMiddle songPrioDown songRowTitle songRowArtist songRowAlbum songRowDuration";
   }
