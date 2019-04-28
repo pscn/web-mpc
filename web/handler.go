@@ -128,11 +128,11 @@ func (h *Handler) Channel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.logger = log.New(os.Stdout, fmt.Sprintf("web-mpc %s ", r.RemoteAddr), log.LstdFlags|log.Lshortfile)
 
-		defer func() { // FIXME: not very nice, but better then crashing eh?
-			if r := recover(); r != nil {
-				h.logger.Println("recovered", r)
-			}
-		}()
+		//defer func() { // FIXME: not very nice, but better then crashing eh?
+		//			if r := recover(); r != nil {
+		//h.logger.Println("recovered", r)
+		//}
+		//}()
 		h.logger.Printf("handling")
 		defer h.logger.Printf("stop handling")
 
