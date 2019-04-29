@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/karrick/golf"
+	"github.com/pscn/web-mpc/server"
 	"github.com/pscn/web-mpc/templates"
-	"github.com/pscn/web-mpc/web"
 )
 
 //go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
@@ -24,7 +24,7 @@ var verbosity = 2
 func main() {
 	golf.Parse()
 	log.SetFlags(0)
-	h := web.New(verbosity, !*devel, *mpdHost, *mpdPass)
+	h := server.New(verbosity, !*devel, *mpdHost, *mpdPass)
 	mux := http.NewServeMux()
 	// read templates and add listener
 	if *devel {
