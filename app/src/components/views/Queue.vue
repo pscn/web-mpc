@@ -42,7 +42,7 @@ export default {
 @media (min-width: 768px) {
   .song {
     grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: "title artist album";
+    grid-template-areas: "title artist album";
   }
 }
 </style>

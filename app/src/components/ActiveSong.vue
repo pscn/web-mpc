@@ -1,43 +1,24 @@
 <template>
   <div class="activeSong" :style="style">
-    <div
-      v-for="(v, k) in attrs"
-      class="item"
-      :key="k"
-      :title="v.title"
-      :area="v.name"
-    >{{attr(v.name)}}</div>
+    <song :song="song"/>
   </div>
 </template>
 
 <script>
+import Song from "./Song.vue";
+
 export default {
   name: "ActiveSong",
-  data: function() {
-    return {
-      attrs: [
-        { name: "artist", title: "Artist" },
-        { name: "title", title: "Title" },
-        { name: "album", title: "Album" }
-      ]
-    };
-  },
   props: {
     area: String,
     song: Object
   },
-  components: {},
+  components: { Song },
   computed: {
     style: function() {
       var result = {};
       if (this.area) result["gridArea"] = this.area;
       return result;
-    }
-  },
-  methods: {
-    attr: function(a) {
-      if (this.song) return this.song[a];
-      return "";
     }
   }
 };
@@ -53,8 +34,8 @@ export default {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas:
-    "artist"
     "title"
+    "artist"
     "album";
 }
 </style>
