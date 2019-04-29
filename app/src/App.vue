@@ -10,7 +10,8 @@
       area="playerControl"
     />
     <view-control
-      area="view" areaControl="viewControl"
+      area="view"
+      areaControl="viewControl"
       :queue="queue"
       :search="search"
       :browse="browse"
@@ -137,6 +138,10 @@ body {
   padding: 0px;
   color: var(--foreground);
   background: var(--background);
+}
+button {
+  font-family: "Righteous", cursive;
+  font-size: 24px;
 }
 
 #app {
