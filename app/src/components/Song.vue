@@ -3,9 +3,9 @@
     <div
       v-for="(v, k) in attrs"
       class="item"
-      :key="k"
-      :title="attr(v.name)"
       :class="v.name"
+      :key="k"
+      :title="v.title + ': ' + attr(v.name)"
       :style="{gridArea:v.name}"
     >{{attr(v.name)}}</div>
   </Fragment>
@@ -21,7 +21,8 @@ export default {
       attrs: [
         { name: "artist", title: "Artist" },
         { name: "title", title: "Title" },
-        { name: "album", title: "Album" }
+        { name: "album", title: "Album" },
+        { name: "duration", title: "Duration" }
       ]
     };
   },
@@ -43,6 +44,14 @@ export default {
         ) {
           return this.song["album"] + " [" + this.song["album_artist"] + "]";
         }
+      } else if (a == "duration") {
+        var value = this.song["duration"];
+        var min = parseInt(value / 60);
+        var sec = parseInt(value % 60);
+        if (sec < 10) {
+          sec = "0" + sec;
+        }
+        return min + ":" + sec;
       }
       return this.song[a];
     }
@@ -52,47 +61,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.artist {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.album {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.duration {
+  text-align: right;
 }
 .item {
   min-height: 0;
-  max-height: 1.2em;
-}
-.viewControl {
-  display: grid;
-  grid-template-columns: auto auto auto auto 1fr;
-  grid-template-areas: "queue search browse playlist .";
-
-  grid-gap: 2px;
-  min-height: 0;
-  min-width: 0;
-}
-
-@media (min-width: 768px) {
-  .item {
-    max-height: 1em;
-  }
-  .viewControl {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "queue"
-      "search"
-      "browse"
-      "playlist";
-  }
+  /*max-height: 1.2em;*/
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
         
