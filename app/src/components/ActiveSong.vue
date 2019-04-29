@@ -32,11 +32,11 @@ export default {
 }
 .activeSong {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-areas:
-    "title"
-    "artist"
-    "album";
+    "title title"
+    "artist artist"
+    "album duration";
 }
 </style>
         
