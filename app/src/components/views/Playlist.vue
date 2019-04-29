@@ -1,18 +1,14 @@
 <template>
-  <div class="view" :style="style">Browse</div>
+  <div class="view" :style="style">Playlist</div>
 </template>
 
 <script>
-import ButtonIcon from "./ButtonIcon.vue";
-
 export default {
-  name: "Browse",
+  name: "Playlist",
   props: {
     area: String
   },
-  components: {
-    ButtonIcon
-  },
+  components: {},
   computed: {
     style: function() {
       var result = {};
