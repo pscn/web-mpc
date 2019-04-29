@@ -51,20 +51,30 @@ export default {
 <style scoped>
 .item {
   min-height: 0;
-  max-height: 0.8em;
+  max-height: 1.2em;
 }
 .viewControl {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "queue"
-    "search"
-    "browse"
-    "playlist";
+  grid-template-columns: auto auto auto auto 1fr;
+  grid-template-areas: "queue search browse playlist .";
 
   grid-gap: 2px;
   min-height: 0;
   min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .item {
+    max-height: 1em;
+  }
+  .viewControl {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "queue"
+      "search"
+      "browse"
+      "playlist";
+  }
 }
 </style>
         

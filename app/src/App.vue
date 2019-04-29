@@ -150,12 +150,27 @@ body {
 
 #app {
   display: grid;
-  grid-template-columns: 4px auto 1fr auto 4px;
+  grid-template-columns: 4px 1fr 4px;
+  grid-gap: 4px;
   grid-template-areas:
-    ".  viewControl activeSong status ."
-    ". . playerControl . ."
-    ". view view view ."
-    ". version version version .";
+    ". viewControl ."
+    ". activeSong ."
+    ". playerControl ."
+    ". status ."
+    ". view ."
+    ". version .";
+}
+
+@media (min-width: 768px) {
+  #app {
+    display: grid;
+    grid-template-columns: 4px auto 1fr auto 4px;
+    grid-template-areas:
+      ".  viewControl activeSong status ."
+      ". . playerControl . ."
+      ". view view view ."
+      ". version version version .";
+  }
 }
 
 .bordered {

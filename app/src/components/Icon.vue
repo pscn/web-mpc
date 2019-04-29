@@ -32,12 +32,19 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .icon {
-  width: 0.9em;
-  height: 0.9em;
+  width: 1.1em;
+  height: 1.1em;
   overflow: hidden;
   display: block;
   stroke-width: 8%;
   stroke-linejoin: round;
+}
+
+@media (min-width: 768px) {
+  .icon {
+    width: 0.9em;
+    height: 0.9em;
+  }
 }
 </style>
         

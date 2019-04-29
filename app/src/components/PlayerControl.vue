@@ -103,7 +103,7 @@ export default {
 .item {
   min-width: 0;
   overflow: hidden;
-  max-width: 1em;
+  max-width: 1.2em;
 }
 .playerControl {
   display: grid;

@@ -59,5 +59,6 @@ export default {
     "title"
     "album";
 }
+
 </style>
         

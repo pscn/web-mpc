@@ -58,8 +58,8 @@ export default {
   margin: 1px;
   box-sizing: unset;
   border-radius: 4px;
-  width: 0.9em;
-  height: 0.9em;
+  width: 1.2em;
+  height: 1.2em;
   text-align: center;
   font-size: 0.9em;
   border: 2px solid var(--foreground);
@@ -78,6 +78,13 @@ export default {
   opacity: 0.5;
   color: var(--c4);
   background: var(--c2);
+}
+
+@media (min-width: 768px) {
+  .button {
+    width: 0.9em;
+    height: 0.9em;
+  }
 }
 </style>
         
