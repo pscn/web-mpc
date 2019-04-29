@@ -30,9 +30,7 @@ export default {
   computed: {
     style: function() {
       var result = {};
-      if (this.area) {
-        result["gridArea"] = this.area;
-      }
+      if (this.area) result["gridArea"] = this.area;
       return result;
     }
   },
@@ -59,6 +57,5 @@ export default {
     "title"
     "album";
 }
-
 </style>
         

@@ -1,5 +1,5 @@
 <template>
-  <svg class="icon" :style="{stroke:color,fill:fill}" aria-hidden="true" focusable="false">
+  <svg class="icon" :style="style" aria-hidden="true" focusable="false">
     <use :xlink:href="icon"></use>
   </svg>
 </template>
@@ -12,18 +12,18 @@ export default {
       type: String,
       default: ""
     },
-    color: {
-      type: String,
-      default: "black"
-    },
-    fill: {
-      type: String,
-      default: "black"
-    }
+    color: String,
+    fill: String
   },
   computed: {
     icon: function() {
       return "#icon-" + this.name;
+    },
+    style: function() {
+      var result = {};
+      if (this.color) result["stroke"] = this.color;
+      if (this.fill) result["fill"] = this.fill;
+      return result;
     }
   }
 };
@@ -36,6 +36,8 @@ export default {
   height: 1.1em;
   overflow: hidden;
   display: block;
+  fill: none;
+  stroke: var(--foreground);
   stroke-width: 8%;
   stroke-linejoin: round;
 }

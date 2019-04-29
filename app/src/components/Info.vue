@@ -11,10 +11,9 @@ export default {
   },
   computed: {
     style: function() {
-      if (this.area) {
-        return { gridArea: this.area };
-      }
-      return {};
+      var result = {};
+      if (this.area) result["gridArea"] = this.area;
+      return result;
     }
   }
 };

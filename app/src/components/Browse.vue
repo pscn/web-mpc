@@ -1,7 +1,5 @@
 <template>
-  <div class="view" :style="style">
-    Browse
-  </div>
+  <div class="view" :style="style">Browse</div>
 </template>
 
 <script>
@@ -18,9 +16,7 @@ export default {
   computed: {
     style: function() {
       var result = {};
-      if (this.area) {
-        result["gridArea"] = this.area;
-      }
+      if (this.area) result["gridArea"] = this.area;
       return result;
     }
   }
@@ -36,8 +32,7 @@ export default {
 .view {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-areas:
-    "item";
+  grid-template-areas: "item";
 
   grid-gap: 2px;
   min-height: 0;

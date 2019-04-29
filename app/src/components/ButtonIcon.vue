@@ -21,20 +21,11 @@ export default {
     background: String
   },
   computed: {
-    border: function() {
-      return "2px solid" + this.borderColor;
-    },
     style: function() {
       var result = {};
-      if (this.border) {
-        result["border"] = this.border;
-      }
-      if (this.background) {
-        result["background"] = this.background;
-      }
-      if (this.area) {
-        result["gridArea"] = this.area;
-      }
+      if (this.border) result["border"] = "2px solid" + this.borderColor;
+      if (this.background) result["background"] = this.background;
+      if (this.area) result["gridArea"] = this.area;
       return result;
     }
   },
