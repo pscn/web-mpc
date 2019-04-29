@@ -11,7 +11,10 @@
     />
     <view-control area="viewControl" @view-changed="setView($event)"/>
     <active-song area="activeSong" :song="activeSong" class="bordered"/>
-    <queue v-if="view=='queue'" area="queue"/>
+    <queue v-if="view=='queue'" area="view"/>
+    <search v-if="view=='search'" area="view"/>
+    <browse v-if="view=='browse'" area="view"/>
+    <playlist v-if="view=='playlist'" area="view"/>
   </div>
 </template>
 
@@ -21,6 +24,9 @@ import PlayerControl from "./components/PlayerControl.vue";
 import ViewControl from "./components/ViewControl.vue";
 import ActiveSong from "./components/ActiveSong.vue";
 import Queue from "./components/Queue.vue";
+import Browse from "./components/Browse.vue";
+import Search from "./components/Search.vue";
+import Playlist from "./components/Playlist.vue";
 
 var ws = null;
 var openWebSocket = function(app) {
@@ -86,7 +92,10 @@ export default {
     PlayerControl,
     ViewControl,
     ActiveSong,
-    Queue
+    Queue,
+    Browse,
+    Search,
+    Playlist
   },
   computed: {
     v: function() {
@@ -145,8 +154,8 @@ body {
   grid-template-areas:
     ".  viewControl activeSong status ."
     ". . playerControl . ."
-    ". queue queue queue ."
-    ". . version version .";
+    ". view view view ."
+    ". version version version .";
 }
 
 .bordered {

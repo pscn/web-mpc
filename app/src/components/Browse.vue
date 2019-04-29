@@ -1,6 +1,6 @@
 <template>
   <div class="view" :style="style">
-    Queue
+    Browse
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import ButtonIcon from "./ButtonIcon.vue";
 
 export default {
-  name: "Queue",
+  name: "Browse",
   props: {
     area: String
   },

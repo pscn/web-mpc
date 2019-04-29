@@ -1,14 +1,12 @@
 <template>
-  <div class="view" :style="style">
-    Queue
-  </div>
+  <div class="view" :style="style">Playlist</div>
 </template>
 
 <script>
 import ButtonIcon from "./ButtonIcon.vue";
 
 export default {
-  name: "Queue",
+  name: "Playlist",
   props: {
     area: String
   },
@@ -36,8 +34,7 @@ export default {
 .view {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-areas:
-    "item";
+  grid-template-areas: "item";
 
   grid-gap: 2px;
   min-height: 0;
