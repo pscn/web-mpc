@@ -9,93 +9,42 @@
       :queue-length="queueLength"
       area="playerControl"
     />
-    <view-control area="viewControl" @view-changed="setView($event)"/>
+    <view-control
+      area="view" areaControl="viewControl"
+      :queue="queue"
+      :search="search"
+      :browse="browse"
+      :playlist="playlist"
+    />
     <active-song area="activeSong" :song="activeSong" class="bordered"/>
-    <queue v-if="view=='queue'" area="view"/>
-    <search v-if="view=='search'" area="view"/>
-    <browse v-if="view=='browse'" area="view"/>
-    <playlist v-if="view=='playlist'" area="view"/>
   </div>
 </template>
 
 <script>
 import Info from "./components/Info.vue";
 import PlayerControl from "./components/PlayerControl.vue";
-import ViewControl from "./components/ViewControl.vue";
+import ViewControl from "./components/views/Control.vue";
 import ActiveSong from "./components/ActiveSong.vue";
-import Queue from "./components/Queue.vue";
-import Browse from "./components/Browse.vue";
-import Search from "./components/Search.vue";
-import Playlist from "./components/Playlist.vue";
-
-var ws = null;
-var openWebSocket = function(app) {
-  ws = new WebSocket("ws://192.168.0.111:8666/ws"); // FIXME: where to get the address
-  ws.onopen = function() {
-    // eslint-disable-next-line
-    console.log("OPEN");
-  };
-  ws.onclose = function() {
-    // eslint-disable-next-line
-    console.log("CLOSE");
-    ws = null;
-    // eslint-disable-next-line
-    console.log("no connection&hellip; reconnecting in 4 seconds&hellip;");
-    setTimeout(openWebSocket, 4000);
-  };
-  ws.onmessage = function(evt) {
-    // eslint-disable-next-line
-    console.log(evt.data);
-    const e = JSON.parse(evt.data);
-    switch (e.type) {
-      case "version":
-        app.version = e.data;
-        break;
-      case "update":
-        app.status = e.data.status.state;
-        app.queue = e.data.queue;
-        app.activeSong = e.data.activeSong;
-        break;
-    }
-  };
-  ws.onerror = function(evt) {
-    // eslint-disable-next-line
-    console.log({ evt });
-  };
-};
-var c = function(cmd, data) {
-  if (!ws) return false;
-  // eslint-disable-next-line
-  var d = data.toString();
-  console.log({ cmd, d });
-  if (cmd == "search" && d.length < 3) {
-    return false;
-  }
-  ws.send(JSON.stringify({ command: cmd, data: d }));
-  return true;
-};
 
 export default {
   name: "app",
   data: function() {
     return {
+      websocket: null,
+      version: "unknown",
       status: "",
       activeSong: null,
       queue: null,
-      version: "unknown",
-      command: c,
-      view: "queue"
+      search: null,
+      browse: null,
+      playlist: null
     };
   },
   components: {
     Info,
     PlayerControl,
     ViewControl,
-    ActiveSong,
-    Queue,
-    Browse,
-    Search,
-    Playlist
+    ActiveSong
   },
   computed: {
     v: function() {
@@ -111,20 +60,64 @@ export default {
     }
   },
   methods: {
-    setView: function(v) {
-      this.view = v;
+    openWebSocket: function(app) {
+      app.websocket = new WebSocket("ws://192.168.0.111:8666/ws"); // FIXME: where to get the address
+      app.websocket.onopen = function() {
+        // eslint-disable-next-line
+        console.log("OPEN");
+      };
+      app.websocket.onclose = function() {
+        // eslint-disable-next-line
+        console.log("CLOSE");
+        app.websocket = null;
+        // eslint-disable-next-line
+        console.log("no connection&hellip; reconnecting in 4 seconds&hellip;");
+        setTimeout(app.openWebSocket, 4000);
+      };
+      app.websocket.onmessage = function(evt) {
+        // eslint-disable-next-line
+        console.log(evt.data);
+        const e = JSON.parse(evt.data);
+        switch (e.type) {
+          case "version":
+            app.version = e.data;
+            break;
+          case "update":
+            app.status = e.data.status.state;
+            app.queue = e.data.queue;
+            app.activeSong = e.data.activeSong;
+            // eslint-disable-next-line
+            console.log(app.status);
+            break;
+        }
+      };
+      app.websocket.onerror = function(evt) {
+        // eslint-disable-next-line
+        console.log({ evt });
+      };
+    },
+    command: function(cmd, data) {
+      if (!this.websocket) return false;
+      var d = data.toString();
+      // eslint-disable-next-line
+      console.log({ cmd, d });
+      if (cmd == "search" && d.length < 3) {
+        return false;
+      }
+      this.websocket.send(JSON.stringify({ command: cmd, data: d }));
+      return true;
     }
   },
   mounted() {
-    openWebSocket(this);
+    this.openWebSocket(this);
   }
 };
 </script>
 
 <style>
+/* FIXME: move the next 2 somewhere global? */
 :root {
   /* copied from https://www.w3schools.com/lib/w3-theme-red.css */
-
   --background: #efefef;
   --foreground: #000000;
   --c1: #8d8c8c;
@@ -135,8 +128,6 @@ export default {
 
 body {
   /* FIXME: better font selection */
-
-  /*  font-family: "Roboto Mono", monospace;*/
   font-family: "Righteous", cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
