@@ -3,11 +3,11 @@
 // Testing for included files:
 // → dist/index.html
 // → dist/favicon.ico
-// → dist/js/app.2b240716.js
+// → dist/js/app.fce1d997.js
 // → dist/js/chunk-vendors.1e34a291.js
-// → dist/js/app.2b240716.js.map
+// → dist/js/app.fce1d997.js.map
 // → dist/js/chunk-vendors.1e34a291.js.map
-// → dist/css/app.d61a6c2f.css
+// → dist/css/app.8fc6b39c.css
 
 package templates
 
@@ -33,25 +33,25 @@ func TestContentExists(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Content \"dist/favicon.ico\" not found: %s", err)
 	}
-	_, err = Content("dist/js/app.2b240716.js")
+	_, err = Content("dist/js/app.fce1d997.js")
 	if err != nil {
-		t.Fatalf("Content \"dist/js/app.2b240716.js\" not found: %s", err)
+		t.Fatalf("Content \"dist/js/app.fce1d997.js\" not found: %s", err)
 	}
 	_, err = Content("dist/js/chunk-vendors.1e34a291.js")
 	if err != nil {
 		t.Fatalf("Content \"dist/js/chunk-vendors.1e34a291.js\" not found: %s", err)
 	}
-	_, err = Content("dist/js/app.2b240716.js.map")
+	_, err = Content("dist/js/app.fce1d997.js.map")
 	if err != nil {
-		t.Fatalf("Content \"dist/js/app.2b240716.js.map\" not found: %s", err)
+		t.Fatalf("Content \"dist/js/app.fce1d997.js.map\" not found: %s", err)
 	}
 	_, err = Content("dist/js/chunk-vendors.1e34a291.js.map")
 	if err != nil {
 		t.Fatalf("Content \"dist/js/chunk-vendors.1e34a291.js.map\" not found: %s", err)
 	}
-	_, err = Content("dist/css/app.d61a6c2f.css")
+	_, err = Content("dist/css/app.8fc6b39c.css")
 	if err != nil {
-		t.Fatalf("Content \"dist/css/app.d61a6c2f.css\" not found: %s", err)
+		t.Fatalf("Content \"dist/css/app.8fc6b39c.css\" not found: %s", err)
 	}
 }
 
@@ -73,11 +73,11 @@ func TestContentMustExist(t *testing.T) {
 	}()
 	_ = ContentMust("dist/index.html")
 	_ = ContentMust("dist/favicon.ico")
-	_ = ContentMust("dist/js/app.2b240716.js")
+	_ = ContentMust("dist/js/app.fce1d997.js")
 	_ = ContentMust("dist/js/chunk-vendors.1e34a291.js")
-	_ = ContentMust("dist/js/app.2b240716.js.map")
+	_ = ContentMust("dist/js/app.fce1d997.js.map")
 	_ = ContentMust("dist/js/chunk-vendors.1e34a291.js.map")
-	_ = ContentMust("dist/css/app.d61a6c2f.css")
+	_ = ContentMust("dist/css/app.8fc6b39c.css")
 }
 
 func TestFilenames(t *testing.T) {
@@ -93,9 +93,9 @@ func TestFilenames(t *testing.T) {
 			filenames[i], "dist/favicon.ico")
 	}
 	i++
-	if filenames[i] != "dist/js/app.2b240716.js" {
+	if filenames[i] != "dist/js/app.fce1d997.js" {
 		t.Fatalf("Filenames: mismatch got '%s' want '%s'",
-			filenames[i], "dist/js/app.2b240716.js")
+			filenames[i], "dist/js/app.fce1d997.js")
 	}
 	i++
 	if filenames[i] != "dist/js/chunk-vendors.1e34a291.js" {
@@ -103,9 +103,9 @@ func TestFilenames(t *testing.T) {
 			filenames[i], "dist/js/chunk-vendors.1e34a291.js")
 	}
 	i++
-	if filenames[i] != "dist/js/app.2b240716.js.map" {
+	if filenames[i] != "dist/js/app.fce1d997.js.map" {
 		t.Fatalf("Filenames: mismatch got '%s' want '%s'",
-			filenames[i], "dist/js/app.2b240716.js.map")
+			filenames[i], "dist/js/app.fce1d997.js.map")
 	}
 	i++
 	if filenames[i] != "dist/js/chunk-vendors.1e34a291.js.map" {
@@ -113,9 +113,9 @@ func TestFilenames(t *testing.T) {
 			filenames[i], "dist/js/chunk-vendors.1e34a291.js.map")
 	}
 	i++
-	if filenames[i] != "dist/css/app.d61a6c2f.css" {
+	if filenames[i] != "dist/css/app.8fc6b39c.css" {
 		t.Fatalf("Filenames: mismatch got '%s' want '%s'",
-			filenames[i], "dist/css/app.d61a6c2f.css")
+			filenames[i], "dist/css/app.8fc6b39c.css")
 	}
 	i++
 }
