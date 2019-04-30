@@ -30,9 +30,9 @@ type Handler struct {
 }
 
 // New handler
-func New(verbosity int, checkOrigin bool, mpdHost string, mpdPass string) *Handler {
+func New(verbosity int, mpdHost string, mpdPass string) *Handler {
 	upgrader := websocket.Upgrader{}
-	if !checkOrigin {
+	if false {
 		// disable origin check to test from static html, css & js
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	}

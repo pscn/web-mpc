@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -11,51 +12,52 @@ import (
 	"github.com/pscn/web-mpc/templates"
 )
 
-//go:generate file2go -v -t -o templates/files.go templates/*.html templates/*.js templates/*.css templates/*.ico
+//go:generate npm run build
+//go:generate file2go -v -t -o templates/files.go dist/*.html dist/*.ico dist/js/*.js dist/js/*.map dist/css/*.css
 
 var addr = golf.StringP('a', "addr", ":8666", "http service address")
 var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
 var mpdPass = golf.StringP('p', "password", "", "MPD password")
-var devel = golf.BoolP('l', "local", false,
-	"serves html, jss & css from the local templates directory")
 
 var verbosity = 2
 
 func main() {
 	golf.Parse()
 	log.SetFlags(0)
-	h := server.New(verbosity, !*devel, *mpdHost, *mpdPass)
+	h := server.New(verbosity, *mpdHost, *mpdPass)
 	mux := http.NewServeMux()
 	// read templates and add listener
-	if *devel {
-		mux.HandleFunc("/", h.StaticTemplateFile("text/html", "index.html"))
-		for _, file := range templates.Filenames() {
-			f := filepath.Base(file)
-			switch {
-			case strings.HasSuffix(f, "js"):
-				mux.HandleFunc("/"+f, h.StaticFile("text/javascript", f))
-			case strings.HasSuffix(f, "css"):
-				mux.HandleFunc("/"+f, h.StaticFile("text/css", f))
-			case strings.HasSuffix(f, "ico"):
-				mux.HandleFunc("/"+f, h.StaticFile("image/x-icon", f))
-			}
+	for _, file := range templates.Filenames() {
+		f, err := filepath.Rel("dist", file)
+		if err != nil {
+			panic(err)
 		}
-	} else {
-		mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
-			templates.ContentMust("templates/index.html")))
-		for _, file := range templates.Filenames() {
-			f := filepath.Base(file)
-			switch {
-			case strings.HasSuffix(f, "js"):
-				mux.HandleFunc("/"+f, h.StaticPacked("text/javascript",
-					templates.ContentMust(file)))
-			case strings.HasSuffix(f, "css"):
-				mux.HandleFunc("/"+f, h.StaticPacked("text/css",
-					templates.ContentMust(file)))
-			case strings.HasSuffix(f, "ico"):
-				mux.HandleFunc("/"+f, h.StaticPacked("image/x-icon",
-					templates.ContentMust(file)))
-			}
+		f = filepath.ToSlash(f)
+		switch {
+		case f == "index.html":
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/", h.StaticPacked("text/html",
+				templates.ContentMust(file)))
+		case strings.HasSuffix(f, "html"):
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/"+f, h.StaticPacked("text/html",
+				templates.ContentMust(file)))
+		case strings.HasSuffix(f, "js"):
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/"+f, h.StaticPacked("text/javascript",
+				templates.ContentMust(file)))
+		case strings.HasSuffix(f, "map"):
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/"+f, h.StaticPacked("application/octet-stream",
+				templates.ContentMust(file)))
+		case strings.HasSuffix(f, "css"):
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/"+f, h.StaticPacked("text/css",
+				templates.ContentMust(file)))
+		case strings.HasSuffix(f, "ico"):
+			fmt.Printf("%s\n", f)
+			mux.HandleFunc("/"+f, h.StaticPacked("image/x-icon",
+				templates.ContentMust(file)))
 		}
 	}
 	mux.HandleFunc("/ws", h.Channel())
