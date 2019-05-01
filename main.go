@@ -16,13 +16,14 @@ import (
 var addr = golf.StringP('a', "addr", ":8666", "http service address")
 var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
 var mpdPass = golf.StringP('p', "password", "", "MPD password")
+var devel = golf.BoolP('d', "devel", false, "development mode (do not check origin for websocket)")
 
 var verbosity = 2
 
 func main() {
 	golf.Parse()
 	log.SetFlags(0)
-	h := server.New(verbosity, *mpdHost, *mpdPass)
+	h := server.New(verbosity, *mpdHost, *mpdPass, !*devel)
 	mux := http.NewServeMux()
 	// read templates and add listener
 	suffix2contentType := map[string]string{
