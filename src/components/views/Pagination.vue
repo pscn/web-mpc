@@ -76,7 +76,7 @@ export default {
 }
 .pagination {
   display: grid;
-  grid-template-columns: 3fr 3fr 7fr 3fr 3fr;
+  grid-template-columns: auto auto 1fr auto auto;
   grid-template-areas: "firstPage previousPage currentPage nextPage lastPage";
 }
 </style>

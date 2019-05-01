@@ -13,10 +13,10 @@
       />
     </div>
 
-    <queue v-if="view=='queue'" :queue="queue" :style="viewStyle"/>
-    <search v-if="view=='search'" :search="search" :style="viewStyle"/>
-    <browse v-if="view=='browse'" :browse="browse" :style="viewStyle"/>
-    <playlist v-if="view=='playlist'" :playlist="playlist" :style="viewStyle"/>
+    <queue v-if="view=='queue'" :queue="queue" :command="command" :style="viewStyle"/>
+    <search v-if="view=='search'" :search="search" :command="command" :style="viewStyle"/>
+    <folder v-if="view=='folder'" :folder="folder" :command="command" :style="viewStyle"/>
+    <playlist v-if="view=='playlist'" :playlist="playlist" :command="command" :style="viewStyle"/>
   </Fragment>
 </template>
 
@@ -26,7 +26,7 @@ import { Fragment } from "vue-fragment";
 import ButtonIcon from "../ButtonIcon.vue";
 import Queue from "./Queue.vue";
 import Search from "./Search.vue";
-import Browse from "./Browse.vue";
+import Folder from "./Folder.vue";
 import Playlist from "./Playlist.vue";
 
 export default {
@@ -37,7 +37,7 @@ export default {
       views: [
         { name: "queue", title: "Queue" },
         { name: "search", title: "Search" },
-        { name: "browse", title: "Browse" },
+        { name: "folder", title: "Folder" },
         { name: "playlist", title: "Playlist" }
       ]
     };
@@ -46,16 +46,17 @@ export default {
     area: String,
     areaControl: String,
     queue: Object,
-    browse: Object,
+    folder: Object,
     search: Object,
-    playlist: Object
+    playlist: Object,
+    command: Function
   },
   components: {
     Fragment,
     ButtonIcon,
     Queue,
     Search,
-    Browse,
+    Folder,
     Playlist
   },
   computed: {

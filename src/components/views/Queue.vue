@@ -22,7 +22,8 @@ export default {
   name: "Queue",
   props: {
     area: String,
-    queue: Object
+    queue: Object,
+    command: Function
   },
   components: { Song, Pagination },
   computed: {
@@ -33,7 +34,7 @@ export default {
     }
   },
   methods: {
-    goto:function(page){
+    goto: function(page) {
       // eslint-disable-next-line
       console.log("goto: " + page);
     }
@@ -46,9 +47,10 @@ export default {
 .song {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas: "title title" 
-  "artist artist" 
-  "album duration";
+  grid-template-areas:
+    "title title"
+    "artist artist"
+    "album duration";
 
   padding: 2px 2px 2px 2px;
   grid-gap: 2px;

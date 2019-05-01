@@ -1,10 +1,10 @@
 <template>
-  <div class="view" :style="style">Browse</div>
+  <div class="view" :style="style">Folder</div>
 </template>
 
 <script>
 export default {
-  name: "Browse",
+  name: "Folder",
   props: {
     area: String
   },

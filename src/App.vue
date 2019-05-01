@@ -16,6 +16,7 @@
       :search="search"
       :browse="browse"
       :playlist="playlist"
+      :command="command"
     />
     <active-song area="activeSong" :song="activeSong" class="bordered"/>
   </div>
@@ -62,7 +63,12 @@ export default {
   },
   methods: {
     openWebSocket: function(app) {
-      app.websocket = new WebSocket("ws://192.168.0.111:8666/ws"); // FIXME: where to get the address
+      var addr = document.getElementById("ws").value;
+      if (addr == "{{.ws}}") {
+        // not served from go, try this
+        addr = "ws://" + window.location.hostname + ":8666/ws";
+      }
+      app.websocket = new WebSocket(addr); // FIXME: where to get the address
       app.websocket.onopen = function() {
         // eslint-disable-next-line
         console.log("OPEN");
