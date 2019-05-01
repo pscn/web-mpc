@@ -17,27 +17,38 @@ type CommandType string
 
 // CommandTypes
 const (
-	TypePlay          CommandType = "play"
-	TypeResume        CommandType = "resume"
-	TypePause         CommandType = "pause"
-	TypeStop          CommandType = "stop"
-	TypeNext          CommandType = "next"
-	TypePrevious      CommandType = "previous"
-	TypeAdd           CommandType = "add"
-	TypeAddPrio       CommandType = "addPrio"
-	TypeClean         CommandType = "clean"
-	TypeRemove        CommandType = "remove"
-	TypeSearch        CommandType = "search"
-	TypeSearchPage    CommandType = "searchPage"
+	// Player controls: play, resume, pause...
+	TypePlay     CommandType = "play"
+	TypeResume   CommandType = "resume"
+	TypePause    CommandType = "pause"
+	TypeStop     CommandType = "stop"
+	TypeNext     CommandType = "next"
+	TypePrevious CommandType = "previous"
+
+	// Queue controls: clean, remove, prio, add...
+	TypeClean   CommandType = "clean"
+	TypeRemove  CommandType = "remove"
+	TypePrio    CommandType = "prio"
+	TypeAdd     CommandType = "add"
+	TypeAddPrio CommandType = "addPrio"
+
+	// Mode controls: random, repeat, single and consume
+	TypeModeRandom  CommandType = "random"
+	TypeModeRepeat  CommandType = "repeat"
+	TypeModeSingle  CommandType = "single"
+	TypeModeConsume CommandType = "consume"
+
+	// View requests:
+	//   - queue: show the current queue
+	//   - folder: browse
+	//   - search: for songs, albums ...
+	//   - playlist: show playlists
+	TypeRequestQueue    CommandType = "request_queue"
+	TypeRequestSearch   CommandType = "request_search"
+	TypeRequestFolder   CommandType = "request_folder"
+	TypeRequestPlaylist CommandType = "request_playlist"
+
 	TypeUpdateRequest CommandType = "updateRequest"
-	TypeBrowse        CommandType = "browse"
-	TypePlaylists     CommandType = "playlists"
-	TypePlaylistsPage CommandType = "playlistsPage"
-	TypeModeRandom    CommandType = "random"
-	TypeModeRepeat    CommandType = "repeat"
-	TypeModeSingle    CommandType = "single"
-	TypeModeConsume   CommandType = "consume"
-	TypePrio          CommandType = "prio"
 )
 
 // Command from the web
@@ -129,25 +140,18 @@ func (c *Command) Exec(client *mpc.Client) (msg *msg.Message, err error) {
 		c.Page = conv.ToInt(c.Data)
 		msg = client.Update(c.Page)
 
-	case TypeSearch:
-		c.SearchPage = 1
+	case TypeRequestSearch:
+		c.SearchPage = 1 // FIXME read from cmd
 		c.LastSearch = c.Data
 		msg = client.Search(c.Data, c.SearchPage)
 
-	case TypeSearchPage:
-		c.SearchPage = conv.ToInt(c.Data)
-		msg = client.Search(c.LastSearch, c.SearchPage)
-
-	case TypeBrowse:
+	case TypeRequestFolder:
 		msg = client.ListDirectory(c.Data)
 
-	case TypePlaylists:
-		c.PlaylistPage = 1
+	case TypeRequestPlaylist:
+		c.PlaylistPage = 1 // FIXME read from cmd
 		msg = client.ListPlaylists(c.PlaylistPage)
 
-	case TypePlaylistsPage:
-		c.PlaylistPage = conv.ToInt(c.Data)
-		msg = client.ListPlaylists(c.PlaylistPage)
 	}
 	return
 }
