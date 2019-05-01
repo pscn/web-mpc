@@ -39,7 +39,7 @@ func main() {
 		}
 		f = filepath.ToSlash(f)
 		if f == "index.html" {
-			mux.HandleFunc("/", h.StaticPacked("text/html",
+			mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
 				templates.ContentMust(file)))
 			continue
 		}
