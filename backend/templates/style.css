@@ -329,7 +329,7 @@ button:disabled {
     "activeSongTitle activeSongTitle activeSongTitle"
     "activeSongArtist activeSongArtist activeSongArtist"
     "activeSongAlbum activeSongAlbum activeSongAlbum"
-    "ctrlElapsed activeSongProgress  ctrlDuration";
+    "ctrlElapsed activeSongProgress ctrlDuration";
 }
 
 .activeSongTitle {
