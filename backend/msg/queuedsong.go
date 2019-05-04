@@ -10,6 +10,7 @@ type queuedSong struct {
 	song
 	IsActive bool `json:"isActive"`
 	IsNext   bool `json:"isNext"`
+	IsQueued bool `json:"queued"`
 	Position int  `json:"position"`
 	Prio     int  `json:"prio"`
 }
