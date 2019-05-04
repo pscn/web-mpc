@@ -12,9 +12,9 @@ const TypeSearchResult MessageType = "search"
 
 // searchResult converted from *mpd.attrs
 type searchResult struct {
-	Songs    songs `json:"songs"`
-	Page     int   `json:"page"`
-	LastPage int   `json:"lastPage"`
+	Songs    queuedSongs `json:"songs"`
+	Page     int         `json:"page"`
+	LastPage int         `json:"lastPage"`
 }
 
 // SearchResult from mpd.Attrs
@@ -36,9 +36,9 @@ func SearchResult(attrArr *[]mpd.Attrs, queueArr *[]mpd.Attrs, page int, perPage
 	//fmt.Printf("page: %d\n", queuePage)
 	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
 	iattrArr := (*attrArr)[start:end]
-	event.Songs = make(songs, len(iattrArr))
+	event.Songs = make(queuedSongs, len(iattrArr))
 	for i, attrs := range iattrArr {
-		event.Songs[i] = *mpd2Song(&attrs)
+		event.Songs[i] = *mpd2QueuedSong(&attrs)
 		if queue != nil {
 			if _, ok := queue[event.Songs[i].File]; ok {
 				event.Songs[i].IsQueued = true
