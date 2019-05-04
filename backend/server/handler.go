@@ -177,10 +177,8 @@ func (h *Handler) Channel() http.HandlerFunc {
 		}()
 
 		// update the web client with the current status
-		page, searchPage, playlistPage := 1, 1, 1
-		lastSearch := ""
 		h.writeMessage(ws, client.Version())
-		h.writeMessage(ws, client.Update(page))
+		h.writeMessage(ws, client.Update(1))
 
 		ping := time.Tick(5 * time.Second)
 		for {
@@ -196,10 +194,10 @@ func (h *Handler) Channel() http.HandlerFunc {
 				}
 
 			case event := <-client.Event:
-				h.logger.Printf("event: %+v, page:%d", event, page)
+				h.logger.Printf("event: %+v, page:%d", event, 1)
 				switch event {
 				case "player", "playlist", "options":
-					h.writeMessage(ws, client.Update(page))
+					h.writeMessage(ws, client.Update(1))
 				}
 
 			case c := <-wc:
@@ -207,8 +205,7 @@ func (h *Handler) Channel() http.HandlerFunc {
 					// wc closed → exit
 					return
 				}
-				c.Page, c.SearchPage, c.PlaylistPage, c.LastSearch = page, searchPage, playlistPage, lastSearch
-				h.logger.Printf("cmd: %+v, page: %d\n", c, page)
+				h.logger.Printf("cmd: %+v, page: %d\n", c, c.Page)
 				msg, err := c.Exec(client)
 				if err != nil {
 					h.logger.Println("command error:", err)
@@ -216,7 +213,6 @@ func (h *Handler) Channel() http.HandlerFunc {
 				if msg != nil {
 					h.writeMessage(ws, msg)
 				}
-				page, searchPage, playlistPage, lastSearch = c.Page, c.SearchPage, c.PlaylistPage, c.LastSearch
 			}
 		}
 	}
