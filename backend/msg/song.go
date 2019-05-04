@@ -17,7 +17,6 @@ type song struct {
 	Title       string `json:"title"`
 	Track       int    `json:"track"`
 	Disc        int    `json:"disc"`
-	IsQueued    bool   `json:"queued"`
 }
 
 // songs list of song
