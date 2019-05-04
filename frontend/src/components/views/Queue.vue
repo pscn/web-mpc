@@ -9,7 +9,10 @@
     />
 
     <div v-if="queue!=null" class="songs">
-      <song v-for="(song, k) in queue.songs" :key="k" :song="song" area="song" class="bordered"/>
+      <div v-for="(song, k) in queue.songs" :key="k" class="bordered row">
+        <div class="control">Ctrl</div>
+        <song :song="song" area="song"/>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +53,17 @@ export default {
   grid-template-areas:
     "pagination"
     "songs";
+  grid-gap: 2px;
+  min-height: 0;
+  min-width: 0;
+}
+.control {
+  grid-area: control;
+}
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "control song";
 
   grid-gap: 2px;
   min-height: 0;
