@@ -55,7 +55,7 @@ const (
 type Command struct {
 	Command      CommandType `json:"command"`
 	Data         string      `json:"data"`
-	Page         int
+	Page         int         `json:"page"`
 	SearchPage   int
 	PlaylistPage int
 	LastSearch   string
@@ -141,9 +141,8 @@ func (c *Command) Exec(client *mpc.Client) (msg *msg.Message, err error) {
 		msg = client.Update(c.Page)
 
 	case TypeRequestSearch:
-		c.SearchPage = 1 // FIXME read from cmd
 		c.LastSearch = c.Data
-		msg = client.Search(c.Data, c.SearchPage)
+		msg = client.Search(c.Data, c.Page)
 
 	case TypeRequestFolder:
 		msg = client.ListDirectory(c.Data)
