@@ -1,6 +1,6 @@
 <template>
   <Fragment>
-    <div class="viewControl" :style="controlStyle">
+    <div class="viewControl" :style="style">
       <button-icon
         v-for="(v, k) in views"
         class="item"
@@ -13,10 +13,10 @@
       />
     </div>
 
-    <queue v-if="view=='queue'" :queue="queue" :command="command" :style="viewStyle"/>
-    <search v-if="view=='search'" :search="search" :command="command" :style="viewStyle"/>
-    <folder v-if="view=='folder'" :folder="folder" :command="command" :style="viewStyle"/>
-    <playlist v-if="view=='playlist'" :playlist="playlist" :command="command" :style="viewStyle"/>
+    <queue v-if="view=='queue'" :queue="queue" :command="command" :area="area"/>
+    <search v-if="view=='search'" :search="search" :command="command" :area="area"/>
+    <folder v-if="view=='folder'" :folder="folder" :command="command" :area="area"/>
+    <playlist v-if="view=='playlist'" :playlist="playlist" :command="command" :area="area"/>
   </Fragment>
 </template>
 
@@ -60,16 +60,11 @@ export default {
     Playlist
   },
   computed: {
-    controlStyle: function() {
+    style: function() {
       var result = {};
       if (this.area) result["gridArea"] = this.areaControl;
       return result;
     },
-    viewStyle: function() {
-      var result = {};
-      if (this.area) result["gridArea"] = this.area;
-      return result;
-    }
   }
 };
 </script>
@@ -83,7 +78,7 @@ export default {
 .viewControl {
   display: grid;
   grid-template-columns: auto auto auto auto 1fr;
-  grid-template-areas: "queue search browse playlist .";
+  grid-template-areas: "queue search folder playlist .";
 
   grid-gap: 2px;
   min-height: 0;
@@ -99,7 +94,7 @@ export default {
     grid-template-areas:
       "queue"
       "search"
-      "browse"
+      "folder"
       "playlist";
   }
 }

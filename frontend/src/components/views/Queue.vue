@@ -2,14 +2,14 @@
   <div class="view" :style="style">
     <pagination
       v-if="queue!=null"
+      area="pagination"
       :page="queue.page"
       :last-page="queue.lastPage"
       @goto="goto($event)"
     />
+
     <div v-if="queue!=null" class="songs">
-      <div v-for="(song, k) in queue.songs" :key="k" class="song bordered">
-        <song :song="song"/>
-      </div>
+      <song v-for="(song, k) in queue.songs" :key="k" :song="song" area="song" class="bordered"/>
     </div>
   </div>
 </template>
@@ -44,24 +44,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.song {
+.view {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   grid-template-areas:
-    "title title"
-    "artist artist"
-    "album duration";
+    "pagination"
+    "songs";
 
-  padding: 2px 2px 2px 2px;
   grid-gap: 2px;
   min-height: 0;
   min-width: 0;
-}
-@media (min-width: 768px) {
-  .song {
-    grid-template-columns: 15fr 12fr 18fr 3fr;
-    grid-template-areas: "title artist album duration";
-  }
 }
 </style>
         

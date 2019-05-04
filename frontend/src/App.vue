@@ -96,6 +96,9 @@ export default {
             // eslint-disable-next-line
             console.log(app.status);
             break;
+          case "search":
+            app.search = e.data;
+            break;
         }
       };
       app.websocket.onerror = function(evt) {
@@ -145,9 +148,22 @@ body {
   color: var(--foreground);
   background: var(--background);
 }
+
 button {
   font-family: "Righteous", cursive;
   font-size: 24px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  width: 100%;
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  font-size: 1em;
 }
 
 #app {

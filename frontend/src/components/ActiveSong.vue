@@ -1,11 +1,11 @@
 <template>
   <div class="activeSong" :style="style">
-    <song :song="song"/>
+    <song-parts :song="song"/>
   </div>
 </template>
 
 <script>
-import Song from "./Song.vue";
+import SongParts from "./SongParts.vue";
 
 export default {
   name: "ActiveSong",
@@ -13,7 +13,7 @@ export default {
     area: String,
     song: Object
   },
-  components: { Song },
+  components: { SongParts },
   computed: {
     style: function() {
       var result = {};
@@ -25,8 +25,8 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.item {
+<style>
+.activeSong .item {
   text-align: center;
   align-self: center;
 }
@@ -36,7 +36,8 @@ export default {
   grid-template-areas:
     "title title"
     "artist artist"
-    "album duration";
+    "album album"
+    "duration duration";
 }
 </style>
         

@@ -1,61 +1,27 @@
 <template>
-  <Fragment>
-    <div
-      v-for="(v, k) in attrs"
-      class="item"
-      :class="v.name"
-      :key="k"
-      :title="v.title + ': ' + attr(v.name)"
-      :style="{gridArea:v.name}"
-    >{{attr(v.name)}}</div>
-  </Fragment>
+  <div class="song" :style="style">
+    <song-parts :song="song"/>
+  </div>
 </template>
 
 <script>
-import { Fragment } from "vue-fragment";
+import SongParts from "./SongParts.vue";
 
 export default {
   name: "Song",
-  data: function() {
-    return {
-      attrs: [
-        { name: "artist", title: "Artist" },
-        { name: "title", title: "Title" },
-        { name: "album", title: "Album" },
-        { name: "duration", title: "Duration" }
-      ]
-    };
-  },
   props: {
+    area: String,
     song: Object
   },
-  components: {
-    Fragment
-  },
-  methods: {
-    attr: function(a) {
-      if (!this.song) {
-        return "";
-      }
-      if (a == "album") {
-        if (
-          this.song["album_artist"] != "" &&
-          this.song["album_artist"] != this.song["artist"]
-        ) {
-          return this.song["album"] + " [" + this.song["album_artist"] + "]";
-        }
-      } else if (a == "duration") {
-        var value = this.song["duration"];
-        var min = parseInt(value / 60);
-        var sec = parseInt(value % 60);
-        if (sec < 10) {
-          sec = "0" + sec;
-        }
-        return min + ":" + sec;
-      }
-      return this.song[a];
+  components: { SongParts },
+  computed: {
+    style: function() {
+      var result = {};
+      if (this.area) result["gridArea"] = this.area;
+      return result;
     }
-  }
+  },
+  methods: {}
 };
 </script>
 
@@ -64,12 +30,26 @@ export default {
 .duration {
   text-align: right;
 }
-.item {
+
+.song {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "title title"
+    "artist artist"
+    "album duration";
+
+  padding: 2px 2px 2px 2px;
+  grid-gap: 2px;
   min-height: 0;
-  /*max-height: 1.2em;*/
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .song {
+    grid-template-columns: 15fr 12fr 18fr 3fr;
+    grid-template-areas: "title artist album duration";
+  }
 }
 </style>
         

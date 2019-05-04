@@ -1,5 +1,5 @@
 <template>
-  <div v-if="lastPage>1" class="pagination">
+  <div v-if="lastPage>1" class="pagination" :style="style">
     <div class="firstPage">
       <button-text :disabled="page<=1" v-on:click="$emit('goto', 1)" text="1"/>
     </div>
