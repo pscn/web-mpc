@@ -53,8 +53,13 @@ export default {
       if (this.searchText.length >= 3) {
         // eslint-disable-next-line
         console.log(this.searchText);
-        this.command("search", this.searchText);
+        this.command("search", this.searchText, 1);
       }
+    },
+    goto: function(page) {
+      // eslint-disable-next-line
+      console.log("goto: " + page);
+      this.command("search", this.searchText, page);
     }
   }
 };
