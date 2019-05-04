@@ -4,21 +4,11 @@
       <button-text :disabled="page<=1" v-on:click="$emit('goto', 1)" text="1"/>
     </div>
     <div class="previousPage">
-      <button-text
-        v-if="page!=1"
-        :disabled="page<=1"
-        v-on:click="$emit('goto', page-1)"
-        :text="(page-1).toString()"
-      />
+      <button-text :disabled="page<=1" v-on:click="$emit('goto', page-1)" text="-"/>
     </div>
     <div id="currentPage" class="currentPage">{{page}}/{{lastPage}}</div>
     <div class="nextPage">
-      <button-text
-        v-if="(page+1)!=lastPage"
-        :disabled="page>=lastPage"
-        v-on:click="$emit('goto', page+1)"
-        :text="(page+1).toString()"
-      />
+      <button-text :disabled="page>=lastPage" v-on:click="$emit('goto', page+1)" text="+"/>
     </div>
     <div class="lastPage">
       <button-text
