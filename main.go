@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/karrick/golf"
+	"github.com/karrick/golf" // flags with short options
 	"github.com/pscn/web-mpc/backend"
 	"github.com/pscn/web-mpc/backend/server"
 )
