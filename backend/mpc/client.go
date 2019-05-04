@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fhs/gompd/mpd"
-	"github.com/pscn/web-mpc/msg"
+	"github.com/pscn/web-mpc/backend/msg"
 )
 
 // Client with host, port & password & mpc reference

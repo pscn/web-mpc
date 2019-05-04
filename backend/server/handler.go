@@ -11,12 +11,11 @@ import (
 	"path"
 	"time"
 
-	"github.com/pscn/web-mpc/cmd"
-	"github.com/pscn/web-mpc/conv"
-	"github.com/pscn/web-mpc/msg"
-
 	"github.com/gorilla/websocket"
-	"github.com/pscn/web-mpc/mpc"
+	"github.com/pscn/web-mpc/backend/cmd"
+	"github.com/pscn/web-mpc/backend/conv"
+	"github.com/pscn/web-mpc/backend/mpc"
+	"github.com/pscn/web-mpc/backend/msg"
 )
 
 // Handler a websocket, a logger and two channels come into a bar

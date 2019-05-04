@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pscn/web-mpc/conv"
-	"github.com/pscn/web-mpc/mpc"
-	"github.com/pscn/web-mpc/msg"
+	"github.com/pscn/web-mpc/backend/conv"
+	"github.com/pscn/web-mpc/backend/mpc"
+	"github.com/pscn/web-mpc/backend/msg"
 )
 
 // Command simple command from the web

@@ -2,7 +2,7 @@ package msg
 
 import (
 	"github.com/fhs/gompd/mpd"
-	"github.com/pscn/web-mpc/conv"
+	"github.com/pscn/web-mpc/backend/conv"
 )
 
 // queuedSong enhances Song with Queue data

@@ -6,12 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/karrick/golf"
-	"github.com/pscn/web-mpc/server"
-	"github.com/pscn/web-mpc/templates"
+	"github.com/pscn/web-mpc/backend"
+	"github.com/pscn/web-mpc/backend/server"
 )
 
-//go:generate npm run build
-//go:generate file2go -v -t -o templates/files.go dist/*.html dist/*.ico dist/js/*.js dist/js/*.map dist/css/*.css
+//go:generate file2go -v -t -o backend/files.go frontend/dist/*.html frontend/dist/*.ico frontend/dist/js/*.js frontend/dist/js/*.map frontend/dist/css/*.css
 
 var addr = golf.StringP('a', "addr", ":8666", "http service address")
 var mpdHost = golf.StringP('m', "mpd", "127.0.0.1:6600", "MPD service address")
@@ -33,20 +32,20 @@ func main() {
 		".css":  "text/css",
 		".ico":  "image/x-icon",
 	}
-	for _, file := range templates.Filenames() {
-		f, err := filepath.Rel("dist", file)
+	for _, file := range backend.Filenames() {
+		f, err := filepath.Rel("frontend/dist", file)
 		if err != nil {
 			panic(err)
 		}
 		f = filepath.ToSlash(f)
 		if f == "index.html" {
 			mux.HandleFunc("/", h.StaticTemplatePacked("text/html",
-				templates.ContentMust(file)))
+				backend.ContentMust(file)))
 			continue
 		}
 		if ct, ok := suffix2contentType[filepath.Ext(f)]; ok {
 			mux.HandleFunc("/"+f, h.StaticPacked(ct,
-				templates.ContentMust(file)))
+				backend.ContentMust(file)))
 		}
 	}
 	mux.HandleFunc("/ws", h.Channel())
