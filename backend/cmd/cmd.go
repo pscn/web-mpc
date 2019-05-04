@@ -43,10 +43,10 @@ const (
 	//   - folder: browse
 	//   - search: for songs, albums ...
 	//   - playlist: show playlists
-	TypeRequestQueue    CommandType = "request_queue"
-	TypeRequestSearch   CommandType = "request_search"
-	TypeRequestFolder   CommandType = "request_folder"
-	TypeRequestPlaylist CommandType = "request_playlist"
+	TypeRequestQueue    CommandType = "queue"
+	TypeRequestSearch   CommandType = "search"
+	TypeRequestFolder   CommandType = "folder"
+	TypeRequestPlaylist CommandType = "playlist"
 
 	TypeUpdateRequest CommandType = "updateRequest"
 )
