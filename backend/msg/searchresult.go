@@ -8,13 +8,13 @@ import (
 const MaxSearchResults = 50
 
 // TypeSearchResult message of type SearchResult
-const TypeSearchResult MessageType = "searchResult"
+const TypeSearchResult MessageType = "search"
 
 // searchResult converted from *mpd.attrs
 type searchResult struct {
-	SearchResult songs `json:"searchResult"`
-	Page         int   `json:"page"`
-	LastPage     int   `json:"lastPage"`
+	Songs    songs `json:"songs"`
+	Page     int   `json:"page"`
+	LastPage int   `json:"lastPage"`
 }
 
 // SearchResult from mpd.Attrs
@@ -36,12 +36,12 @@ func SearchResult(attrArr *[]mpd.Attrs, queueArr *[]mpd.Attrs, page int, perPage
 	//fmt.Printf("page: %d\n", queuePage)
 	//fmt.Printf("size: %d; start: %d; end: %d\n", queueLength, start, end)
 	iattrArr := (*attrArr)[start:end]
-	event.SearchResult = make(songs, len(iattrArr))
+	event.Songs = make(songs, len(iattrArr))
 	for i, attrs := range iattrArr {
-		event.SearchResult[i] = *mpd2Song(&attrs)
+		event.Songs[i] = *mpd2Song(&attrs)
 		if queue != nil {
-			if _, ok := queue[event.SearchResult[i].File]; ok {
-				event.SearchResult[i].IsQueued = true
+			if _, ok := queue[event.Songs[i].File]; ok {
+				event.Songs[i].IsQueued = true
 			}
 		}
 	}
